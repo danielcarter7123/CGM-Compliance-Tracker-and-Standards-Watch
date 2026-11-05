@@ -14,6 +14,11 @@ export default async function WatchPage() {
   const content = await loadContent(createClient());
   return (
     <main>
+      {viewer.products.tracker && (
+        <div className="wrap" style={{ display: "flex", justifyContent: "flex-end", paddingTop: 12 }}>
+          <a className="btn-main" href="/tracker">Next: Compliance Tracker →</a>
+        </div>
+      )}
       <WatchView content={content} defaultFunctions={viewer.functions} />
     </main>
   );

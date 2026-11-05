@@ -136,7 +136,7 @@ async function main() {
   if (!ct) {
     await must(
       db.from("client_tasks").insert([
-        { company_id: companyIds.full, title: "Renew fake air permit", due_date: addDays(40), category: "Environmental" },
+        { company_id: companyIds.full, title: "Renew fake air permit", due_date: addDays(40), category: "Environmental", recur_n: 0, recur_unit: "m" },
         { company_id: companyIds.full, title: "Quarterly safety walk (fake)", due_date: addDays(10), recur_n: 3, recur_unit: "m" },
       ]),
       "client_tasks",

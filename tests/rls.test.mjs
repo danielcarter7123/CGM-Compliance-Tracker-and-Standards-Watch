@@ -256,3 +256,16 @@ test("uploaded files: private bucket, each client only inside its own folder", a
   assert.equal(await count(STAFF, "select count(*) from storage.objects"), 1);
   assert.equal((await as(T_USER, "delete from storage.objects returning id")).length, 0);
 });
+
+test("app settings: emails ship off; staff read, only CGM admins change them; clients see nothing", async () => {
+  const [s] = (await db.query(`select value from app_settings where key = 'emails_enabled'`)).rows;
+  assert.equal(s.value, false);
+  assert.equal(await count(STAFF, "select count(*) from app_settings"), 1);
+  assert.equal(await count(T_ADMIN, "select count(*) from app_settings"), 0);
+  assert.equal(await count(NOPLAN, "select count(*) from app_settings"), 0);
+  assert.equal((await as(PM, `update app_settings set value = 'true' where key = 'emails_enabled' returning key`)).length, 0, "PM can't turn email on");
+  assert.equal((await as(T_ADMIN, `update app_settings set value = 'true' where key = 'emails_enabled' returning key`)).length, 0);
+  const [r] = await as(ADMIN, `update app_settings set value = 'true' where key = 'emails_enabled' returning updated_by`);
+  assert.equal(r.updated_by, ADMIN);
+  await as(ADMIN, `update app_settings set value = 'false' where key = 'emails_enabled'`);
+});

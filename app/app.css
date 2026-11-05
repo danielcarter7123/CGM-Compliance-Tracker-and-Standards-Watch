@@ -46,3 +46,16 @@ html,body{margin:0}
 .formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}
 .preview{background:#fff;border-radius:6px;overflow:hidden}
 .preview iframe{width:100%;height:720px;border:0;display:block}
+
+.sitenav a.locked{color:var(--muted)}
+.sitenav a.locked span{font-size:11px;margin-left:2px}
+
+/* Admin and tracker tables */
+.cardbox.wide{max-width:none}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:4px}
+table.grid{width:100%;border-collapse:collapse;font-size:14px}
+table.grid th{text-align:left;font:600 11.5px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--sunk);padding:8px 10px;white-space:nowrap}
+table.grid td{padding:9px 10px;border-top:1px solid var(--line);vertical-align:middle}
+table.grid select,.cardbox select{font:14px var(--body);padding:6px 8px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink)}
+.btn-line.sm,.btn-main.sm{padding:6px 12px;font-size:13px}
+.checks.tight label{padding:3px 10px}

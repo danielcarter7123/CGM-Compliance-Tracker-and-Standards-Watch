@@ -9,7 +9,7 @@ export async function POST() {
   const { data: auth } = await db.auth.getUser();
   if (!auth.user) return NextResponse.redirect(new URL("/login?next=/account", siteUrl()), 303);
   const admin = createAdminClient();
-  const { data: p } = await admin.from("profiles").select("company_role, company:companies(stripe_customer_id)").eq("id", auth.user.id).single();
+  const { data: p } = await admin.from("profiles").select("company_role, company:companies!profiles_company_id_fkey(stripe_customer_id)").eq("id", auth.user.id).single();
   if (p?.company_role !== "admin") return NextResponse.redirect(new URL("/account", siteUrl()), 303); // billing is for company admins
   const customer = (p?.company as { stripe_customer_id?: string } | null)?.stripe_customer_id;
   if (!customer) return NextResponse.redirect(new URL("/account", siteUrl()), 303);

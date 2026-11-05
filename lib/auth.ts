@@ -31,7 +31,7 @@ export async function getViewer(): Promise<Viewer | null> {
   const db = createClient();
   const { data: auth } = await db.auth.getUser();
   if (!auth.user) return null;
-  const { data: p } = await db.from("profiles").select("*, company:companies(id, name)").eq("id", auth.user.id).maybeSingle();
+  const { data: p } = await db.from("profiles").select("*, company:companies!profiles_company_id_fkey(id, name)").eq("id", auth.user.id).maybeSingle();
   if (!p) return null;
   const company = (p.company as Viewer["company"]) ?? null;
   const { data: ents } = company

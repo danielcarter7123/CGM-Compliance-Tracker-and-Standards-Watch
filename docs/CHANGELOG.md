@@ -2,6 +2,57 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 5, 2026: F0 local environment and F1 app shell (Claude Code)
+
+**Decided by Dan:** answers to every open question are recorded in `docs/OPEN-QUESTIONS.md`. In short:
+- Standards Watch launches first, with the Tracker shown locked.
+- Automated emails are built but ship off, behind an admin switch.
+- Build locally in Docker; go live on Supabase Pro + Vercel.
+
+**F0: local environment**
+- The project moved to `C:\dev\cgm-compliance-platform`, out of OneDrive. It's in git and pushed to GitHub (`danielcarter7123/CGM-Compliance-Tracker-and-Standards-Watch`).
+- Supabase CLI (pinned) with `supabase/config.toml`:
+  - auth redirects point at `localhost:3000`;
+  - email and sign-in rate limits are raised for local testing only.
+- New npm scripts:
+  - `db:start`, `db:stop`, `db:reset`;
+  - `db:env`, which writes the local keys into `.env.local`;
+  - `seed:dev`, which creates fake users for every role, three fake companies, the CGM library and fake tasks. It refuses to run against anything that isn't local.
+- Playwright (pinned) signs in through the real email-link flow via the local mail catcher. Run it with `npm run test:e2e`.
+- `docs/LOCAL.md` walks through all of it.
+
+**F1: app shell**
+- The masthead shows Watch, Tracker, Review queue, Digest and Admin by role and product. The Tracker shows as **locked** (🔒) for people whose company doesn't have it, and leads to an "ask CGM" notice on `/account`.
+- Route guards (`lib/guards.ts`):
+  - `/tracker/**` needs the Tracker product;
+  - `/admin` needs a CGM admin;
+  - `/admin/review` and `/admin/digest` need an editor.
+- `/tracker` has a console bar. Sections not built yet are greyed out, and Clients and Team Tasks are shown to staff only. A first dashboard shows open, overdue, due-soon and awaiting-approval counts per client, read through RLS.
+- `/admin` (CGM admin):
+  - the automated-email master switch;
+  - each company's products (Stripe-billed products are changed in Stripe);
+  - add a company;
+  - each person's CGM role, client company and company role.
+- `/watch` shows "Next: Compliance Tracker →" to Tracker users.
+- `0006_app_settings.sql`:
+  - an `app_settings` table, readable by staff and writable only by CGM admins;
+  - `emails_enabled` defaults to `false`.
+  - `lib/settings.ts` exposes `emailsEnabled()`, which every automated sender must check. The `EMAILS_DISABLED` env var forces email off.
+- **Bug fixed:** `getViewer()` embedded `companies` from `profiles` ambiguously, because `companies.pm_id` also points at `profiles`. PostgREST refused the query, so every signed-in user looked signed out. It now names `profiles_company_id_fkey`. The Stripe portal route had the same issue.
+
+**Tests:**
+- 22 access-rule tests, including the new app-settings case;
+- 13 lib tests;
+- 11 Playwright tests: each of the 8 roles plus signed out, client isolation on the dashboard, and the admin switches;
+- typecheck and build green.
+
+**Still open:**
+- the exact evidence purge rule (confirm);
+- pricing (blocks W4);
+- launch details (block P1);
+- the task plans file, which Dan will send.
+- The single comprehensive registered-function list (Q5) lands with T1, the client records.
+
 ## Nov 5, 2026: live data import, SharePoint and file upload, decisions
 
 **Decided by Dan**

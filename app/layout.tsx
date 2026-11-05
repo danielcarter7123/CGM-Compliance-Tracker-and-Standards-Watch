@@ -18,7 +18,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&display=swap"
         />
       </head>
       <body>
@@ -35,8 +35,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </a>
             <nav className="sitenav" aria-label="Site">
               {viewer?.hasAccess && <a href="/watch">Watch</a>}
+              {viewer && (viewer.products.tracker ? (
+                <a href="/tracker">Tracker</a>
+              ) : (
+                <a className="locked" href="/tracker" title="The Compliance Tracker is available by agreement with CGM">
+                  Tracker <span aria-hidden="true">🔒</span>
+                </a>
+              ))}
               {viewer?.isEditor && <a className="admin" href="/admin/review">Review queue</a>}
               {viewer?.isEditor && <a className="admin" href="/admin/digest">Digest</a>}
+              {viewer?.staffRole === "admin" && <a className="admin" href="/admin">Admin</a>}
               {viewer ? <a href="/account">Account</a> : <a href="/login">Sign in</a>}
               {!viewer?.hasAccess && <a className="cta" href="/#plans">Subscribe</a>}
             </nav>

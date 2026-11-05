@@ -19,6 +19,16 @@ npm run dev           # http://localhost:3000
 
 `npm run db:start` applies every migration in `supabase/migrations`. To start over with an empty database, run `npm run db:reset`, then `npm run seed:dev` and `npm run import:pilot` again.
 
+If a terminal says `docker: command not found` right after installing Docker Desktop, close and reopen the terminal (or restart the PC) so it picks up Docker's new PATH.
+
+## Tests
+
+```bash
+npm run typecheck
+npm test            # database access rules + library tests (no Docker needed)
+npm run test:e2e    # browser tests: signs in as every role (needs db:start, seed:dev, import:pilot)
+```
+
 ## Signing in locally
 
 Go to http://localhost:3000/login and enter one of the fake addresses printed by `seed:dev`, for example `admin@cgm.example`. Then open the local mail catcher at http://127.0.0.1:54324 and click the sign-in link.

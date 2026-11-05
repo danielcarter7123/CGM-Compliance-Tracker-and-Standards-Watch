@@ -24,7 +24,13 @@ export default async function AccountPage({ searchParams }: { searchParams: { sa
       </div>
       {searchParams.saved && <p className="notice ok">Preferences saved.</p>}
       {searchParams.checkout === "success" && <p className="notice ok">Thanks for subscribing. Your access turns on as soon as Stripe confirms the payment, usually within a minute.</p>}
-      {searchParams.need && !v.hasAccess && <p className="notice">Standards Watch needs an active subscription. Choose a plan below.</p>}
+      {searchParams.need === "subscription" && !v.hasAccess && <p className="notice">Standards Watch needs an active subscription. Choose a plan below.</p>}
+      {searchParams.need === "tracker" && !v.products.tracker && (
+        <p className="notice">
+          The Compliance Tracker is available by agreement with CGM Consulting Group. It includes Standards Watch, plus your NERC tasks, reminders and evidence in one place.{" "}
+          <a href="mailto:dan@cgmconsultinggroup.com?subject=Compliance%20Tracker">Ask CGM about access</a>.
+        </p>
+      )}
       {searchParams.error && <p className="notice">Couldn&apos;t save: {searchParams.error}</p>}
 
       <section className="cardbox">

@@ -51,6 +51,7 @@ Nobody can raise their own role. Only CGM admins set staff roles, company member
 | Contacts (digest recipients) | | | admin reads own | admin reads own | ✓ | ✓ | ✓ |
 | Products and roles | | read own | read own | read own | read | read | ✓ |
 | Billing (Stripe portal) | | company admin | company admin | company admin | | | |
+| App switches (automated emails on/off) | | | | | read | read | ✓ |
 
 ## Rules worth knowing
 
