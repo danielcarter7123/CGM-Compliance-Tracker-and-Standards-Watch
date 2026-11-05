@@ -61,6 +61,7 @@ Running `npm install`, `npm run typecheck`, `npm test` and `npm run build`, and 
    - **go live on the cloud**: Supabase Pro + Vercel + Resend, roughly $45–50/month;
    - deploy from GitHub.
 11. **Git.** Yes. Dan has an empty GitHub repository ready.
+12. **Sign-in method.** Keep the one-time email link for now: no passwords. "Sign in with Microsoft" (Azure via Supabase) can come later. It needs a CGM app registration in Microsoft Entra, which SharePoint evidence will need anyway.
 
 **Client data:** the live tracker's data is essential to how the internal tracker runs. It must be carried over completely and handled under CLAUDE.md rule 7.
 
