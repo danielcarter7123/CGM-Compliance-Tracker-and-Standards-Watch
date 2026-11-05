@@ -62,6 +62,7 @@ Running `npm install`, `npm run typecheck`, `npm test` and `npm run build`, and 
    - deploy from GitHub.
 11. **Git.** Yes. Dan has an empty GitHub repository ready.
 12. **Sign-in method.** Keep the one-time email link for now: no passwords. "Sign in with Microsoft" (Azure via Supabase) can come later. It needs a CGM app registration in Microsoft Entra, which SharePoint evidence will need anyway.
+13. **Look.** Dan likes the sign-in page's white and blue. Decision: one CGM white-and-blue palette across every screen (Watch, Tracker, sign-in, editor console, digest email). The pilot's orange accent and the violet editor console are retired. Layouts and fonts stay as in the pilots.
 
 **Client data:** the live tracker's data is essential to how the internal tracker runs. It must be carried over completely and handled under CLAUDE.md rule 7.
 

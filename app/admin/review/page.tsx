@@ -7,7 +7,7 @@ import type { Draft } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-/** Editor-only review queue. Same violet console look as the pilot, so it never reads as client-facing. */
+/** Editor-only review queue. Dark navy console, so it never reads as client-facing. */
 export default async function ReviewPage() {
   const v = await getViewer();
   if (!v) redirect("/login?next=/admin/review");

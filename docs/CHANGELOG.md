@@ -2,6 +2,29 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 5, 2026: W1 Standards Watch parity and one color scheme (Claude Code)
+
+**Decided by Dan:** sign-in stays on the email link for now; every screen uses the CGM white-and-blue palette (`docs/OPEN-QUESTIONS.md` 12–13).
+
+**Palette.** Shared tokens on `:root` in `app/watch.css`:
+- blue `--accent` #1747D1 (dark #6C94FF) and navy `--navy` #0B2347, on white surfaces and a cool grey-blue background;
+- the hero countdown, CTA band and toasts are navy;
+- selected chips are blue;
+- "New FERC approval" moves to indigo so it doesn't blend with the accent; the other status colors are unchanged.
+- Sign-in, the Tracker and the digest email read the same tokens. The editor console is dark navy instead of violet.
+
+**W1 parity with the pilot** (`components/WatchView.tsx`, `app/watch/page.tsx`):
+- filter choices are remembered per browser; the first visit starts from the company's functions;
+- jumping to a card from the hero, calendar or counts flashes it;
+- the calendar shows the Today rule even when every date is past;
+- the "Not sure which of these apply" CTA band and the full sources list are back;
+- a bottom bar shows "Next: Compliance Tracker →" for Tracker clients, and the locked Tracker for everyone else.
+
+**Tests:**
+- unit test of the HANDOFF filter cases on the pilot content;
+- `e2e/watch.spec.ts`: filters, remembered filters, flash, furniture, Tracker bar;
+- `e2e/screens.spec.ts` (opt-in, `SCREENSHOTS=1`) writes review screenshots at 1280/900/390 in light and dark to `screenshots/` (git-ignored).
+
 ## Nov 5, 2026: F0 local environment and F1 app shell (Claude Code)
 
 **Decided by Dan:** answers to every open question are recorded in `docs/OPEN-QUESTIONS.md`. In short:

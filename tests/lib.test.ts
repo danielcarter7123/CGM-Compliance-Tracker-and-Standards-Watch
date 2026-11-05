@@ -81,3 +81,17 @@ test("the CGM standards library loads into the tracker tables", async () => {
   assert.equal((n.rows[0] as any).s, 48);
   assert.equal((n.rows[0] as any).t, 72);
 });
+
+test("function filters: GO hides CIP-014-4 and TPL-008-1; TP shows TPL-008-1 and hides EOP-004-5", async () => {
+  const { matchesFunctions } = await import("../lib/watch");
+  const items = contentFromPilot().items as any[];
+  const shown = (sel: string[]) => new Set(items.filter((i) => matchesFunctions(i.fn, sel)).map((i) => i.std));
+  const go = shown(["GO"]);
+  assert.ok(!go.has("CIP-014-4"), "GO hides CIP-014-4");
+  assert.ok(!go.has("TPL-008-1"), "GO hides TPL-008-1");
+  assert.ok(go.has("EOP-004-5"), "GO shows EOP-004-5");
+  const tp = shown(["TP"]);
+  assert.ok(tp.has("TPL-008-1"), "TP shows TPL-008-1");
+  assert.ok(!tp.has("EOP-004-5"), "TP hides EOP-004-5");
+  assert.equal(shown([]).size, new Set(items.map((i) => i.std)).size, "All shows everything");
+});

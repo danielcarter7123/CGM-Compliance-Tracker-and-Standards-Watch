@@ -1,11 +1,12 @@
 /* Compliance Tracker console look (IBM Plex, blue accent). Starter set for the app shell;
    the rest of the pilot's console styles are ported with each tracker screen. */
 .trk{
-  --trk-accent:#1F5FD1;--trk-accent-ink:#fff;--trk-bad:#B42318;
+  --trk-accent:var(--accent);--trk-accent-ink:var(--accent-ink);--trk-bad:#B42318;
   --trk-sans:"IBM Plex Sans",system-ui,sans-serif;--trk-cond:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;
   font-family:var(--trk-sans);
 }
-@media (prefers-color-scheme:dark){.trk{--trk-accent:#6EA2FF;--trk-accent-ink:#0B1220;--trk-bad:#FF8A80}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .trk{--trk-bad:#FF8A80}}
+:root[data-theme="dark"] .trk{--trk-bad:#FF8A80}
 .trk-bar{border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:5}
 .trk-barin{display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding-block:8px}
 .trk-who{display:grid;line-height:1.2}

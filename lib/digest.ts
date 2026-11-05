@@ -7,7 +7,7 @@ import { classify, daysUntil, events, fmt, matchesFunctions, rel } from "./watch
 const esc = (s: unknown) =>
   String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string);
 
-const C = { ink: "#14212B", muted: "#56646F", line: "#D3DADF", accent: "#C2410C", bg: "#F2F4F5" };
+const C = { ink: "#0D1B2E", muted: "#55657A", line: "#D3DBE6", accent: "#1747D1", bg: "#F4F7FB" };
 
 export function digestSubject(content: Content) {
   return `NERC Standards Watch: ${content.week?.label ?? "this week's changes"}`;

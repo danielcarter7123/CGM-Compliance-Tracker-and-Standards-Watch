@@ -1,8 +1,10 @@
-/* Layout: compliance bulletin — hero with next-milestone readout, this-week strip, filter bar, status sections of standard cards, sticky rail with calendar, deadlines and activity. */
+/* Palette: CGM white and blue (navy #0B2347, blue #1747D1), shared by every screen. Status colors keep their meaning:
+   indigo = new FERC approval, amber = coming into effect, teal = in effect, grey = in development.
+   Layout: compliance bulletin — hero with next-milestone readout, this-week strip, filter bar, status sections of standard cards, sticky rail with calendar, deadlines and activity. */
 :root{
-  --bg:#F2F4F5; --surface:#FFFFFF; --sunk:#E8ECEE; --ink:#14212B; --muted:#56646F; --line:#D3DADF;
-  --accent:#C2410C; --accent-ink:#FFFFFF;
-  --approved:#1D4ED8; --approved-bg:#E3EBFD;
+  --bg:#F4F7FB; --surface:#FFFFFF; --sunk:#E9EEF6; --ink:#0D1B2E; --muted:#55657A; --line:#D3DBE6;
+  --accent:#1747D1; --accent-ink:#FFFFFF; --navy:#0B2347; --navy-ink:#FFFFFF;
+  --approved:#4338CA; --approved-bg:#E6E6FB;
   --effect:#0F766E; --effect-bg:#DDF3EF;
   --upcoming:#A35400; --upcoming-bg:#FCEFD9;
   --dev:#5F6B76; --dev-bg:#E7EAED;
@@ -11,17 +13,17 @@
   --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0D151B; --surface:#152029; --sunk:#1B2832; --ink:#E5EBEE; --muted:#95A4AF; --line:#2A3945;
-  --accent:#F07A3A; --accent-ink:#1A0D05;
-  --approved:#8DB0FF; --approved-bg:#1C2A4A;
+  --bg:#0B1320; --surface:#111C2C; --sunk:#172437; --ink:#E6ECF4; --muted:#9AA9BC; --line:#26364D;
+  --accent:#6C94FF; --accent-ink:#0B1220; --navy:#16305C; --navy-ink:#FFFFFF;
+  --approved:#A5A8FF; --approved-bg:#22244A;
   --effect:#5CD3BC; --effect-bg:#12332F;
   --upcoming:#F2B357; --upcoming-bg:#3A2A12;
   --dev:#A9B3BC; --dev-bg:#26313A;
   color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0D151B; --surface:#152029; --sunk:#1B2832; --ink:#E5EBEE; --muted:#95A4AF; --line:#2A3945;
-  --accent:#F07A3A; --accent-ink:#1A0D05;
-  --approved:#8DB0FF; --approved-bg:#1C2A4A;
+  --bg:#0B1320; --surface:#111C2C; --sunk:#172437; --ink:#E6ECF4; --muted:#9AA9BC; --line:#26364D;
+  --accent:#6C94FF; --accent-ink:#0B1220; --navy:#16305C; --navy-ink:#FFFFFF;
+  --approved:#A5A8FF; --approved-bg:#22244A;
   --effect:#5CD3BC; --effect-bg:#12332F;
   --upcoming:#F2B357; --upcoming-bg:#3A2A12;
   --dev:#A9B3BC; --dev-bg:#26313A;
@@ -51,13 +53,13 @@ h1,h2,h3{text-wrap:balance;margin:0}
 .eyebrow{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
 .hero h1{font-family:var(--display);font-weight:700;font-size:clamp(38px,5.4vw,64px);line-height:.98;letter-spacing:-.005em}
 .hero p.lede{max-width:60ch;color:var(--muted);font-size:16.5px;margin:16px 0 0}
-.next{background:var(--ink);color:var(--bg);border-radius:6px;padding:22px 24px;display:grid;gap:6px}
+.next{background:var(--navy);color:var(--navy-ink);border-radius:6px;padding:22px 24px;display:grid;gap:6px}
 .next .lbl{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;opacity:.75;font-weight:600}
 .next .big{font-family:var(--display);font-size:64px;line-height:.9;font-weight:700;font-variant-numeric:tabular-nums}
 .next .big span{font-size:22px;font-weight:600;margin-left:6px;opacity:.8}
 .next .what{font-family:var(--mono);font-size:14px;font-weight:600}
 .next .sub{font-size:13.5px;opacity:.8}
-.next button{justify-self:start;margin-top:8px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:4px;padding:8px 14px;font:600 13px var(--body);cursor:pointer}
+.next button{justify-self:start;margin-top:8px;background:#fff;color:#0B2347;border:0;border-radius:4px;padding:8px 14px;font:600 13px var(--body);cursor:pointer}
 
 /* This week */
 .week{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:6px;padding:16px 20px;margin-bottom:22px;display:grid;grid-template-columns:180px minmax(0,1fr);gap:8px 24px}
@@ -84,7 +86,7 @@ h1,h2,h3{text-wrap:balance;margin:0}
 .fgroup .sep{width:1px;height:20px;background:var(--line);margin:0 4px}
 .chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 12px;font:500 13px var(--body);cursor:pointer}
 .chip.fnc{font-family:var(--mono);font-size:12.5px;font-weight:600}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .search{margin-left:auto;display:flex;align-items:center}
 .search input{font:500 13.5px var(--mono);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:7px 10px;width:200px;max-width:100%}
 
@@ -157,7 +159,7 @@ h1,h2,h3{text-wrap:balance;margin:0}
 .plist .soon .fd{color:var(--accent);font-weight:600}
 
 /* CTA + footer */
-.cta{background:var(--ink);color:var(--bg)}
+.cta{background:var(--navy);color:var(--navy-ink)}
 .cta .wrap{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:28px;padding-block:40px;align-items:center}
 .cta h2{font-family:var(--display);font-size:34px;font-weight:700;line-height:1.05}
 .cta p{margin:10px 0 0;opacity:.8;max-width:60ch}
@@ -198,8 +200,8 @@ h1,h2,h3{text-wrap:balance;margin:0}
 .nbtn.locked svg{flex:none}
 .nbtn.locked:hover{filter:saturate(.7)}
 
-/* Review queue (editors only). Deliberately its own dark violet console, the same in light and dark themes, so it never reads as client-facing. */
-:root{--adm-bg:#17142E;--adm-panel:#221E42;--adm-line:#3A3466;--adm-ink:#EFECFF;--adm-muted:#ABA4D6;--adm-accent:#A78BFA;--adm-accent-ink:#140F2B;--adm-add:#5EEAD4;--adm-del:#FCA5A5;--adm-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+/* Review queue (editors only). Its own dark navy console with a striped "Editor only" band, the same in light and dark themes, so it never reads as client-facing. */
+:root{--adm-bg:#0B1A30;--adm-panel:#13264A;--adm-line:#29406A;--adm-ink:#EAF0FA;--adm-muted:#A3B3CC;--adm-accent:#7FA6FF;--adm-accent-ink:#0B1220;--adm-add:#5EEAD4;--adm-del:#FCA5A5;--adm-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
 .review{background:var(--adm-bg);color:var(--adm-ink);border-radius:8px;margin-bottom:28px;overflow:hidden;box-shadow:0 0 0 1px var(--adm-line)}
 .review::before{content:"";display:block;height:8px;background:repeating-linear-gradient(-45deg,var(--adm-accent) 0 10px,var(--adm-bg) 10px 20px)}
 .review .rhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 20px;border-bottom:1px solid var(--adm-line)}
@@ -235,4 +237,10 @@ h1,h2,h3{text-wrap:balance;margin:0}
 .review :focus-visible{outline-color:var(--adm-accent)}
 .edjson{width:100%;min-height:220px;font:12.5px/1.5 var(--adm-mono);background:var(--adm-bg);color:var(--adm-ink);border:1px solid var(--adm-line);border-radius:4px;padding:10px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:6px;z-index:30;font-size:13.5px;max-width:calc(100% - 32px)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--navy);color:var(--navy-ink);padding:10px 16px;border-radius:6px;z-index:30;font-size:13.5px;max-width:calc(100% - 32px)}
+
+/* Sources list under the Watch page (the site footer carries the disclaimer) */
+.foot.sources .wrap{padding-bottom:8px}
+.foot .srchead{font-family:var(--display);font-size:20px;font-weight:600;color:var(--ink);margin:8px 0 4px}
+a.nbtn.locked{cursor:pointer}
+@media (max-width:520px){.nextbar .wrap > span{display:none}.nextbar .nbtn{width:100%;text-align:center;justify-content:center}}

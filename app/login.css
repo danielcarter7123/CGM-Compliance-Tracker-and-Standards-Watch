@@ -1,16 +1,13 @@
 /* Sign-in: full-screen split layout. Plant photo with CGM navy wash on the left, form on the right. */
 .signin{
-  --si-navy:#0B2347;--si-blue:#1747D1;--si-blue-hover:#0F38AE;--si-ink:#0D1B2E;--si-muted:#55657A;
-  --si-panel:#F7F8FA;--si-field:#FFFFFF;--si-line:#CBD3DE;--si-focus:rgba(23,71,209,.25);--si-alert:#B42318;
+  /* Colors come from the shared palette in watch.css; only the sign-in specifics live here. */
+  --si-navy:#0B2347;--si-blue:var(--accent);--si-blue-ink:var(--accent-ink);--si-ink:var(--ink);--si-muted:var(--muted);
+  --si-panel:var(--bg);--si-field:var(--surface);--si-line:var(--line);--si-focus:rgba(23,71,209,.25);--si-alert:#B42318;
   min-height:100vh;min-height:100dvh;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(380px,1fr);
   font-family:var(--body);background:var(--si-panel);color:var(--si-ink);
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .signin{
-  --si-blue:#4C7DFF;--si-blue-hover:#6C94FF;--si-ink:#E6ECF4;--si-muted:#9AA9BC;--si-panel:#0E1724;--si-field:#132033;--si-line:#2A3A52;--si-focus:rgba(76,125,255,.35);--si-alert:#FF8A80;
-}}
-:root[data-theme="dark"] .signin{
-  --si-blue:#4C7DFF;--si-blue-hover:#6C94FF;--si-ink:#E6ECF4;--si-muted:#9AA9BC;--si-panel:#0E1724;--si-field:#132033;--si-line:#2A3A52;--si-focus:rgba(76,125,255,.35);--si-alert:#FF8A80;
-}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .signin{--si-focus:rgba(108,148,255,.35);--si-alert:#FF8A80}}
+:root[data-theme="dark"] .signin{--si-focus:rgba(108,148,255,.35);--si-alert:#FF8A80}
 
 .signin-art{
   position:relative;color:#fff;padding:clamp(28px,4vw,56px);display:flex;flex-direction:column;justify-content:space-between;gap:40px;
@@ -37,8 +34,8 @@
 .signin-form input{font:16px var(--body);padding:13px 14px;border:1px solid var(--si-line);border-radius:8px;background:var(--si-field);color:var(--si-ink);outline:none;transition:border-color .15s,box-shadow .15s}
 .signin-form input::placeholder{color:var(--si-muted);opacity:.8}
 .signin-form input:focus{border-color:var(--si-blue);box-shadow:0 0 0 4px var(--si-focus)}
-.signin-btn{margin-top:16px;font:600 17px var(--body);padding:15px 18px;border:0;border-radius:8px;background:var(--si-blue);color:#fff;cursor:pointer;transition:background .15s}
-.signin-btn:hover{background:var(--si-blue-hover)}
+.signin-btn{margin-top:16px;font:600 17px var(--body);padding:15px 18px;border:0;border-radius:8px;background:var(--si-blue);color:var(--si-blue-ink);cursor:pointer;transition:filter .15s}
+.signin-btn:hover{filter:brightness(.9)}
 .signin-btn:focus-visible{outline:3px solid var(--si-focus);outline-offset:2px}
 .signin-btn:disabled{opacity:.7;cursor:progress}
 

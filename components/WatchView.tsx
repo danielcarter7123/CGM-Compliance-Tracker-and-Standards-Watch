@@ -1,17 +1,36 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Content } from "@/lib/types";
 import { FUNCTIONS, TOPICS } from "@/lib/types";
 import { SECTIONS, classify, daysUntil, events, fmt, fmtShort, isTx, matchesFunctions, parseDate, rel, sortDate, startOfToday, type Classified } from "@/lib/watch";
 
 type Props = { content: Content; defaultFunctions: string[]; teaser?: boolean };
 
+/** Filter choices are remembered per browser, like the pilot. First visit starts from the company's registered functions. */
+const SAVED = "cgm-watch-filters";
+const ALL_FN: string[] = [...FUNCTIONS.gen, ...FUNCTIONS.tx];
+
 export default function WatchView({ content, defaultFunctions, teaser = false }: Props) {
   const [fns, setFns] = useState<string[]>(defaultFunctions);
   const [topics, setTopics] = useState<string[]>([]);
   const [q, setQ] = useState("");
   const today = startOfToday();
+
+  useEffect(() => {
+    if (teaser) return;
+    try {
+      const s = JSON.parse(localStorage.getItem(SAVED) || "null");
+      if (s && Array.isArray(s.fns)) setFns(s.fns.filter((f: string) => ALL_FN.includes(f)));
+      if (s && Array.isArray(s.topics)) setTopics(s.topics.filter((t: string) => t in TOPICS));
+    } catch {}
+  }, [teaser]);
+  // Saved only when the viewer changes a filter, never on load.
+  const choose = (nextFns: string[], nextTopics: string[]) => {
+    setFns(nextFns);
+    setTopics(nextTopics);
+    try { localStorage.setItem(SAVED, JSON.stringify({ fns: nextFns, topics: nextTopics })); } catch {}
+  };
 
   const all = useMemo(() => classify(content.items, today), [content.items]); // eslint-disable-line react-hooks/exhaustive-deps
   const vis = all.filter(
@@ -24,7 +43,15 @@ export default function WatchView({ content, defaultFunctions, teaser = false }:
   const ev = events(vis);
   const nx = ev.find((e) => daysUntil(e.d, today) > 0);
   const toggle = (list: string[], v: string) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
-  const go = (id: string) => document.getElementById(id)?.scrollIntoView({ block: "start", behavior: "smooth" });
+  const go = (id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ block: "start" });
+    if (el.classList.contains("card")) {
+      el.classList.add("flash");
+      setTimeout(() => el.classList.remove("flash"), 1600);
+    }
+  };
   const src = (keys: string[]) =>
     keys.filter((k) => content.sources[k]).map((k, i) => {
       const s = content.sources[k];
@@ -111,6 +138,7 @@ export default function WatchView({ content, defaultFunctions, teaser = false }:
       </button>,
     );
   });
+  if (calRows.length && !placed) calRows.push(<div className="today" key="t-end">Today</div>);
 
   const dls = content.deadlines.filter((d) => daysUntil(d.d, today) >= 0 && matchesFunctions(d.fn, fns));
   const acts = [...content.actions].sort((a, b) => sortDate(b.d).localeCompare(sortDate(a.d)) || (a.pos ?? 0) - (b.pos ?? 0)).slice(0, 14);
@@ -156,16 +184,16 @@ export default function WatchView({ content, defaultFunctions, teaser = false }:
 
         <div className="filters" role="group" aria-label="Filters">
           <div className="fgroup"><span className="flbl">Function</span>
-            <button type="button" className="chip" aria-pressed={!fns.length} onClick={() => setFns([])}>All</button>
+            <button type="button" className="chip" aria-pressed={!fns.length} onClick={() => choose([], topics)}>All</button>
             {[FUNCTIONS.gen, FUNCTIONS.tx].map((list, gi) => (
               <span key={gi} style={{ display: "contents" }}>
                 <span className="sep" aria-hidden="true" />
-                {list.map((f) => <button type="button" key={f} className="chip fnc" aria-pressed={fns.includes(f)} onClick={() => setFns(toggle(fns, f))}>{f}</button>)}
+                {list.map((f) => <button type="button" key={f} className="chip fnc" aria-pressed={fns.includes(f)} onClick={() => choose(toggle(fns, f), topics)}>{f}</button>)}
               </span>
             ))}
           </div>
           <div className="fgroup"><span className="flbl">Topic</span>
-            {Object.entries(TOPICS).map(([k, v]) => <button type="button" key={k} className="chip" aria-pressed={topics.includes(k)} onClick={() => setTopics(toggle(topics, k))}>{v}</button>)}
+            {Object.entries(TOPICS).map(([k, v]) => <button type="button" key={k} className="chip" aria-pressed={topics.includes(k)} onClick={() => choose(fns, toggle(topics, k))}>{v}</button>)}
           </div>
           <label className="search" htmlFor="q"><input id="q" type="search" placeholder="Search e.g. PRC-029" autoComplete="off" aria-label="Search standards" value={q} onChange={(e) => setQ(e.target.value)} /></label>
         </div>
@@ -199,6 +227,41 @@ export default function WatchView({ content, defaultFunctions, teaser = false }:
           </aside>
         </div>
       </div>
+
+      <section className="cta" aria-label="Help from CGM">
+        <div className="wrap">
+          <div>
+            <h2>Not sure which of these apply to your facilities?</h2>
+            <p>
+              Applicability turns on facility details: IBR or synchronous, BES or Category 2, low or medium impact cyber systems, CIP-014 criteria,
+              control center or not. CGM Consulting Group can map each standard to your registered functions and sites and build the implementation plan.
+            </p>
+            <p style={{ marginTop: 16 }}>
+              <a className="nbtn" style={{ background: "#fff", color: "#0B2347" }} href="mailto:dan@cgmconsultinggroup.com?subject=Standards%20applicability%20review">Talk to CGM</a>
+            </p>
+          </div>
+          <ul>
+            <li>Applicability review by facility and registered function</li>
+            <li>Gap assessments against new versions before the effective date</li>
+            <li>Data specification, modeling and planning program updates for TO, TOP, TP and PC</li>
+            <li>Procedure, evidence and training updates</li>
+            <li>Category 2 IBR registration and onboarding support</li>
+          </ul>
+        </div>
+      </section>
+
+      {Object.keys(content.sources).length > 0 && (
+        <section className="foot sources" aria-label="Sources">
+          <div className="wrap">
+            <h2 className="srchead">Sources</h2>
+            <ol>
+              {Object.values(content.sources).map((s, i) => (
+                <li key={i}>{s.u ? <a href={s.u} target="_blank" rel="noopener noreferrer">{s.t}</a> : s.t}</li>
+              ))}
+            </ol>
+          </div>
+        </section>
+      )}
     </>
   );
 }
