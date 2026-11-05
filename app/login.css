@@ -1,0 +1,67 @@
+/* Sign-in: full-screen split layout. Plant photo with CGM navy wash on the left, form on the right. */
+.signin{
+  --si-navy:#0B2347;--si-blue:#1747D1;--si-blue-hover:#0F38AE;--si-ink:#0D1B2E;--si-muted:#55657A;
+  --si-panel:#F7F8FA;--si-field:#FFFFFF;--si-line:#CBD3DE;--si-focus:rgba(23,71,209,.25);--si-alert:#B42318;
+  min-height:100vh;min-height:100dvh;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(380px,1fr);
+  font-family:var(--body);background:var(--si-panel);color:var(--si-ink);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .signin{
+  --si-blue:#4C7DFF;--si-blue-hover:#6C94FF;--si-ink:#E6ECF4;--si-muted:#9AA9BC;--si-panel:#0E1724;--si-field:#132033;--si-line:#2A3A52;--si-focus:rgba(76,125,255,.35);--si-alert:#FF8A80;
+}}
+:root[data-theme="dark"] .signin{
+  --si-blue:#4C7DFF;--si-blue-hover:#6C94FF;--si-ink:#E6ECF4;--si-muted:#9AA9BC;--si-panel:#0E1724;--si-field:#132033;--si-line:#2A3A52;--si-focus:rgba(76,125,255,.35);--si-alert:#FF8A80;
+}
+
+.signin-art{
+  position:relative;color:#fff;padding:clamp(28px,4vw,56px);display:flex;flex-direction:column;justify-content:space-between;gap:40px;
+  background:
+    linear-gradient(90deg,rgba(11,35,71,.96) 0%,rgba(11,35,71,.82) 34%,rgba(11,35,71,.25) 70%,rgba(11,35,71,.05) 100%),
+    url("/sign-in-plant.webp") center/cover no-repeat,var(--si-navy);
+}
+.signin-logo{align-self:flex-start;display:inline-flex;background:#fff;border-radius:8px;padding:10px 14px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.signin-logo img{display:block;width:clamp(150px,14vw,200px);height:auto}
+.signin-pitch{max-width:34rem;margin-block:auto}
+.signin-pitch h1{font:800 clamp(38px,4.6vw,64px)/1.02 var(--body);letter-spacing:-.02em;margin:0 0 18px;text-wrap:balance}
+.signin-pitch p{font-size:clamp(17px,1.5vw,21px);line-height:1.4;margin:0 0 32px;color:rgba(255,255,255,.88);max-width:30rem}
+.signin-pitch ul{list-style:none;margin:0;padding:0;display:grid;gap:20px}
+.signin-pitch li{display:flex;align-items:center;gap:16px;font-size:clamp(15px,1.25vw,18px);font-weight:500}
+.signin-pitch svg{flex:none;width:34px;height:34px;fill:none;stroke:#7FA6FF;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+.signin-panel{display:flex;align-items:center;justify-content:center;padding:clamp(28px,5vw,64px)}
+.signin-box{width:100%;max-width:440px;display:grid;gap:0}
+.signin-box h2{font:800 clamp(36px,3.4vw,52px)/1.05 var(--body);letter-spacing:-.02em;margin:0 0 8px;color:var(--si-ink)}
+.signin-sub{font-size:18px;color:var(--si-muted);margin:0 0 32px}
+
+.signin-form{display:grid;gap:8px}
+.signin-form label{font-weight:600;font-size:15px}
+.signin-form input{font:16px var(--body);padding:13px 14px;border:1px solid var(--si-line);border-radius:8px;background:var(--si-field);color:var(--si-ink);outline:none;transition:border-color .15s,box-shadow .15s}
+.signin-form input::placeholder{color:var(--si-muted);opacity:.8}
+.signin-form input:focus{border-color:var(--si-blue);box-shadow:0 0 0 4px var(--si-focus)}
+.signin-btn{margin-top:16px;font:600 17px var(--body);padding:15px 18px;border:0;border-radius:8px;background:var(--si-blue);color:#fff;cursor:pointer;transition:background .15s}
+.signin-btn:hover{background:var(--si-blue-hover)}
+.signin-btn:focus-visible{outline:3px solid var(--si-focus);outline-offset:2px}
+.signin-btn:disabled{opacity:.7;cursor:progress}
+
+.signin-sent{border:1px solid var(--si-line);border-left:4px solid var(--si-blue);background:var(--si-field);border-radius:8px;padding:16px 18px}
+.signin-sent b{font-size:16px}
+.signin-sent p{margin:6px 0 10px;color:var(--si-muted)}
+.signin-linkbtn{background:none;border:0;padding:0;color:var(--si-blue);font:600 14px var(--body);cursor:pointer}
+.signin-alert{color:var(--si-alert);font-size:14px;margin:4px 0}
+
+.signin-how{font-size:14px;color:var(--si-muted);margin:18px 0 0;padding-top:18px;border-top:1px solid var(--si-line)}
+.signin-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:28px;font-size:14.5px;color:var(--si-muted)}
+.signin-foot a{color:var(--si-blue);font-weight:600;text-decoration:none}
+.signin-foot a:hover{text-decoration:underline}
+
+/* Tablet and phone: photo becomes a banner above the form */
+@media (max-width:900px){
+  .signin{grid-template-columns:1fr}
+  .signin-art{min-height:auto;gap:28px;padding:24px 16px 32px;
+    background:linear-gradient(180deg,rgba(11,35,71,.92),rgba(11,35,71,.78)),url("/sign-in-plant.webp") center/cover no-repeat,var(--si-navy)}
+  .signin-pitch h1{font-size:34px}
+  .signin-pitch p{margin-bottom:20px}
+  .signin-pitch ul{gap:12px}
+  .signin-pitch svg{width:26px;height:26px}
+  .signin-panel{padding:32px 16px 48px;align-items:flex-start}
+  .signin-sub{margin-bottom:24px}
+}

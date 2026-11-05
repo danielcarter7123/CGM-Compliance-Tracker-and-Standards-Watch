@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./watch.css";
 import "./app.css";
+import SiteChrome from "@/components/SiteChrome";
 import { getViewer } from "@/lib/auth";
 
 export const metadata: Metadata = {
@@ -22,6 +23,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
       </head>
       <body>
+        <SiteChrome>
         <header className="mast">
           <div className="wrap">
             <a className="brand" href="/" style={{ textDecoration: "none", color: "inherit" }}>
@@ -50,7 +52,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </nav>
           </div>
         </header>
+        </SiteChrome>
         {children}
+        <SiteChrome>
         <footer className="foot">
           <div className="wrap">
             <p>
@@ -60,6 +64,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <p>© CGM Consulting Group</p>
           </div>
         </footer>
+        </SiteChrome>
       </body>
     </html>
   );

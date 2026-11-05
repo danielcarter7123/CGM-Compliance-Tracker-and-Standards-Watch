@@ -23,16 +23,30 @@ export default function LoginForm({ next }: { next: string }) {
   }
 
   if (state === "sent")
-    return <p className="notice ok">Check {email} for your sign-in link. It works once and expires in an hour.</p>;
+    return (
+      <div className="signin-sent" role="status">
+        <b>Check your inbox</b>
+        <p>Check {email} for your sign-in link. It works once and expires in an hour.</p>
+        <button type="button" className="signin-linkbtn" onClick={() => setState("idle")}>Use a different email</button>
+      </div>
+    );
 
   return (
-    <form className="cardbox" onSubmit={submit}>
-      <div className="field">
-        <label htmlFor="email">Work email</label>
-        <input id="email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-      </div>
-      {state === "error" && <p className="notice">Couldn&apos;t send the link: {msg}</p>}
-      <div><button className="btn-main" type="submit" disabled={state === "sending"}>{state === "sending" ? "Sending…" : "Email me a sign-in link"}</button></div>
+    <form className="signin-form" onSubmit={submit}>
+      <label htmlFor="email">Work email</label>
+      <input
+        id="email"
+        type="email"
+        required
+        autoComplete="email"
+        placeholder="you@company.com"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      {state === "error" && <p className="signin-alert">Couldn&apos;t send the link: {msg}</p>}
+      <button className="signin-btn" type="submit" disabled={state === "sending"}>
+        {state === "sending" ? "Sending…" : "Email me a sign-in link"}
+      </button>
     </form>
   );
 }
