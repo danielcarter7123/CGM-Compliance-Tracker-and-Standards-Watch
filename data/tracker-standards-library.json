@@ -1,0 +1,1296 @@
+{
+ "_about": {
+  "source": "NERC Compliance Tracker (Copy) artifact, standards collection, read 2026-11-05. CGM reference content; no client data.",
+  "fields": "recur.n = interval (0 = event-driven, no repeat); recur.unit d=days, m=calendar months, y=calendar years (due Dec 31 of the year N years later). suggestedBasis comes from the artifact's BASIS_SUGGEST table and is NOT confirmed by CGM: 'done' = interval runs from completion date, 'due' = fixed schedule from previous due date. url empty = default https://www.nerc.com/pa/Stand/Reliability%20Standards/<CODE>-<VERSION>.pdf",
+  "caveat": "Versions reflect the library as loaded in October 2026; the artifact itself says to confirm each version against NERC U.S. effective dates. Not re-verified here."
+ },
+ "standards": [
+  {
+   "code": "CIP-002",
+   "version": "5.1a",
+   "title": "Cyber Security — BES Cyber System Categorization",
+   "family": "CIP",
+   "applies": [
+    "GO",
+    "GOP",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R2",
+     "title": "Review BES Cyber System identifications and categorization; CIP Senior Manager approval",
+     "recur": {
+      "n": 15,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    }
+   ]
+  },
+  {
+   "code": "CIP-003",
+   "version": "9",
+   "title": "Cyber Security — Security Management Controls",
+   "family": "CIP",
+   "applies": [
+    "GO",
+    "GOP",
+    "TO"
+   ],
+   "url": "",
+   "notes": "Includes low-impact plan elements; CIP-003-9 adds vendor electronic remote access controls for low impact.",
+   "templates": [
+    {
+     "req": "R1",
+     "title": "Review and CIP Senior Manager approval of cyber security policies",
+     "recur": {
+      "n": 15,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    },
+    {
+     "req": "R3",
+     "title": "Document CIP Senior Manager change within 30 days",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "CIP-004",
+   "version": "7",
+   "title": "Cyber Security — Personnel & Training",
+   "family": "CIP",
+   "applies": [
+    "GO",
+    "GOP",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R1",
+     "title": "Cyber security awareness reinforcement (quarterly)",
+     "recur": {
+      "n": 3,
+      "unit": "m"
+     },
+     "suggestedBasis": "due"
+    },
+    {
+     "req": "R2",
+     "title": "Cyber security training for authorized personnel",
+     "recur": {
+      "n": 15,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    },
+    {
+     "req": "R4 P4.2",
+     "title": "Verify authorized access lists (quarterly)",
+     "recur": {
+      "n": 3,
+      "unit": "m"
+     },
+     "suggestedBasis": "due"
+    },
+    {
+     "req": "R4 P4.3",
+     "title": "Verify user accounts and privileges",
+     "recur": {
+      "n": 15,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    },
+    {
+     "req": "R3 P3.5",
+     "title": "Personnel risk assessment refresh (7 years)",
+     "recur": {
+      "n": 84,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    }
+   ]
+  },
+  {
+   "code": "CIP-005",
+   "version": "7",
+   "title": "Cyber Security — Electronic Security Perimeter(s)",
+   "family": "CIP",
+   "applies": [
+    "GO",
+    "GOP",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R2 P2.4–2.5",
+     "title": "Review vendor remote access methods and disable capability",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "CIP-006",
+   "version": "6",
+   "title": "Cyber Security — Physical Security of BES Cyber Systems",
+   "family": "CIP",
+   "applies": [
+    "GO",
+    "GOP",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R3 P3.1",
+     "title": "Physical Access Control System maintenance and testing",
+     "recur": {
+      "n": 24,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    }
+   ]
+  },
+  {
+   "code": "CIP-007",
+   "version": "6",
+   "title": "Cyber Security — System Security Management",
+   "family": "CIP",
+   "applies": [
+    "GO",
+    "GOP",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R2 P2.2",
+     "title": "Evaluate security patches for applicability",
+     "recur": {
+      "n": 35,
+      "unit": "d"
+     },
+     "suggestedBasis": "done"
+    },
+    {
+     "req": "R4 P4.4",
+     "title": "Review summarization/sampling of logged events (high impact)",
+     "recur": {
+      "n": 15,
+      "unit": "d"
+     },
+     "suggestedBasis": "done"
+    },
+    {
+     "req": "R5 P5.6",
+     "title": "Change passwords (where technically feasible)",
+     "recur": {
+      "n": 15,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    }
+   ]
+  },
+  {
+   "code": "CIP-008",
+   "version": "6",
+   "title": "Cyber Security — Incident Reporting and Response Planning",
+   "family": "CIP",
+   "applies": [
+    "GO",
+    "GOP",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R2 P2.1",
+     "title": "Test Cyber Security Incident response plan(s)",
+     "recur": {
+      "n": 15,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    },
+    {
+     "req": "R3 P3.1",
+     "title": "Update response plan after test or incident (lessons learned)",
+     "recur": {
+      "n": 90,
+      "unit": "d"
+     },
+     "suggestedBasis": "due"
+    }
+   ]
+  },
+  {
+   "code": "CIP-009",
+   "version": "6",
+   "title": "Cyber Security — Recovery Plans for BES Cyber Systems",
+   "family": "CIP",
+   "applies": [
+    "GO",
+    "GOP",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R2 P2.1",
+     "title": "Test recovery plan(s)",
+     "recur": {
+      "n": 15,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    },
+    {
+     "req": "R2 P2.2",
+     "title": "Test representative sample of backup information",
+     "recur": {
+      "n": 15,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    },
+    {
+     "req": "R2 P2.3",
+     "title": "Operational exercise of recovery plan (high impact)",
+     "recur": {
+      "n": 36,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    }
+   ]
+  },
+  {
+   "code": "CIP-010",
+   "version": "4",
+   "title": "Cyber Security — Configuration Change Management and Vulnerability Assessments",
+   "family": "CIP",
+   "applies": [
+    "GO",
+    "GOP",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R2 P2.1",
+     "title": "Monitor baseline configuration changes (high impact)",
+     "recur": {
+      "n": 35,
+      "unit": "d"
+     },
+     "suggestedBasis": "done"
+    },
+    {
+     "req": "R3 P3.1",
+     "title": "Paper or active vulnerability assessment",
+     "recur": {
+      "n": 15,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    },
+    {
+     "req": "R3 P3.2",
+     "title": "Active vulnerability assessment (high impact)",
+     "recur": {
+      "n": 36,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    }
+   ]
+  },
+  {
+   "code": "CIP-011",
+   "version": "3",
+   "title": "Cyber Security — Information Protection",
+   "family": "CIP",
+   "applies": [
+    "GO",
+    "GOP",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": []
+  },
+  {
+   "code": "CIP-012",
+   "version": "2",
+   "title": "Cyber Security — Communications between Control Centers",
+   "family": "CIP",
+   "applies": [
+    "GOP",
+    "TO"
+   ],
+   "url": "",
+   "notes": "Applies to GOP Control Centers transmitting real-time assessment and monitoring data.",
+   "templates": []
+  },
+  {
+   "code": "CIP-013",
+   "version": "2",
+   "title": "Cyber Security — Supply Chain Risk Management",
+   "family": "CIP",
+   "applies": [
+    "GO",
+    "GOP",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R3",
+     "title": "Review and CIP Senior Manager approval of supply chain risk management plan(s)",
+     "recur": {
+      "n": 15,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    }
+   ]
+  },
+  {
+   "code": "CIP-014",
+   "version": "3",
+   "title": "Physical Security",
+   "family": "CIP",
+   "applies": [
+    "TO"
+   ],
+   "url": "",
+   "notes": "Applies to TOs with Transmission stations/substations meeting the applicability criteria. Initial risk assessment cycle is 30 calendar months if a station was identified in the prior assessment, otherwise 60 calendar months.",
+   "templates": [
+    {
+     "req": "R1",
+     "title": "Transmission station and substation risk assessment",
+     "recur": {
+      "n": 30,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    },
+    {
+     "req": "R2",
+     "title": "Unaffiliated third-party verification of risk assessment (within 90 days of R1)",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    },
+    {
+     "req": "R3",
+     "title": "Notify Transmission Operator of identified stations (within 7 days of verification)",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    },
+    {
+     "req": "R4–R5",
+     "title": "Evaluate threats and vulnerabilities; develop and implement physical security plan",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    },
+    {
+     "req": "R6",
+     "title": "Third-party review of threat evaluation and security plan",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "COM-001",
+   "version": "3",
+   "title": "Communications",
+   "family": "COM",
+   "applies": [
+    "GOP"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": []
+  },
+  {
+   "code": "COM-002",
+   "version": "4",
+   "title": "Operating Personnel Communications Protocols",
+   "family": "COM",
+   "applies": [
+    "GOP"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R3",
+     "title": "Train operating personnel on three-part communication before issuing/receiving Operating Instructions",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "EOP-004",
+   "version": "4",
+   "title": "Event Reporting",
+   "family": "EOP",
+   "applies": [
+    "GO",
+    "GOP",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R3",
+     "title": "Validate event reporting contact information (each calendar year)",
+     "recur": {
+      "n": 12,
+      "unit": "m"
+     },
+     "suggestedBasis": "due"
+    }
+   ]
+  },
+  {
+   "code": "EOP-005",
+   "version": "3",
+   "title": "System Restoration from Blackstart Resources",
+   "family": "EOP",
+   "applies": [
+    "GOP",
+    "TO"
+   ],
+   "url": "",
+   "notes": "Blackstart Resource GOPs.",
+   "templates": [
+    {
+     "req": "Blackstart testing",
+     "title": "Blackstart Resource capability test (per TOP restoration plan; at least every 3 years)",
+     "recur": {
+      "n": 36,
+      "unit": "m"
+     },
+     "suggestedBasis": "due"
+    },
+    {
+     "req": "Blackstart training",
+     "title": "Blackstart Resource operator training (every 2 calendar years)",
+     "recur": {
+      "n": 24,
+      "unit": "m"
+     },
+     "suggestedBasis": "due"
+    }
+   ]
+  },
+  {
+   "code": "EOP-011",
+   "version": "4",
+   "title": "Emergency Operations",
+   "family": "EOP",
+   "applies": [
+    "GOP"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "Cold weather data",
+     "title": "Provide cold weather data to Balancing Authority",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "EOP-012",
+   "version": "3",
+   "title": "Extreme Cold Weather Preparedness and Operations",
+   "family": "EOP",
+   "applies": [
+    "GO",
+    "GOP"
+   ],
+   "url": "",
+   "notes": "Confirm effective version and implementation-plan dates.",
+   "templates": [
+    {
+     "req": "Training requirement",
+     "title": "Unit-specific cold weather preparedness training (annual)",
+     "recur": {
+      "n": 12,
+      "unit": "m"
+     },
+     "suggestedBasis": "due"
+    },
+    {
+     "req": "Plan review",
+     "title": "Review/update cold weather preparedness plan",
+     "recur": {
+      "n": 60,
+      "unit": "m"
+     },
+     "suggestedBasis": "due"
+    }
+   ]
+  },
+  {
+   "code": "FAC-001",
+   "version": "4",
+   "title": "Facility Interconnection Requirements",
+   "family": "FAC",
+   "applies": [
+    "GO",
+    "TO"
+   ],
+   "url": "",
+   "notes": "Applies to GOs that have executed an interconnection agreement for a third party.",
+   "templates": []
+  },
+  {
+   "code": "FAC-002",
+   "version": "4",
+   "title": "Facility Interconnection Studies",
+   "family": "FAC",
+   "applies": [
+    "GO",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R2",
+     "title": "Coordinate on interconnection studies for new or materially modified Facilities",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "FAC-003",
+   "version": "5",
+   "title": "Transmission Vegetation Management",
+   "family": "FAC",
+   "applies": [
+    "GO",
+    "TO"
+   ],
+   "url": "",
+   "notes": "Applies to GO generator interconnection Facilities meeting the applicability criteria.",
+   "templates": [
+    {
+     "req": "R6",
+     "title": "Vegetation inspection of applicable lines (each calendar year)",
+     "recur": {
+      "n": 12,
+      "unit": "m"
+     },
+     "suggestedBasis": "due"
+    },
+    {
+     "req": "R7",
+     "title": "Complete annual vegetation work plan",
+     "recur": {
+      "n": 12,
+      "unit": "m"
+     },
+     "suggestedBasis": "due"
+    }
+   ]
+  },
+  {
+   "code": "FAC-008",
+   "version": "5",
+   "title": "Facility Ratings",
+   "family": "FAC",
+   "applies": [
+    "GO",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R7–R8",
+     "title": "Provide Facility Ratings and limiting equipment on request (within 30 days)",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "IRO-010",
+   "version": "4",
+   "title": "Reliability Coordinator Data Specification and Collection",
+   "family": "IRO",
+   "applies": [
+    "GO",
+    "GOP",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R3",
+     "title": "Respond to RC data specification",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "MOD-025",
+   "version": "2",
+   "title": "Verification and Data Reporting of Generator Real and Reactive Power Capability",
+   "family": "MOD",
+   "applies": [
+    "GO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R1",
+     "title": "Verify and report Real Power capability (5-year cycle)",
+     "recur": {
+      "n": 60,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    },
+    {
+     "req": "R2",
+     "title": "Verify and report Reactive Power capability (5-year cycle)",
+     "recur": {
+      "n": 60,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    }
+   ]
+  },
+  {
+   "code": "MOD-026",
+   "version": "2",
+   "title": "Verification of Models and Data for Generator Excitation Control System or Plant Volt/Var Control Functions",
+   "family": "MOD",
+   "applies": [
+    "GO"
+   ],
+   "url": "https://www.nerc.com/globalassets/standards/reliability-standards/mod/mod-026-2.pdf",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R2",
+     "title": "Provide verified excitation/volt-var model (10-year cycle)",
+     "recur": {
+      "n": 120,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    }
+   ]
+  },
+  {
+   "code": "MOD-027",
+   "version": "1",
+   "title": "Verification of Models and Data for Turbine/Governor and Load Control or Active Power/Frequency Control Functions",
+   "family": "MOD",
+   "applies": [
+    "GO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R2",
+     "title": "Provide verified turbine/governor model (10-year cycle)",
+     "recur": {
+      "n": 120,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    }
+   ]
+  },
+  {
+   "code": "MOD-032",
+   "version": "1",
+   "title": "Data for Power System Modeling and Analysis",
+   "family": "MOD",
+   "applies": [
+    "GO",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R2",
+     "title": "Submit modeling data per PC/TP data requirements and schedule",
+     "recur": {
+      "n": 12,
+      "unit": "m"
+     },
+     "suggestedBasis": "due"
+    }
+   ]
+  },
+  {
+   "code": "PRC-002",
+   "version": "3",
+   "title": "Disturbance Monitoring and Reporting Requirements",
+   "family": "PRC",
+   "applies": [
+    "GO",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R11",
+     "title": "Restore Disturbance Monitoring Equipment capability within 90 days of discovery",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "PRC-004",
+   "version": "6",
+   "title": "Protection System Misoperation Identification and Correction",
+   "family": "PRC",
+   "applies": [
+    "GO",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R1",
+     "title": "Review BES interrupting device operations for Misoperation (120 days)",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "PRC-005",
+   "version": "6",
+   "title": "Protection System, Automatic Reclosing, and Sudden Pressure Relaying Maintenance",
+   "family": "PRC",
+   "applies": [
+    "GO",
+    "TO"
+   ],
+   "url": "",
+   "notes": "Intervals depend on component type and monitoring level per Tables 1–4.",
+   "templates": [
+    {
+     "req": "Table 1-4",
+     "title": "Station DC supply (battery) inspection",
+     "recur": {
+      "n": 4,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    },
+    {
+     "req": "Table 1-1",
+     "title": "Microprocessor relay maintenance (unmonitored)",
+     "recur": {
+      "n": 72,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    },
+    {
+     "req": "Table 1-1",
+     "title": "Electromechanical relay maintenance",
+     "recur": {
+      "n": 72,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    },
+    {
+     "req": "Table 1-3",
+     "title": "Voltage/current sensing device verification",
+     "recur": {
+      "n": 144,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    },
+    {
+     "req": "Table 1-5",
+     "title": "Protective function control circuitry verification",
+     "recur": {
+      "n": 144,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    }
+   ]
+  },
+  {
+   "code": "PRC-006",
+   "version": "5",
+   "title": "Automatic Underfrequency Load Shedding",
+   "family": "PRC",
+   "applies": [
+    "TO"
+   ],
+   "url": "",
+   "notes": "Applies to TOs that own, operate or control UFLS equipment as part of the Planning Coordinator's UFLS program.",
+   "templates": [
+    {
+     "req": "R9",
+     "title": "Provide UFLS data to the Planning Coordinator per its schedule",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    },
+    {
+     "req": "R10",
+     "title": "Implement UFLS program changes per Planning Coordinator schedule",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "PRC-010",
+   "version": "2",
+   "title": "Undervoltage Load Shedding",
+   "family": "PRC",
+   "applies": [
+    "TO"
+   ],
+   "url": "",
+   "notes": "Applies to TOs that own, operate or control UVLS equipment.",
+   "templates": [
+    {
+     "req": "R5",
+     "title": "Provide UVLS data to the Planning Coordinator per its schedule",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    },
+    {
+     "req": "R6",
+     "title": "Correct UVLS Program misoperations / implement Corrective Action Plan",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "PRC-012",
+   "version": "2",
+   "title": "Remedial Action Schemes",
+   "family": "PRC",
+   "applies": [
+    "GO",
+    "TO"
+   ],
+   "url": "",
+   "notes": "Applies where the GO owns all or part of a RAS.",
+   "templates": [
+    {
+     "req": "R8",
+     "title": "RAS functional test",
+     "recur": {
+      "n": 72,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    }
+   ]
+  },
+  {
+   "code": "PRC-017",
+   "version": "1",
+   "title": "Remedial Action Scheme Maintenance and Testing",
+   "family": "PRC",
+   "applies": [
+    "GO",
+    "TO"
+   ],
+   "url": "",
+   "notes": "Confirm continued applicability after PRC-012-2 implementation.",
+   "templates": []
+  },
+  {
+   "code": "PRC-019",
+   "version": "2",
+   "title": "Coordination of Generating Unit or Plant Capabilities, Voltage Regulating Controls, and Protection",
+   "family": "PRC",
+   "applies": [
+    "GO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R1",
+     "title": "Coordination of voltage regulating controls, limiters and protection (5-year cycle)",
+     "recur": {
+      "n": 60,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    }
+   ]
+  },
+  {
+   "code": "PRC-023",
+   "version": "6",
+   "title": "Transmission Relay Loadability",
+   "family": "PRC",
+   "applies": [
+    "TO",
+    "GO"
+   ],
+   "url": "",
+   "notes": "Applies to load-responsive phase protection on applicable transmission lines and transformers.",
+   "templates": [
+    {
+     "req": "R1",
+     "title": "Re-verify load-responsive relay settings after circuit rating or setting changes",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    },
+    {
+     "req": "R3",
+     "title": "Implement Corrective Action Plan for any setting that cannot meet criteria",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "PRC-024",
+   "version": "4",
+   "title": "Frequency and Voltage Protection Settings for Synchronous Generators, Type 1 and Type 2 Wind Resources, and Synchronous Condensers",
+   "family": "PRC",
+   "applies": [
+    "GO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "Settings documentation",
+     "title": "Provide protection settings documentation on request (60 days)",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "PRC-025",
+   "version": "2",
+   "title": "Generator Relay Loadability",
+   "family": "PRC",
+   "applies": [
+    "GO",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R1",
+     "title": "Re-verify load-responsive relay settings after relay or system changes",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "PRC-026",
+   "version": "2",
+   "title": "Relay Performance During Stable Power Swings",
+   "family": "PRC",
+   "applies": [
+    "GO",
+    "TO"
+   ],
+   "url": "",
+   "notes": "Confirm effective version.",
+   "templates": [
+    {
+     "req": "R2",
+     "title": "Evaluate identified load-responsive relays after PC notification",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "PRC-027",
+   "version": "1",
+   "title": "Coordination of Protection Systems for Performance During Faults",
+   "family": "PRC",
+   "applies": [
+    "GO",
+    "TO"
+   ],
+   "url": "",
+   "notes": "Applies to GO-owned BES interconnection Elements.",
+   "templates": [
+    {
+     "req": "R2",
+     "title": "Protection system coordination study (Option 1: 6-year cycle)",
+     "recur": {
+      "n": 72,
+      "unit": "m"
+     },
+     "suggestedBasis": "done"
+    }
+   ]
+  },
+  {
+   "code": "PRC-028",
+   "version": "1",
+   "title": "Disturbance Monitoring and Reporting Requirements for Inverter-Based Resources",
+   "family": "PRC",
+   "applies": [
+    "GO"
+   ],
+   "url": "",
+   "notes": "IBR disturbance recording; follow phased implementation plan.",
+   "templates": [
+    {
+     "req": "R1–R3",
+     "title": "Install/verify IBR disturbance recording per implementation plan",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    },
+    {
+     "req": "Equipment availability",
+     "title": "Restore recording capability within 90 days of discovered failure",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "PRC-029",
+   "version": "2",
+   "title": "Frequency and Voltage Ride-through Requirements for Inverter-Based Resources",
+   "family": "PRC",
+   "applies": [
+    "GO"
+   ],
+   "url": "https://www.nerc.com/globalassets/standards/reliability-standards/prc/prc-029-2.pdf",
+   "notes": "",
+   "templates": [
+    {
+     "req": "Settings documentation",
+     "title": "Document ride-through capability and exemptions",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "PRC-030",
+   "version": "1",
+   "title": "Unexpected Inverter-Based Resource Event Mitigation",
+   "family": "PRC",
+   "applies": [
+    "GO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R2–R3",
+     "title": "Analyze unexpected IBR tripping/output reduction and develop CAP",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "SEC-1600",
+   "version": "1",
+   "title": "Periodic Data Submissions",
+   "family": "SEC",
+   "applies": [
+    "GO",
+    "GOP",
+    "GO-2",
+    "GOP-2",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [],
+   "custom": true
+  },
+  {
+   "code": "TOP-003",
+   "version": "7",
+   "title": "Transmission Operator and Balancing Authority Data Specification and Collection",
+   "family": "TOP",
+   "applies": [
+    "GO",
+    "GOP",
+    "TO"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R5",
+     "title": "Respond to TOP/BA data specification",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "TPL-007",
+   "version": "4",
+   "title": "Transmission System Planned Performance for Geomagnetic Disturbance Events",
+   "family": "TPL",
+   "applies": [
+    "TO",
+    "GO"
+   ],
+   "url": "",
+   "notes": "Applies to TOs and GOs owning applicable transformers (high-side wye-grounded winding >200 kV).",
+   "templates": [
+    {
+     "req": "Data request",
+     "title": "Provide GIC flow information to the Planning Coordinator on request",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    },
+    {
+     "req": "R6 / R10",
+     "title": "Thermal impact assessment of applicable transformers (within 24 months of PC request)",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  },
+  {
+   "code": "VAR-002",
+   "version": "4.1",
+   "title": "Generator Operation for Maintaining Network Voltage Schedules",
+   "family": "VAR",
+   "applies": [
+    "GO",
+    "GOP"
+   ],
+   "url": "",
+   "notes": "",
+   "templates": [
+    {
+     "req": "R3",
+     "title": "Notify TOP of AVR/PSS status changes (30 minutes)",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    },
+    {
+     "req": "R5",
+     "title": "Provide GSU tap settings and impedance data on request (30 days)",
+     "recur": {
+      "n": 0,
+      "unit": "m"
+     }
+    }
+   ]
+  }
+ ]
+}

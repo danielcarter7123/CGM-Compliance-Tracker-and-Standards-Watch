@@ -1,0 +1,934 @@
+{
+ "activity": {
+  "2026-02-mod-026-2-mod-032-2-top-003-8-and-iro-01": {
+   "d": "2026-02",
+   "pos": 12,
+   "src": "FERC",
+   "t": "MOD-026-2, MOD-032-2, TOP-003-8 and IRO-010-6 approved (RD26-1, RD26-3)."
+  },
+  "2026-03-19-order-no-918-cip-003-11-and-order-no-919": {
+   "d": "2026-03-19",
+   "pos": 11,
+   "src": "FERC",
+   "t": "Order No. 918 (CIP-003-11) and Order No. 919 (CIP virtualization) issued."
+  },
+  "2026-07-16-directed-nerc-to-file-computational-load": {
+   "d": "2026-07-16",
+   "pos": 10,
+   "src": "FERC",
+   "t": "Directed NERC to file computational load standards and registry criteria by Dec 31, 2026."
+  },
+  "2026-08-10-cip-015-2-insm-expansion-approved-by-let": {
+   "d": "2026-08-10",
+   "pos": 8,
+   "src": "FERC",
+   "t": "CIP-015-2 INSM expansion approved by letter order. Phased from Oct 1, 2029."
+  },
+  "2026-08-eop-004-5-event-reporting-approved-effec": {
+   "d": "2026-08",
+   "pos": 9,
+   "src": "FERC",
+   "t": "EOP-004-5 Event Reporting approved. Effective Oct 1, 2027."
+  },
+  "2026-09-10-cip-014-4-physical-security-approved-to-": {
+   "d": "2026-09-10",
+   "pos": 7,
+   "src": "FERC",
+   "t": "CIP-014-4 Physical Security approved (TO/TOP). Effective Oct 1, 2028."
+  },
+  "2026-10-14-ero-portal-and-cores-update-released": {
+   "d": "2026-10-14",
+   "pos": 6,
+   "src": "NERC",
+   "t": "ERO Portal and CORES update released."
+  },
+  "2026-10-15-accepted-the-2027-business-plans-and-bud": {
+   "d": "2026-10-15",
+   "pos": 5,
+   "src": "FERC",
+   "t": "Accepted the 2027 business plans and budgets of NERC, the Regional Entities and WIRAB."
+  },
+  "2026-10-19-revised-prc-028-1-and-prc-029-1-rsaws-po": {
+   "d": "2026-10-19",
+   "pos": 3,
+   "src": "NERC",
+   "t": "Revised PRC-028-1 and PRC-029-1 RSAWs posted. CIP virtualization webinar set for Dec 7."
+  },
+  "2026-10-21-filed-rules-of-procedure-registry-change": {
+   "d": "2026-10-21",
+   "pos": 1,
+   "src": "NERC",
+   "t": "Filed Rules of Procedure registry changes adding Computational Load Owner and Computational Load Operator."
+  },
+  "2026-10-21-standards-committee-accepted-the-project": {
+   "d": "2026-10-21",
+   "pos": 2,
+   "src": "NERC",
+   "t": "Standards Committee accepted the Project 2026-03 SAR (Computational Loads Disturbance Performance)."
+  },
+  "2026-10-26-mspp-initial-ballot-and-comment-periods-": {
+   "d": "2026-10-26",
+   "pos": 0,
+   "src": "NERC",
+   "t": "MSPP initial ballot on the Standard Processes Manual closed and passed (81.61% quorum, 97.78% approval)."
+  },
+  "2026-10-prc-029-2-ibr-ride-through-approved-rd26": {
+   "d": "2026-10",
+   "pos": 4,
+   "src": "FERC",
+   "t": "PRC-029-2 IBR Ride-through approved (RD26-10). PRC-029-1 retired."
+  },
+  "2026-10-29-frequency-response-annual-analysis": {
+   "d": "2026-10-29",
+   "src": "NERC",
+   "t": "Filed the 2026 Frequency Response Annual Analysis Report supporting BAL-003-2."
+  },
+  "2026-11-2027-cmep-ip-and-pds-schedule": {
+   "d": "2026-11",
+   "src": "NERC",
+   "t": "Released the 2027 CMEP Implementation Plan and 2027 Periodic Data Submittal schedule (adds PRC-028-1 and PRC-029-2)."
+  }
+ },
+ "deadlines": {
+  "2026-11-05-bal-001-tre-3-comments-close": {
+   "d": "2026-11-05",
+   "fn": [
+    "GO",
+    "GOP"
+   ],
+   "t": "BAL-001-TRE-3 comments close",
+   "who": "ERCOT (Texas RE) entities only"
+  },
+  "2026-11-13-project-2026-03-drafting-team-nomination": {
+   "d": "2026-11-13",
+   "fn": null,
+   "t": "Project 2026-03 drafting team nominations close",
+   "who": "Anyone wanting a seat on the team"
+  },
+  "2026-11-18-standards-committee-meeting-virtual-1-00": {
+   "d": "2026-11-18",
+   "fn": null,
+   "t": "Standards Committee meeting (virtual), 1:00–3:00 p.m. ET",
+   "who": "Informational"
+  },
+  "2026-11-20-project-2026-03-sar-comments-close-8-00-": {
+   "d": "2026-11-20",
+   "fn": [
+    "TO",
+    "TOP",
+    "TP",
+    "PC"
+   ],
+   "t": "Project 2026-03 SAR comments close, 8:00 p.m. ET; advisory group applications also close",
+   "who": "TO, TOP, TP, PC most directly"
+  },
+  "2026-12-07-cip-virtualization-webinar-1-00-3-00-p-m": {
+   "d": "2026-12-07",
+   "fn": [
+    "GO",
+    "GOP",
+    "TO",
+    "TOP"
+   ],
+   "t": "CIP virtualization webinar, 1:00–3:00 p.m. ET (registration required)",
+   "who": "Medium and high impact entities"
+  },
+  "2026-12-16-standards-committee-meeting-virtual-1-00": {
+   "d": "2026-12-16",
+   "fn": null,
+   "t": "Standards Committee meeting (virtual), 1:00–3:00 p.m. ET",
+   "who": "Informational"
+  },
+  "2026-12-31-nerc-deadline-to-file-computational-load": {
+   "d": "2026-12-31",
+   "fn": [
+    "TO",
+    "TOP",
+    "TP",
+    "PC"
+   ],
+   "t": "NERC deadline to file computational load standards and registry criteria with FERC",
+   "who": "TO, TOP, TP, PC"
+  },
+  "2026-11-20-rr27-1-comments-due": {
+   "d": "2026-11-20",
+   "fn": null,
+   "t": "FERC comments due on NERC's computational load registry petition (Docket RR27-1-000), 5:00 p.m. ET",
+   "who": "Anyone commenting; most relevant to TO, TOP, TP, PC"
+  },
+  "2026-12-10-project-2024-02-era-001-1": {
+   "d": "2026-12-10",
+   "fn": null,
+   "t": "Project 2024-02 Planning Energy Assurance (ERA-001-1) comments and additional ballot close, 8:00 p.m. ET (ballot opens Dec 1)",
+   "who": "Ballot pool members and anyone commenting"
+  }
+ },
+ "items": {
+  "bal-001-tre-3": {
+   "fn": [
+    "GO",
+    "GOP"
+   ],
+   "pos": 25,
+   "src": [
+    "nercWeekly",
+    "report"
+   ],
+   "stage": "Comment period Sep 22 – Nov 5, 2026",
+   "status": "dev",
+   "std": "BAL-001-TRE-3",
+   "title": "Primary Frequency Response in ERCOT (regional standard)",
+   "todo": "ERCOT (Texas RE) entities only. Comment by Nov 5 if applicable.",
+   "topic": "ops",
+   "what": "Texas RE regional revision of the ERCOT primary frequency response standard."
+  },
+  "category-2-applicability-revisions": {
+   "fn": [
+    "GO",
+    "GOP"
+   ],
+   "pos": 26,
+   "src": [
+    "goGopDates"
+   ],
+   "stage": "Listed by NERC as requiring modification (Aug 2026)",
+   "status": "dev",
+   "std": "Category 2 applicability revisions",
+   "title": "CIP, COM, EOP, FAC, MOD-025, PER, PRC-002/004/005/019/024–027, TOP-001 and others",
+   "todo": "Category 2 owners should expect a series of new compliance dates and plan program build-out in stages.",
+   "topic": "ibr",
+   "what": "NERC is revising the applicability of the remaining GO/GOP standards so they cover Category 2 IBRs. Compliance dates come with each revision."
+  },
+  "category-2-ibr-registration": {
+   "effective": "2026-05-15",
+   "fn": [
+    "GO",
+    "GOP"
+   ],
+   "pos": 18,
+   "src": [
+    "ibrReg",
+    "goGopDates"
+   ],
+   "std": "Category 2 IBR registration",
+   "title": "Non-BES IBRs ≥20 MVA at ≥60 kV registered as GO/GOP",
+   "todo": "Category 2 entities should confirm their registry listing, GADS reporting, and evidence for each standard that already applies.",
+   "topic": "ibr",
+   "what": "Newly registered Category 2 GOs and GOPs must comply with BAL-001-TRE, IRO-010-5, MOD-032, PRC-012-2, PRC-017-1, TOP-003-6.1, VAR-001-5 and VAR-002-4.1 as of May 15, 2026. More standards are being revised to cover Category 2."
+  },
+  "cip-002-8-virtualization-set": {
+   "effective": "2028-07-01",
+   "ferc": "2026-03-19",
+   "fn": [
+    "GO",
+    "GOP",
+    "TO",
+    "TOP"
+   ],
+   "news": [
+    {
+     "d": "2026-10-19",
+     "t": "NERC outreach webinar Dec 7, 2026, 1:00–3:00 p.m. ET. Registration required; questions can be sent in advance. One-on-one advisory sessions are full."
+    }
+   ],
+   "order_no": "Order No. 919",
+   "pos": 4,
+   "src": [
+    "cipOrders",
+    "report",
+    "nercWeekly"
+   ],
+   "std": "CIP-002-8 + virtualization set",
+   "title": "CIP-002-8, CIP-003-10, CIP-004-8, CIP-005-8, CIP-006-7.1, CIP-007-7.1, CIP-008-7.1, CIP-009-7.1, CIP-010-5, CIP-011-4.1, CIP-013-3",
+   "todo": "Every entity should re-check BES Cyber System categorization under CIP-002-8. Low impact: review CIP-002 and CIP-003 changes. Medium and high impact: start the gap assessment now. Early adoption is allowed.",
+   "todoTx": "Applies in full to TO/TOP Control Centers and substations at medium or high impact.",
+   "topic": "cip",
+   "what": "Revises CIP-002 through CIP-013 (Project 2016-02) so virtual machines, shared infrastructure and new technologies can be secured. Adds new and revised Glossary terms, per-system capability options, and an updated Control Center definition."
+  },
+  "cip-003-11": {
+   "effective": "2029-07-01",
+   "ferc": "2026-03-19",
+   "fn": [
+    "GO",
+    "GOP",
+    "TO",
+    "TOP"
+   ],
+   "order_no": "Order No. 918",
+   "pos": 2,
+   "src": [
+    "cip918",
+    "cipOrders",
+    "report"
+   ],
+   "std": "CIP-003-11",
+   "title": "Security Management Controls (low impact)",
+   "todo": "Inventory low impact sites with routable connectivity, find legacy protocols, and budget for detection capability. Check the Attachment 1 low impact plan against both CIP-003-10 (2028) and CIP-003-11.",
+   "topic": "cip",
+   "what": "Adds low impact controls for assets with external routable connectivity: authenticate remote users, protect credentials in transit (no Telnet or plain FTP), and detect malicious communications in and out of low impact BES Cyber Systems."
+  },
+  "cip-003-12-cip-008-8": {
+   "fn": [
+    "GO",
+    "GOP",
+    "TO",
+    "TOP"
+   ],
+   "pos": 24,
+   "src": [
+    "nercWeeklySep"
+   ],
+   "stage": "Initial ballot Sep 14–23, 2026 (Project 2022-05)",
+   "status": "dev",
+   "std": "CIP-003-12 / CIP-008-8",
+   "title": "CIP-008 incident reporting threshold",
+   "todo": "Watch the final language before updating incident response plans.",
+   "topic": "cip",
+   "what": "Revises what counts as a reportable attempt to compromise, which changes when Cyber Security Incidents must be reported."
+  },
+  "cip-003-9": {
+   "effective": "2026-04-01",
+   "fn": [
+    "GO",
+    "GOP",
+    "TO",
+    "TOP"
+   ],
+   "pos": 19,
+   "src": [
+    "naes"
+   ],
+   "std": "CIP-003-9",
+   "title": "Security Management Controls (vendor remote access)",
+   "todo": "Confirm low impact cyber security plans include the vendor remote access section and the ability to disable access.",
+   "topic": "cip",
+   "what": "Adds low impact controls for vendor electronic remote access: identify, disable, and detect malicious communications."
+  },
+  "cip-012-2": {
+   "effective": "2026-07-01",
+   "fn": [
+    "GO",
+    "GOP",
+    "TO",
+    "TOP"
+   ],
+   "pos": 17,
+   "src": [
+    "naes"
+   ],
+   "std": "CIP-012-2",
+   "title": "Communications Between Control Centers",
+   "todo": "Applies to entities with Control Centers. Verify the plan covers availability of real-time assessment and monitoring data links.",
+   "topic": "cip",
+   "what": "Extends protection of real-time data between Control Centers to cover availability as well as confidentiality and integrity."
+  },
+  "cip-014-4": {
+   "effective": "2028-10-01",
+   "ferc": "2026-09-10",
+   "fn": [
+    "TO",
+    "TOP"
+   ],
+   "pos": 3,
+   "src": [
+    "nercWeeklySep",
+    "report"
+   ],
+   "std": "CIP-014-4",
+   "title": "Physical Security",
+   "todo": "Does not apply to GO/GOP.",
+   "todoTx": "Confirm which facilities meet the CIP-014 criteria, then review the risk assessment, threat evaluation and security plan against the new version.",
+   "topic": "cip",
+   "what": "Revised physical security requirements for transmission stations and substations that meet the CIP-014 applicability criteria."
+  },
+  "cip-015-1": {
+   "effective": "2028-10-01",
+   "fn": [
+    "GO",
+    "GOP",
+    "TO",
+    "TOP"
+   ],
+   "pos": 8,
+   "src": [
+    "nercWeekly",
+    "report"
+   ],
+   "std": "CIP-015-1",
+   "title": "Internal Network Security Monitoring",
+   "todo": "Applies only to control centers with high or medium impact BCS with ERC. Superseded by CIP-015-2 one year later.",
+   "topic": "cip",
+   "what": "Requires INSM inside the ESP for high impact and medium impact BCS with external routable connectivity at Control Centers."
+  },
+  "cip-015-2": {
+   "effective": "2029-10-01",
+   "ferc": "2026-08-10",
+   "fn": [
+    "GO",
+    "GOP",
+    "TO",
+    "TOP"
+   ],
+   "milestones": [
+    {
+     "d": "2030-10-01",
+     "l": "Phase 2a: remaining medium impact BCS with ERC, plus PCAs and supporting systems"
+    },
+    {
+     "d": "2031-10-01",
+     "l": "Phase 2b: EACMS, PACS and supporting systems for all other medium impact BCS with ERC"
+    }
+   ],
+   "pos": 1,
+   "src": [
+    "cip015",
+    "report"
+   ],
+   "std": "CIP-015-2",
+   "title": "Internal Network Security Monitoring (expanded scope)",
+   "todo": "Applies only to high or medium impact BES Cyber Systems with external routable connectivity, such as a GOP control center. Scope sensor coverage for EACMS and PACS now.",
+   "todoTx": "Applies to TO/TOP Control Centers and substations with medium or high impact BCS with ERC.",
+   "topic": "cip",
+   "what": "Extends INSM beyond the ESP to associated EACMS, PACS, PCAs and supporting systems. Phase 1 covers high and medium impact BCS with ERC at Control Centers. Retires CIP-015-1."
+  },
+  "computational-load-sars": {
+   "fn": [
+    "TOP",
+    "TP",
+    "PC"
+   ],
+   "pos": 22,
+   "src": [
+    "pjmOct"
+   ],
+   "stage": "SAR comment periods closed Oct 22, 2026",
+   "status": "dev",
+   "std": "Computational load SARs",
+   "title": "Load loss in planning and operations studies; event reporting and model validation",
+   "todo": "No direct GO/GOP obligations proposed.",
+   "todoTx": "Expect future TPL, FAC and IRO revisions that add computational load loss to planning and operational studies.",
+   "topic": "load",
+   "what": "Two SARs: one would require computational load loss, reduction and reconnection to be modeled and studied (TPL, FAC and IRO revisions); the other would require load event reporting and model validation by Computational Load Owners."
+  },
+  "eop-004-5": {
+   "effective": "2027-10-01",
+   "ferc": "2026-08",
+   "fn": [
+    "GO",
+    "GOP",
+    "TO",
+    "TOP"
+   ],
+   "pos": 0,
+   "src": [
+    "eop004",
+    "report"
+   ],
+   "std": "EOP-004-5",
+   "title": "Event Reporting",
+   "todo": "Update the event reporting Operating Plan, thresholds and contact lists, and train control room staff before the effective date.",
+   "todoTx": "Update event reporting procedures and contact lists. Same effective date as for GO/GOP.",
+   "topic": "ops",
+   "what": "Revises the generation-loss reporting thresholds so they capture inverter-based resource events (solar, wind, battery storage) and line up with recent large disturbances."
+  },
+  "eop-012-3": {
+   "effective": "2025-10-01",
+   "ferc": "2025-09",
+   "fn": [
+    "GO",
+    "GOP"
+   ],
+   "milestones": [
+    {
+     "d": "2027-07-01",
+     "l": "Superseded by EOP-012-4 (no U.S. requirement changes)"
+    }
+   ],
+   "news": [
+    {
+     "d": "2026-10-19",
+     "t": "NERC reminder: extreme cold weather best practices report is available ahead of winter."
+    }
+   ],
+   "pos": 14,
+   "src": [
+    "eop012",
+    "pjmJul",
+    "report"
+   ],
+   "std": "EOP-012-3",
+   "title": "Extreme Cold Weather Preparedness and Operations",
+   "todo": "Keep CAPs on schedule and submit Generator Cold Weather Constraint declarations through the ERO submittal process.",
+   "topic": "ops",
+   "what": "Cold weather preparedness plans, freeze protection, training, and Corrective Action Plans for units that cannot operate to their extreme cold weather temperature."
+  },
+  "eop-012-4": {
+   "effective": "2027-07-01",
+   "fn": [
+    "GO",
+    "GOP"
+   ],
+   "pos": 7,
+   "src": [
+    "nercWeekly",
+    "report"
+   ],
+   "std": "EOP-012-4",
+   "title": "Extreme Cold Weather Preparedness and Operations",
+   "todo": "No new U.S. obligations. Keep cold weather plans, training and Corrective Action Plans current under EOP-012-3.",
+   "topic": "ops",
+   "what": "Replaces EOP-012-3. Adds a regional variance for Canadian jurisdictions only. No changes to the requirements that apply to U.S. entities."
+  },
+  "fac-011-5-top-003-9": {
+   "fn": [
+    "TOP"
+   ],
+   "pos": 23,
+   "src": [
+    "pjmJul"
+   ],
+   "stage": "Ballots held July 2026; check NERC for results",
+   "status": "dev",
+   "std": "FAC-011-5 / TOP-003-9",
+   "title": "IBR and DER in operational planning and real-time monitoring (Project 2025-03)",
+   "todo": "Indirect for GO/GOP through future TOP data requests.",
+   "todoTx": "TOPs: plan for expanded operational assessment and data specification scope.",
+   "topic": "model",
+   "what": "Order No. 901 revisions that add IBR performance to operational assessments and real-time monitoring and include aggregate DER."
+  },
+  "mod-026-2": {
+   "effective": "2026-04-01",
+   "ferc": "2026-02",
+   "fn": [
+    "GO",
+    "TO",
+    "TP",
+    "PC"
+   ],
+   "milestones": [
+    {
+     "d": "2027-04-01",
+     "l": "R1 and R7 compliance for existing facilities"
+    },
+    {
+     "d": "2029-04-01",
+     "l": "R2 through R6 compliance for existing facilities"
+    }
+   ],
+   "order_no": "Docket RD26-3",
+   "pos": 11,
+   "src": [
+    "mod026",
+    "goGopDates",
+    "fercFeb26"
+   ],
+   "std": "MOD-026-2",
+   "title": "Verification and Validation of Dynamic Models and Data",
+   "todo": "GO: inventory each unit's last MOD-026-1/MOD-027-1 submittal date, since R2 periodic verification runs off it, and schedule IBR EMT model work with your OEM.",
+   "todoTx": "TP/PC: set up review of submitted models, including EMT models, within the implementation plan's review windows. TO: verify models for applicable equipment.",
+   "topic": "model",
+   "what": "Replaces MOD-026-1 and MOD-027-1 with one standard covering synchronous and IBR model verification, including EMT models for IBRs."
+  },
+  "mod-032-2": {
+   "effective": "2028-04-01",
+   "ferc": "2026-02",
+   "fn": [
+    "GO",
+    "TO",
+    "TP",
+    "PC"
+   ],
+   "order_no": "Docket RD26-1",
+   "phasing": true,
+   "pos": 6,
+   "src": [
+    "mod032",
+    "report"
+   ],
+   "std": "MOD-032-2",
+   "title": "Data for Power System Modeling and Analysis",
+   "todo": "GO: check models against the Unacceptable Models List and line up MOD-026-2 work so submittals use accepted models. A two-year enforcement abeyance covers good-faith estimated data.",
+   "todoTx": "TP/PC: update your data requirements and reporting procedures for the new IBR and DER data. TO: provide modeling data for your equipment. Track the phase-in dates in the implementation plan.",
+   "topic": "model",
+   "what": "GOs and TOs provide steady-state, dynamic and short-circuit data, now including IBR and DER parameters. Dynamic models must be the MOD-026 accepted models; use of a model on the ERO Unacceptable Models List needs a technical rationale."
+  },
+  "prc-024-4": {
+   "effective": "2026-10-01",
+   "ferc": "2025-07",
+   "fn": [
+    "GO"
+   ],
+   "pos": 15,
+   "src": [
+    "prc029",
+    "ibrRide"
+   ],
+   "std": "PRC-024-4",
+   "title": "Frequency and Voltage Protection Settings (synchronous and Type 1/2 wind)",
+   "todo": "Confirm protection settings documentation references PRC-024-4 and that IBR evidence has moved to PRC-029-2.",
+   "topic": "ops",
+   "what": "Now covers synchronous generators, Type 1 and Type 2 wind, and synchronous condensers only. IBRs moved to PRC-029 (now PRC-029-2). PRC-024-3 retired."
+  },
+  "prc-028-1": {
+   "effective": "2025-04-01",
+   "fn": [
+    "GO"
+   ],
+   "milestones": [
+    {
+     "d": "2028-12-31",
+     "l": "50% of existing BES IBRs compliant with R1–R7"
+    },
+    {
+     "d": "2030-01-01",
+     "l": "100% of existing BES IBRs compliant"
+    }
+   ],
+   "news": [
+    {
+     "d": "2026-11-02",
+     "t": "The 2027 ERO Periodic Data Submittal schedule is posted and now includes PRC-028-1. The Align Create PDS workaround is still needed; NERC says a fix is planned for a future release."
+    },
+    {
+     "d": "2026-10-19",
+     "t": "Revised RSAW posted. It corrects the referenced effective dates. Replace the old RSAW in compliance files."
+    },
+    {
+     "d": "2026-10-19",
+     "t": "Align 7.8.0 bug: PRC-028-1 is missing from the Create PDS list. Type \"PRC-028\" in the STD and REQ dropdown."
+    }
+   ],
+   "pos": 13,
+   "src": [
+    "texasRE",
+    "goGopDates",
+    "report",
+    "nercWeeklyNov2"
+   ],
+   "std": "PRC-028-1",
+   "title": "Disturbance Monitoring and Reporting for Inverter-Based Resources",
+   "todo": "Plan recorder installs across the fleet to hit the 50% mark. Report any recording failure in Align within 90 days.",
+   "topic": "ibr",
+   "what": "Requires sequence-of-events, fault and dynamic disturbance recording at IBR facilities, with data retention and reporting."
+  },
+  "prc-029-2": {
+   "effective": "2026-10-01",
+   "ferc": "2026-10",
+   "fn": [
+    "GO"
+   ],
+   "milestones": [
+    {
+     "d": "2027-01-01",
+     "l": "Non-BES IBRs (Category 2) design compliance"
+    },
+    {
+     "d": "2027-10-01",
+     "l": "R4 hardware-limitation documentation due (Periodic Data Submittal); staggered by in-service date"
+    }
+   ],
+   "news": [
+    {
+     "d": "2026-11-02",
+     "t": "The 2027 ERO Periodic Data Submittal schedule is posted and now includes PRC-029-2. Use it to calendar 2027 submittals."
+    },
+    {
+     "d": "2026-10-19",
+     "t": "NERC posted a revised PRC-029-1 RSAW (sub-requirement numbering fix only). Check whether a PRC-029-2 RSAW follows before replacing compliance files."
+    }
+   ],
+   "order_no": "Docket RD26-10",
+   "pos": 9,
+   "src": [
+    "prc0292",
+    "prc0292std",
+    "texasRE",
+    "ibrRide",
+    "report",
+    "nercWeeklyNov2"
+   ],
+   "std": "PRC-029-2",
+   "title": "Frequency and Voltage Ride-through for Inverter-Based Resources",
+   "todo": "Repoint procedures and evidence from PRC-029-1 to PRC-029-2. Confirm inverter and plant controller settings meet the ride-through curves. Re-check R4 exemption eligibility under the new in-service and contract-date criteria, and file hardware-limitation documentation in Align by its deadline.",
+   "topic": "ibr",
+   "what": "Replaces PRC-029-1, which is retired. Keeps the IBR ride-through curves that replaced PRC-024's IBR provisions, and widens the R4 hardware-limitation exemption to IBRs in service after Oct 1, 2026 if the interconnection agreement was signed by Oct 1, 2026 and the limiting equipment was contracted before Sep 1, 2025. The exemption ends when the limiting hardware is replaced. Adds a limited exemption for VSC-HVDC-connected IBRs with choppers. Operational compliance follows PRC-028-1 disturbance monitoring installation."
+  },
+  "prc-030-1": {
+   "effective": "2026-10-01",
+   "ferc": "2025-07",
+   "fn": [
+    "GO"
+   ],
+   "phasing": true,
+   "pos": 10,
+   "src": [
+    "nercWeeklySep",
+    "goGopDates"
+   ],
+   "std": "PRC-030-1",
+   "title": "Unexpected Inverter-Based Resource Event Mitigation",
+   "todo": "Set up a process to detect and review unexpected IBR output changes, with data retention to support analysis.",
+   "topic": "ibr",
+   "what": "Requires GOs to identify unexpected changes in IBR output, analyze the cause, and implement a corrective action plan."
+  },
+  "project-2026-02": {
+   "fn": [
+    "GO",
+    "TO",
+    "TOP",
+    "TP",
+    "PC"
+   ],
+   "news": [
+    {
+     "d": "2026-11-02",
+     "t": "FERC assigned Docket RR27-1-000 to the registry petition. Comments are due Nov 20 at 5:00 p.m. ET."
+    },
+    {
+     "d": "2026-10-21",
+     "t": "NERC filed Rules of Procedure registry changes (Appendices 2, 5A and 5B) adding Computational Load Owner and Computational Load Operator."
+    }
+   ],
+   "pos": 21,
+   "src": [
+    "clo",
+    "report",
+    "nercWeekly",
+    "nercWeeklyNov2"
+   ],
+   "stage": "Final ballot passed Oct 2026; NERC must file with FERC by Dec 31, 2026",
+   "status": "dev",
+   "std": "Project 2026-02",
+   "title": "Computational Loads: CLO-002-1, CLO-003-1 and FAC-001 / FAC-002 revisions",
+   "todo": "GO exposure is limited to the FAC-002 interconnection study revisions, mainly for load co-located at a generating site.",
+   "todoTx": "High relevance: these loads connect to transmission. Expect new FAC-001 interconnection requirements and data specification work, with a 6-month clock for data specifications once approved.",
+   "topic": "load",
+   "what": "New standards for computational loads of 50 MW or more at 100 kV or above, plus new Computational Load Owner and Operator registration. Owners and operators must follow TOP, BA and RC instructions and install recording equipment."
+  },
+  "project-2026-03": {
+   "fn": [
+    "TO",
+    "TOP",
+    "TP",
+    "PC"
+   ],
+   "news": [
+    {
+     "d": "2026-10-21",
+     "t": "Standards Committee accepted the SAR. Comments Oct 22–Nov 20; drafting team nominations Oct 22–Nov 13."
+    }
+   ],
+   "pos": 20,
+   "src": [
+    "report"
+   ],
+   "stage": "SAR accepted Oct 21, 2026; comments open through Nov 20",
+   "status": "dev",
+   "std": "Project 2026-03",
+   "title": "Computational Loads Disturbance Performance",
+   "todo": "Low GO/GOP impact today. Watch it if a data center is sited at or near a plant.",
+   "todoTx": "Review the SAR and comment by Nov 20 (8:00 p.m. ET) if you have large loads in the interconnection queue. Drafting team nominations close Nov 13.",
+   "topic": "load",
+   "what": "Proposes voltage and frequency ride-through and post-fault power recovery requirements for large computational loads such as data centers. The SAR also notes that TPs and PCs lack accurate models for these loads."
+  },
+  "top-003-7": {
+   "effective": "2026-10-01",
+   "fn": [
+    "GO",
+    "GOP",
+    "TO",
+    "TOP"
+   ],
+   "pos": 16,
+   "src": [
+    "nercWeeklySep"
+   ],
+   "std": "TOP-003-7",
+   "title": "TOP and BA Data and Information Specification and Collection",
+   "todo": "Check that you have the current TOP/BA data specifications and that your response process is documented.",
+   "todoTx": "TOPs: confirm the revised specification has been issued to GOs, GOPs, TOs and DPs and that collection is working.",
+   "topic": "model",
+   "what": "Revised data specification standard. Entities that receive a TOP or BA data specification must satisfy it."
+  },
+  "top-003-8-iro-010-6": {
+   "effective": "2029-04-01",
+   "ferc": "2026-02",
+   "fn": [
+    "GO",
+    "GOP",
+    "TO",
+    "TOP"
+   ],
+   "order_no": "Docket RD26-1",
+   "pos": 5,
+   "src": [
+    "fercFeb26",
+    "report"
+   ],
+   "std": "TOP-003-8 / IRO-010-6",
+   "title": "Data and Information Specification and Collection",
+   "todo": "GO/GOP: expect revised data requests from your TOP, BA and RC ahead of this date, and confirm your plants can supply the IBR data points.",
+   "todoTx": "TOPs issue the data specifications: update the specification and the collection process. TOs must meet the specifications they receive.",
+   "topic": "model",
+   "what": "Order No. 901 revisions. TOPs, BAs and RCs may request IBR and DER performance data. Entities that receive a data specification must provide it."
+  },
+  "tpl-008-1": {
+   "effective": "2026-04-01",
+   "fn": [
+    "TP",
+    "PC"
+   ],
+   "milestones": [
+    {
+     "d": "2028-04-01",
+     "l": "R2 through R6 compliance"
+    },
+    {
+     "d": "2030-04-01",
+     "l": "R7 through R11 compliance; initial Extreme Temperature Assessment due"
+    }
+   ],
+   "pos": 12,
+   "src": [
+    "tpl008",
+    "nercJan"
+   ],
+   "std": "TPL-008-1",
+   "title": "Transmission Planning for Extreme Temperature Events",
+   "todo": "Does not apply to GO/GOP.",
+   "todoTx": "Confirm the R1 joint-responsibility agreements are in place, then build the benchmark cases and study scope so the first assessment is done by Apr 1, 2030.",
+   "topic": "model",
+   "what": "Requires Planning Coordinators and Transmission Planners to assess system performance under extreme heat and cold benchmark events and develop corrective action plans."
+  }
+ },
+ "reviewed": "2026-11-02",
+ "sources": {
+  "cip015": {
+   "t": "Dragos, FERC approves CIP-015-2",
+   "u": "https://www.dragos.com/blog/ferc-approves-nerc-cip-015-2-insm-expansion"
+  },
+  "cip918": {
+   "t": "Federal Register, Order No. 918 (CIP-003-11)",
+   "u": "https://www.federalregister.gov/documents/2026/03/24/2026-05711/order-no-918-critical-infrastructure-protection-reliability-standard-cip-003-11-cyber"
+  },
+  "cipOrders": {
+   "t": "FERC Orders 918 and 919 summary (Ampyx Cyber)",
+   "u": "https://ampyxcyber.com/blog/ferc-issues-orders-on-virtualization-and-low-impact-what-changed-and-what-you-need-to-do"
+  },
+  "clo": {
+   "t": "mGrid, Computational load standards pass final ballot",
+   "u": "https://mgrid.org/2026/10/16/nercs-data-center-reliability-rules-pass-final-ballot-but-existing-sites-get-36-months-to-install-recorders/"
+  },
+  "eop004": {
+   "t": "APPA, FERC approves EOP-004-5 IBR event reporting",
+   "u": "https://www.publicpower.org/periodical/article/ferc-approves-nerc-reliability-standard-improve-reporting-events-involving-inverter-based-resources"
+  },
+  "eop012": {
+   "t": "FERC, Reliability Standard updates E-1 to E-4 (Sep 2025)",
+   "u": "https://www.ferc.gov/sites/default/files/2025-09/Reliability%20Standard%20Updates%20Items%20E-1%20through%20E-4.pdf"
+  },
+  "fercFeb26": {
+   "t": "White & Case, FERC Feb 2026 agenda (RD26-1, RD26-3)",
+   "u": "https://www.whitecase.com/insight-alert/summary-ferc-meeting-agenda-february-2026"
+  },
+  "goGopDates": {
+   "t": "NERC, Compliance Dates for GOs/GOPs (Rev 1.5, Aug 2026)",
+   "u": "https://nerc.com/pa/Stand/202401%20Rules%20of%20Procedure%20Definitions%20Alignment%20GO/ComplianceDatesforGOs_GOPS.pdf"
+  },
+  "ibrReg": {
+   "t": "pv magazine, IBR registration initiative final stretch",
+   "u": "https://pv-magazine-usa.com/2026/05/14/nerc-inverter-based-resource-registration-initiative-enters-final-stretch-for-asset-owners/"
+  },
+  "ibrRide": {
+   "t": "Federal Register, IBR frequency/voltage settings and ride-through final rule",
+   "u": "https://www.federalregister.gov/documents/2025/07/29/2025-14304/reliability-standards-for-frequency-and-voltage-protection-settings-and-ride-through-for"
+  },
+  "mod026": {
+   "t": "NERC, MOD-026-2 Implementation Plan",
+   "u": "https://www.nerc.com/globalassets/standards/projects/2020-06/final-ballot---mod-026/2020-06-mod-026-2-implementation-plan-clean_102025.pdf"
+  },
+  "mod032": {
+   "t": "NERC, MOD-032-2 standard",
+   "u": "https://www.nerc.com/globalassets/standards/reliability-standards/mod/mod-032-2.pdf"
+  },
+  "naes": {
+   "t": "NAES, U.S. effective dates for future reliability standards",
+   "u": "https://www.naes.com/u-s-effective-dates-for-future-reliability-standards/"
+  },
+  "nercJan": {
+   "t": "NERC Standards, Compliance and Enforcement Bulletin, Jan 5, 2026",
+   "u": "https://www.nerc.com/globalassets/who-we-are/news/2026/01/2026_1_5_standardscompliancebulletin.pdf"
+  },
+  "nercWeekly": {
+   "t": "NERC Weekly Regulatory Updates, Oct 19, 2026",
+   "u": "https://www.nerc.com/globalassets/programs/compliance/bulletins/2026_10_19_weeklyregulatoryupdates.pdf"
+  },
+  "nercWeeklySep": {
+   "t": "NERC Weekly Regulatory Updates, Sep 14, 2026",
+   "u": "https://www.nerc.com/globalassets/programs/compliance/bulletins/2026_09_14_weeklyregulatoryupdates.pdf"
+  },
+  "pjmJul": {
+   "t": "PJM Reliability Compliance Update, Jul 7, 2026",
+   "u": "https://www.pjm.com/-/media/DotCom/committees-groups/committees/pc/2026/20260707/20260707-item-09---reliability-compliance-update---presentation.pdf"
+  },
+  "pjmOct": {
+   "t": "PJM Reliability Compliance Update, Oct 6, 2026",
+   "u": "https://www.pjm.com/-/media/DotCom/committees-groups/committees/pc/2026/20261006/20261006-item-09---reliability-compliance-update---presentation.pdf"
+  },
+  "prc029": {
+   "t": "Keentel, PRC-029-1 applicability and key dates",
+   "u": "https://keentelengineering.com/prc-029-1-applicability-key-dates-generator-owners"
+  },
+  "prc0292": {
+   "t": "NERC, Petition for approval of PRC-029-2 (RD26-10)",
+   "u": "https://www.nerc.com/globalassets/who-we-are/legal--regulatory/filings--orders/nerc-filings-to-ferc/2026/petition-for-approval-of-prc-029-2_signed.pdf"
+  },
+  "prc0292std": {
+   "t": "NERC, PRC-029-2 standard",
+   "u": "https://www.nerc.com/globalassets/standards/reliability-standards/prc/prc-029-2.pdf"
+  },
+  "report": {
+   "t": "CGM NERC Regulatory Update Report, Oct 26, 2026"
+  },
+  "texasRE": {
+   "t": "Texas RE, PRC-028-1 & PRC-029-1 implementation and data submittals",
+   "u": "https://texasre.org/pages/newsletters/april2026/prc-028-1andprc-029-1ipsanddatasubmittals"
+  },
+  "tpl008": {
+   "t": "NERC, TPL-008-1 Implementation Plan",
+   "u": "https://nerc.com/pa/Stand/Project202307ModtoTPL00151TransSystPlanPerfReqExWe/2023-07_Final_Ballot_Implementation_Plan_120224.pdf"
+  },
+  "nercWeeklyNov2": {
+   "t": "NERC Weekly Regulatory Updates, Nov 2, 2026",
+   "u": "https://www.nerc.com/globalassets/programs/compliance/bulletins/2026_11_02_weeklyregulatoryupdates.pdf"
+  }
+ },
+ "updatedAt": "2026-11-02T16:16:52.032Z",
+ "updatedBy": null,
+ "week": {
+  "label": "Week of Nov 2, 2026",
+  "covers": "Bulletin Nov 2 – Nov 8",
+  "items": [
+   {
+    "b": "No effective dates changed",
+    "t": "in the Nov 2 bulletin. Its future-enforcement table matches the dates on this page."
+   },
+   {
+    "b": "New posting",
+    "t": "Project 2024-02 Planning Energy Assurance (ERA-001-1) is open for comment through Dec 10, with an additional ballot Dec 1–10."
+   },
+   {
+    "b": "Registration",
+    "t": "FERC docketed NERC's computational load registry petition as RR27-1-000. Comments are due Nov 20 at 5:00 p.m. ET."
+   },
+   {
+    "b": "IBR owners",
+    "t": "The 2027 ERO Periodic Data Submittal schedule is posted and now includes PRC-028-1 and PRC-029-2. The 2027 CMEP Implementation Plan is also out."
+   },
+   {
+    "b": "Process",
+    "t": "The MSPP Standards Processes Manual initial ballot passed with 81.61% quorum and 97.78% approval."
+   }
+  ]
+ }
+}

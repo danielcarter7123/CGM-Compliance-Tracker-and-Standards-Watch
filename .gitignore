@@ -1,0 +1,12 @@
+node_modules
+# Real client data and generated import SQL: never commit
+data/private/*
+!data/private/README.md
+.next
+out
+.env
+.env.local
+.env*.local
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store

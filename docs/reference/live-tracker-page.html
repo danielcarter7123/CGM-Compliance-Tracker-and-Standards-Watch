@@ -1,0 +1,1107 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>NERC Compliance Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one-screen operator console — sticky header + tab rail, summary strip before detail, tables scroll in their own containers. */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --surface-2:#eaeef4; --line:#d5dce6; --fg:#16202e; --muted:#5a6779;
+  --accent:#1f4fb8; --accent-ink:#ffffff; --accent-soft:#e3ebfb;
+  --crit:#b42318; --crit-soft:#fde8e6; --warn:#a15c00; --warn-soft:#fdf0d9; --ok:#1e7a46; --ok-soft:#e1f3e8; --info:#4a5a73; --info-soft:#e9edf3;
+  --shadow:0 8px 30px rgba(22,32,46,.16);
+  --f-display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f141c; --surface:#161d28; --surface-2:#1e2735; --line:#2c3748; --fg:#e4e9f1; --muted:#97a3b6;
+  --accent:#7aa2ff; --accent-ink:#0b1220; --accent-soft:#1d2a47;
+  --crit:#ff8a7e; --crit-soft:#3a1c1a; --warn:#f2b45a; --warn-soft:#352812; --ok:#6fd39a; --ok-soft:#14301f; --info:#a9b6ca; --info-soft:#232d3c;
+  --shadow:0 8px 30px rgba(0,0,0,.5); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0f141c; --surface:#161d28; --surface-2:#1e2735; --line:#2c3748; --fg:#e4e9f1; --muted:#97a3b6;
+  --accent:#7aa2ff; --accent-ink:#0b1220; --accent-soft:#1d2a47;
+  --crit:#ff8a7e; --crit-soft:#3a1c1a; --warn:#f2b45a; --warn-soft:#352812; --ok:#6fd39a; --ok-soft:#14301f; --info:#a9b6ca; --info-soft:#232d3c;
+  --shadow:0 8px 30px rgba(0,0,0,.5); color-scheme:dark;}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:14px/1.5 var(--f-body);}
+a{color:var(--accent)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-block:12px}
+.brand{display:flex;flex-direction:column;line-height:1.15;margin-right:auto;min-width:0}
+.brand b{font:700 20px/1.1 var(--f-display);letter-spacing:.01em}
+.brand span{color:var(--muted);font-size:12px}
+.bell{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:6px 10px;cursor:pointer}
+.bell .n{background:var(--crit);color:#fff;border-radius:10px;padding:0 7px;font:600 12px/18px var(--f-mono)}
+.bell .n.zero{background:var(--surface-2);color:var(--muted)}
+nav.tabs{display:flex;gap:4px;overflow-x:auto}
+nav.tabs button{border:0;background:none;padding:10px 14px;border-bottom:2px solid transparent;cursor:pointer;color:var(--muted);font-weight:500;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+main{padding-block:20px 60px;display:flex;flex-direction:column;gap:20px}
+h2{font:600 18px/1.2 var(--f-display);margin:0;text-wrap:balance}
+h3{font:600 15px/1.2 var(--f-display);margin:0;letter-spacing:.01em}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.muted{color:var(--muted)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:7px 12px;cursor:pointer;font-weight:500;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.danger{color:var(--crit);border-color:var(--crit)}
+.btn.sm{padding:4px 9px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.toolbar .grow{flex:1 1 220px;min-width:0}
+input[type=text],input[type=email],input[type=url],input[type=tel],input[type=date],input[type=number],input[type=url],select,textarea{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 10px;width:100%;min-width:0}
+textarea{min-height:70px;resize:vertical}
+.strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:760px){.strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:2px;cursor:pointer;text-align:left}
+.stat .v{font:600 28px/1.1 var(--f-display);font-variant-numeric:tabular-nums}
+.stat.crit .v{color:var(--crit)} .stat.warn .v{color:var(--warn)} .stat.ok .v{color:var(--ok)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;min-width:0}
+.panel-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--line)}
+.panel-h .sp{margin-left:auto}
+.cols{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px}
+@media (max-width:900px){.cols{grid-template-columns:minmax(0,1fr)}}
+.list{display:flex;flex-direction:column}
+.item{display:grid;grid-template-columns:6px minmax(0,1fr) auto;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);align-items:center;cursor:pointer}
+.item:last-child{border-bottom:0}
+.item:hover{background:var(--surface-2)}
+.item .bar{align-self:stretch;border-radius:3px;background:var(--info-soft)}
+.item.overdue .bar{background:var(--crit)} .item.window .bar{background:var(--warn)} .item.done .bar{background:var(--ok)}
+.item .t{font-weight:500;overflow-wrap:anywhere}
+.item .m{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.when{text-align:right;font-size:12px;white-space:nowrap}
+.when b{display:block;font:600 14px var(--f-mono)}
+.pill{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:1px 9px;font-size:12px;font-weight:500;white-space:nowrap}
+.pill.overdue{background:var(--crit-soft);color:var(--crit)}
+.pill.window{background:var(--warn-soft);color:var(--warn)}
+.pill.nodate{background:var(--warn-soft);color:var(--warn);border:1px dashed var(--warn)}
+.pill.scheduled{background:var(--info-soft);color:var(--info)}
+.pill.done{background:var(--ok-soft);color:var(--ok)}
+.pill.inprogress{background:var(--accent-soft);color:var(--accent)}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:4px;padding:0 6px;font:500 11px/18px var(--f-mono);color:var(--muted)}
+.code{font:500 13px var(--f-mono);color:var(--accent);text-decoration:none;white-space:nowrap}
+.code:hover{text-decoration:underline}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:760px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;background:var(--surface-2);position:sticky;top:0}
+tbody tr{cursor:pointer} tbody tr:hover{background:var(--surface-2)}
+td.num{font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
+.empty{padding:28px 16px;text-align:center;color:var(--muted);display:flex;flex-direction:column;gap:10px;align-items:center}
+.empty b{color:var(--fg);font-weight:600}
+.note{font-size:12px;color:var(--muted);padding:10px 16px;border-top:1px solid var(--line)}
+.month{padding:8px 16px;background:var(--surface-2);font:600 12px var(--f-display);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line)}
+.tpl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:8px 0;border-top:1px dashed var(--line)}
+.tpl:first-child{border-top:0}
+.std-row td:first-child{width:150px}
+.std-detail td{background:var(--surface-2);cursor:default}
+.std-detail .inner{display:flex;flex-direction:column;gap:10px;max-width:820px}
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(10,15,25,.45);z-index:50;display:flex;justify-content:flex-end}
+.drawer{background:var(--surface);width:min(560px,100%);height:100%;overflow-y:auto;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.drawer-h{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:1}
+.drawer-h h2{margin-right:auto}
+.drawer-b{padding:16px 20px;display:flex;flex-direction:column;gap:14px}
+.drawer-f{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;position:sticky;bottom:0;background:var(--surface)}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field label,.field .lbl{font-size:12px;font-weight:600;color:var(--muted)}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:480px){.row2{grid-template-columns:minmax(0,1fr)}}
+.checks{display:flex;gap:6px;flex-wrap:wrap}
+.checks label{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:6px;padding:4px 9px;font-size:13px;cursor:pointer;color:var(--fg);font-weight:500}
+.checks input{accent-color:var(--accent)}
+.callout{border:1px solid var(--line);background:var(--surface-2);border-radius:6px;padding:10px 12px;font-size:13px;display:flex;flex-direction:column;gap:8px}
+.confirm{border:1px solid var(--crit);background:var(--crit-soft);border-radius:6px;padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:6px;z-index:60;box-shadow:var(--shadow);max-width:calc(100% - 32px);font-size:13px}
+.banner{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:12px 16px;font-size:13px}
+.banner.warn{border-color:var(--warn);background:var(--warn-soft)}
+.act-who{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.act-who img{width:22px;height:22px;border-radius:50%;flex:none}
+.act-chg{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:2px;max-width:420px}
+.act-chg b{color:var(--fg);font-weight:600}
+.act-chg s{color:var(--muted)}
+.tag{display:inline-block;border-radius:4px;padding:0 6px;font:600 11px/18px var(--f-mono);white-space:nowrap}
+.tag.created{background:var(--ok-soft);color:var(--ok)} .tag.updated{background:var(--accent-soft);color:var(--accent)}
+.tag.completed{background:var(--ok-soft);color:var(--ok)} .tag.deleted{background:var(--crit-soft);color:var(--crit)}
+.tag.other{background:var(--info-soft);color:var(--info)}
+.av{width:24px;height:24px;border-radius:50%;flex:none;border:2px solid var(--surface)}
+.avs{display:flex;align-items:center}.avs .av+.av{margin-left:-8px}
+.who{display:flex;align-items:center;gap:8px;min-width:0}
+.pp{border:1px solid var(--line);border-radius:6px;padding:6px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--surface);position:relative}
+.pp .pc{display:inline-flex;align-items:center;gap:6px;background:var(--surface-2);border-radius:999px;padding:2px 4px 2px 2px;font-size:13px}
+.pp .pc img{width:20px;height:20px;border-radius:50%}
+.pp .pc button{border:0;background:none;cursor:pointer;color:var(--muted);padding:0 4px;font-size:14px;line-height:1}
+.pp input{border:0!important;padding:4px!important;flex:1 1 140px;min-width:120px;background:transparent!important}
+.pp input:focus{outline:none}
+.pp-menu{position:absolute;left:-1px;right:-1px;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow);z-index:5;max-height:260px;overflow:auto}
+.pp-menu button{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;padding:8px 10px;cursor:pointer;text-align:left}
+.pp-menu button:hover,.pp-menu button:focus{background:var(--surface-2)}
+.pp-menu img{width:22px;height:22px;border-radius:50%}
+.pill.notstarted{background:var(--info-soft);color:var(--info)} .pill.onhold{background:var(--warn-soft);color:var(--warn)} .pill.review{background:var(--accent-soft);color:var(--accent);border:1px dashed var(--accent)}
+@media (prefers-reduced-motion:no-preference){.drawer{animation:slide .18s ease-out}@keyframes slide{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}}
+</style>
+
+<header class="top">
+  <div class="wrap top-row">
+    <div class="brand"><b>NERC Compliance Tracker</b><span>Generator Owner, Generator Operator &amp; Transmission Owner obligations</span></div>
+    <button class="btn" id="exportAllBtn" type="button" hidden title="Download every client, task, standard, team task and activity record as one JSON file. Visible to Editors only.">Export all data</button>
+    <button class="bell" id="bellBtn" type="button" aria-label="Open reminders"><span>Reminders</span><span class="n zero mono" id="bellN">0</span></button>
+    <button class="btn primary" id="newTaskTop" type="button">New task</button>
+  </div>
+  <div class="wrap"><nav class="tabs" role="tablist" id="tabs">
+    <button role="tab" data-v="dash" aria-selected="true">Dashboard</button>
+    <button role="tab" data-v="tasks" aria-selected="false">Tasks</button>
+    <button role="tab" data-v="team" aria-selected="false">Team Tasks</button>
+    <button role="tab" data-v="standards" aria-selected="false">Standards</button>
+    <button role="tab" data-v="clients" aria-selected="false">Clients</button>
+    <button role="tab" data-v="forms" aria-selected="false">Reporting Forms</button>
+    <button role="tab" data-v="rsaw" aria-selected="false">Audit Worksheets</button>
+    <button role="tab" data-v="activity" aria-selected="false">Activity Log</button>
+  </nav></div>
+</header>
+<div class="wrap"><main id="main"><div class="panel"><div class="empty"><b>Loading compliance data…</b><span>Clients, tasks and the GO/GOP standards library load from this tracker's shared store.</span></div></div></main></div>
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+
+<script>
+(function(){
+"use strict";
+const S={standards:[],clients:[],tasks:[],team:[],teamLoaded:false,tf:{scope:"mine",status:"active",client:"",q:""},activity:[],actLoaded:false,af:{range:"30",who:"",kind:"",client:"",q:"",n:200},people:{},loaded:{standards:false,clients:false,tasks:false},view:"dash",
+  f:{q:"",client:"",std:"",status:"open",fn:""}, sf:{q:"",fam:"",fn:""}, openStd:null, offline:false, readOnly:false};
+let db=null, mcp=null, downloads=null, userNS=null, meId=null;
+const REM_OPTS=[90,60,30,14,7,1];
+const NERC_BASE="https://www.nerc.com/pa/Stand/Reliability%20Standards/";
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const parse=s=>{if(!s)return null;const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const today=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
+const daysUntil=s=>{const d=parse(s);return d?Math.round((d-today())/86400000):null};
+const addDays=(s,n)=>{const d=parse(s);d.setDate(d.getDate()+n);return ymd(d)};
+const addMonths=(s,n)=>{const d=parse(s);const day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+n);const last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();d.setDate(Math.min(day,last));return ymd(d)};
+const fmt=s=>{const d=parse(s);return d?d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}):"—"};
+const isLink=v=>/^https:\/\/\S+$/i.test(String(v||"").trim());
+const stdDefaultLink=s=>NERC_BASE+encodeURIComponent(s.code+"-"+s.version)+".pdf";
+const stdLink=s=>(s.url&&/^https:\/\//i.test(s.url))?s.url:stdDefaultLink(s);
+const stdLabel=s=>s.code+"-"+s.version;
+const stdByCode=c=>S.standards.find(s=>s.code===c);
+const clientById=id=>S.clients.find(c=>c.id===id);
+const byName=a=>[...a].sort((x,y)=>String(x.name||"").localeCompare(String(y.name||""),undefined,{sensitivity:"base",numeric:true}));
+const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
+
+/* ---------- activity log ----------
+   One document per day (activity/YYYY-MM-DD) holding an `entries` map, so concurrent
+   writers merge instead of overwriting and the store stays far below its document cap.
+   Entries store the actor's id only; names are resolved per viewer when rendering. */
+let actQ=Promise.resolve();
+function logAct(e){
+  if(!db||S.readOnly)return;
+  const now=new Date(); const day=ymd(now); const eid=now.getTime().toString(36)+uid().slice(0,6);
+  const entry=Object.assign({ts:now.toISOString(),day,by:meId||null,action:"updated",kind:"task",target:"",label:"",client:"",changes:[],note:""},e);
+  const raw={}; for(const c of entry.changes||[]) if(c.k) raw[c.k]={from:c.rf===undefined?null:c.rf,to:c.rt===undefined?null:c.rt};
+  if(Object.keys(raw).length&&JSON.stringify(raw).length<60000)entry.raw=raw;
+  entry.changes=(entry.changes||[]).slice(0,40).map(c=>({f:String(c.f),from:String(c.from??"").slice(0,300),to:String(c.to??"").slice(0,300)}));
+  const snap=entry.snap; delete entry.snap; if(snap)entry.hasSnap=true;
+  actQ=actQ.then(async()=>{
+    if(snap){try{await db.doc("activitySnapshots/"+eid).set({day,snap:JSON.parse(JSON.stringify(snap))})}catch(_){entry.hasSnap=false}}
+    const ref=db.doc("activity/"+day);
+    try{await ref.update({entries:{[eid]:entry}})}
+    catch(err){ if(err&&(err.code==="invalid_argument"||err.code==="not_found")){
+        const snap=await ref.get().catch(()=>null);
+        if(snap&&snap.exists)await ref.update({entries:{[eid]:entry}}); else await ref.set({day,entries:{[eid]:entry}});
+      } else throw err }
+  }).catch(()=>{});
+  return actQ;
+}
+const showVal=(f,v)=>{if(v===null||v===undefined||v==="")return "";if(f==="links")return (v||[]).map(l=>(l.label?l.label+" ("+l.url+")":l.url)).join("; ");if(Array.isArray(v)&&f!=="collaborators")return v.join(", ");
+  if(typeof v==="boolean")return v?"Yes":"No";
+  if(f==="recur")return recurText(v); if(f==="remindDays")return (v||[]).join(", ")+" days";
+  if(f==="clientId"){const c=clientById(v);return c?c.name:v}
+  if(f==="status")return {open:"Open",inprogress:"In progress",done:"Complete",notstarted:"Not started",onhold:"On hold",review:"In review"}[v]||v;
+  if(f==="owner")return whoName(v);
+  if(f==="collaborators")return (v||[]).map(whoName).join(", ");
+  if(typeof v==="object")return Object.entries(v).filter(([,x])=>x!==""&&x!==null).map(([k,x])=>k.toUpperCase()+": "+x).join("; ");
+  if(/^\d{4}-\d{2}-\d{2}$/.test(v))return fmt(v);
+  return String(v)};
+const TASK_F={title:"Task",clientId:"Client",facility:"Facility",standard:"Standard",requirement:"Requirement",dueDate:"Due date",assignee:"Assignee",assigneeEmail:"Assignee email",remindDays:"Reminders",recur:"Repeats",status:"Status",evidence:"Evidence location",notes:"Notes",completedAt:"Completed"};
+const CLIENT_F={name:"Entity name",ncr:"NCR ID",region:"Regional Entity",regDate:"Registration date",functions:"Registered functions",entities:"Mapped entities",facilities:"Facilities",contact:"Compliance contact",contactEmail:"Contact email",digest:"Contact digest",pmName:"Project Manager",pmEmail:"PM email",pmDigest:"PM digest",plantMgrName:"Plant Manager",plantMgrEmail:"Plant Manager email",plantMgrDigest:"Plant Manager digest",sharepoint:"SharePoint folder",notes:"Notes"};
+const TEAM_F={title:"Task",description:"Description",clientId:"Client",owner:"Assigned to",ownerEmail:"Owner email",collaborators:"Collaborators",plannedDate:"Anticipated completion",actualDate:"Actual completion",estHours:"Estimated hours",status:"Status",links:"Links"};
+const STD_F={version:"Version",title:"Title",family:"Family",applies:"Applies to",url:"Link",notes:"Notes"};
+function diffs(oldO,newO,map){const out=[];for(const [k,lbl] of Object.entries(map)){if(!(k in newO))continue;
+  let a=oldO?oldO[k]:undefined,b=newO[k];
+  if(oldO&&(k==="digest"||k==="pmDigest")&&a===undefined)a=true;
+  if(k==="entities"&&a&&b){b=Object.assign({},a,b)}
+  const sa=showVal(k,a),sb=showVal(k,b); if(sa!==sb)out.push({f:lbl,from:sa,to:sb,k,rf:a===undefined?null:a,rt:b===undefined?null:b})}return out}
+const taskLabel=t=>(t.standard?t.standard+(t.requirement?" "+t.requirement:"")+" · ":"")+(t.title||"");
+
+function state(t){
+  if(t.status==="done")return "done";
+  const n=daysUntil(t.dueDate); if(n===null)return "nodate";
+  if(n<0)return "overdue";
+  const maxR=Math.max(0,...(t.remindDays||[]));
+  if(n<=maxR)return "window";
+  return t.status==="inprogress"?"inprogress":"scheduled";
+}
+const STATE_LABEL={nodate:"Needs due date",overdue:"Overdue",window:"Reminder active",scheduled:"Scheduled",inprogress:"In progress",done:"Complete"};
+function whenText(t){
+  if(t.status==="done")return "Completed "+fmt(t.completedAt);
+  const n=daysUntil(t.dueDate); if(n===null)return "No due date";
+  if(n<0)return Math.abs(n)+" day"+(Math.abs(n)===1?"":"s")+" overdue";
+  if(n===0)return "Due today"; return "Due in "+n+" day"+(n===1?"":"s");
+}
+function nextReminder(t){
+  if(t.status==="done"||!t.dueDate)return null;
+  const offs=[...(t.remindDays||[])].sort((a,b)=>b-a);
+  for(const o of offs){const d=addDays(t.dueDate,-o); if(daysUntil(d)>=0)return {date:d,off:o};}
+  return null;
+}
+const activeTasks=()=>S.tasks.filter(t=>t.status!=="done");
+const reminderTasks=()=>activeTasks().filter(t=>["overdue","window"].includes(state(t))).sort((a,b)=>(a.dueDate||"").localeCompare(b.dueDate||""));
+
+function confirm1(btn,msg){if(btn&&btn.dataset.armed==="1"){delete btn.dataset.armed;return true}if(btn)btn.dataset.armed="1";toast(msg+" Click again to confirm.");return false}
+function toast(msg){const r=$("#toastRoot");r.innerHTML='<div class="toast" role="status">'+esc(msg)+'</div>';clearTimeout(toast._t);toast._t=setTimeout(()=>r.innerHTML="",3800)}
+
+/* ---------- rendering ---------- */
+function render(){
+  document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.v===S.view)));
+  const n=reminderTasks().length; const bn=$("#bellN"); bn.textContent=n; bn.classList.toggle("zero",n===0);
+  $("#newTaskTop").hidden=S.readOnly;
+  const m=$("#main");
+  let pre="";
+  if(S.offline) pre='<div class="banner warn">This view can\'t reach the tracker\'s shared store, so nothing can be loaded or saved here. Open the tracker from claude.ai while signed in.</div>';
+  else if(S.readOnly) pre='<div class="banner">You have view-only access. Ask the tracker owner for Contributor access to add or update tasks.</div>';
+  const v={dash:viewDash,tasks:viewTasks,team:viewTeam,standards:viewStandards,clients:viewClients,forms:viewForms,rsaw:viewRsaw,activity:viewActivity}[S.view]();
+  m.innerHTML=pre+v;
+  bindView();
+}
+
+function itemHTML(t){
+  const st=state(t), c=clientById(t.clientId), s=stdByCode(t.standard);
+  return '<div class="item '+st+'" data-task="'+esc(t.id)+'" tabindex="0" role="button">'+
+    '<span class="bar"></span><div style="min-width:0"><div class="t">'+esc(t.title)+(t.sample?' <span class="chip">SAMPLE</span>':'')+'</div>'+
+    '<div class="m">'+(s?'<span class="mono">'+esc(stdLabel(s))+(t.requirement?' '+esc(t.requirement):'')+'</span>':(t.standard?'<span class="mono">'+esc(t.standard)+'</span>':''))+
+    (c?'<span>'+esc(c.name)+'</span>':'')+(t.facility?'<span>'+esc(t.facility)+'</span>':'')+(t.assignee?'<span>'+esc(t.assignee)+'</span>':'')+'</div></div>'+
+    '<div class="when"><b>'+esc(fmt(t.dueDate))+'</b><span class="pill '+st+'">'+esc(whenText(t))+'</span></div></div>';
+}
+
+function viewDash(){
+  if(!allLoaded()) return loadingPanel();
+  const act=activeTasks(); const od=act.filter(t=>state(t)==="overdue"); const d30=act.filter(t=>{const n=daysUntil(t.dueDate);return n!==null&&n>=0&&n<=30});
+  const q0=new Date();const qStart=ymd(new Date(q0.getFullYear(),Math.floor(q0.getMonth()/3)*3,1));
+  const doneQ=S.tasks.filter(t=>t.status==="done"&&(t.completedAt||"")>=qStart);
+  const rem=reminderTasks();
+  const upcoming=act.filter(t=>!["overdue","window"].includes(state(t))&&t.dueDate).sort((a,b)=>a.dueDate.localeCompare(b.dueDate)).slice(0,40);
+  let up=""; let lastM="";
+  for(const t of upcoming){const mo=parse(t.dueDate).toLocaleDateString(undefined,{month:"long",year:"numeric"}); if(mo!==lastM){up+='<div class="month">'+esc(mo)+'</div>';lastM=mo} up+=itemHTML(t)}
+  const noClients=S.clients.length===0;
+  const perClient=S.clients.map(c=>{const ts=act.filter(t=>t.clientId===c.id);return {c,open:ts.length,od:ts.filter(t=>state(t)==="overdue").length,win:ts.filter(t=>state(t)==="window").length}}).sort((a,b)=>b.od-a.od||b.win-a.win);
+  return '<div class="strip">'+
+    '<button class="stat crit" data-jump="overdue"><span class="eyebrow">Overdue</span><span class="v">'+od.length+'</span><span class="muted">past due date</span></button>'+
+    '<button class="stat warn" data-jump="d30"><span class="eyebrow">Due ≤ 30 days</span><span class="v">'+d30.length+'</span><span class="muted">coming due</span></button>'+
+    '<button class="stat" data-jump="open"><span class="eyebrow">Open tasks</span><span class="v">'+act.length+'</span><span class="muted">across '+S.clients.length+' client'+(S.clients.length===1?'':'s')+'</span></button>'+
+    '<button class="stat ok" data-jump="done"><span class="eyebrow">Closed this quarter</span><span class="v">'+doneQ.length+'</span><span class="muted">since '+esc(fmt(qStart))+'</span></button></div>'+
+  (act.filter(t=>!t.dueDate).length?'<button class="banner warn" data-jump="nodate" style="text-align:left;cursor:pointer;width:100%"><b>'+act.filter(t=>!t.dueDate).length+' task'+(act.filter(t=>!t.dueDate).length===1?' needs':'s need')+' a due date.</b> Reminders and digest emails skip tasks without one. Open the list to set them.</button>':'')+
+  (noClients?'<div class="panel"><div class="empty"><b>Start by adding a client</b><span>Add a Generator Owner / Operator entity, then create tasks from the standards library.</span>'+(S.readOnly?'':'<button class="btn primary" data-act="newClient">Add client</button>')+'</div></div>':'')+
+  '<div class="cols"><div class="panel"><div class="panel-h"><h3>Reminders</h3><span class="muted">Overdue, or inside a reminder window</span></div><div class="list">'+
+    (rem.length?rem.map(itemHTML).join(""):'<div class="empty"><b>No active reminders</b><span>Tasks appear here once they enter the reminder window you set (for example 30 or 7 days before due).</span></div>')+
+  '</div></div>'+
+  '<div class="panel"><div class="panel-h"><h3>By client</h3></div>'+
+    (perClient.length?'<div class="tbl-wrap"><table style="min-width:0"><thead><tr><th>Client</th><th>Open</th><th>Reminders</th><th>Overdue</th></tr></thead><tbody>'+
+    perClient.map(p=>'<tr data-clientjump="'+esc(p.c.id)+'"><td>'+esc(p.c.name)+'</td><td class="num">'+p.open+'</td><td class="num">'+p.win+'</td><td class="num" style="color:'+(p.od?'var(--crit)':'inherit')+'">'+p.od+'</td></tr>').join("")+'</tbody></table></div>':'<div class="empty">No clients yet.</div>')+
+  '</div></div>'+
+  '<div class="panel"><div class="panel-h"><h3>Upcoming schedule</h3><span class="muted">Next 40 tasks outside their reminder window</span></div><div class="list">'+
+    (up||'<div class="empty">Nothing scheduled beyond the current reminder windows.</div>')+'</div></div>';
+}
+
+function filteredTasks(){
+  const f=S.f; const q=f.q.trim().toLowerCase();
+  return S.tasks.filter(t=>{
+    const st=state(t);
+    if(f.status==="open"&&t.status==="done")return false;
+    if(f.status==="overdue"&&st!=="overdue")return false;
+    if(f.status==="d30"){const n=daysUntil(t.dueDate);if(t.status==="done"||n===null||n<0||n>30)return false}
+    if(f.status==="window"&&!["overdue","window"].includes(st))return false;
+    if(f.status==="done"&&t.status!=="done")return false;
+    if(f.status==="nodate"&&(t.status==="done"||t.dueDate))return false;
+    if(f.client&&t.clientId!==f.client)return false;
+    if(f.std&&t.standard!==f.std)return false;
+    if(f.fn){const s=stdByCode(t.standard);if(!s||!(s.applies||[]).includes(f.fn))return false}
+    if(q){const c=clientById(t.clientId);const hay=[t.title,t.standard,t.requirement,t.facility,t.assignee,t.assigneeEmail,t.notes,c&&c.name].join(" ").toLowerCase();if(!hay.includes(q))return false}
+    return true;
+  }).sort((a,b)=>f.status==="done"?(b.completedAt||"").localeCompare(a.completedAt||""):(a.dueDate||"9").localeCompare(b.dueDate||"9"));
+}
+function viewTasks(){
+  if(!allLoaded()) return loadingPanel();
+  const rows=filteredTasks();
+  const stds=[...S.standards].sort((a,b)=>a.code.localeCompare(b.code));
+  return '<div class="panel"><div class="panel-h"><h2>Tasks</h2><span class="muted mono">'+rows.length+' shown</span><span class="sp toolbar">'+
+    (downloads?'<button class="btn sm" data-act="csv">Export CSV</button>':'')+(S.readOnly?'':'<button class="btn sm primary" data-act="newTask">New task</button>')+'</span></div>'+
+    '<div class="toolbar" style="padding:12px 16px;border-bottom:1px solid var(--line)">'+
+      '<input class="grow" type="text" id="fq" placeholder="Search title, facility, assignee…" value="'+esc(S.f.q)+'" aria-label="Search tasks">'+
+      '<select id="fstatus" aria-label="Status" style="width:auto">'+[["open","All open"],["window","Reminders active"],["nodate","Needs due date"],["overdue","Overdue"],["d30","Due ≤ 30 days"],["done","Completed"],["all","All tasks"]].map(([v,l])=>'<option value="'+v+'"'+(S.f.status===v?' selected':'')+'>'+l+'</option>').join("")+'</select>'+
+      '<select id="fclient" aria-label="Client" style="width:auto"><option value="">All clients</option>'+byName(S.clients).map(c=>'<option value="'+esc(c.id)+'"'+(S.f.client===c.id?' selected':'')+'>'+esc(c.name)+'</option>').join("")+'</select>'+
+      '<select id="fstd" aria-label="Standard" style="width:auto"><option value="">All standards</option>'+stds.map(s=>'<option value="'+esc(s.code)+'"'+(S.f.std===s.code?' selected':'')+'>'+esc(s.code)+'</option>').join("")+'</select>'+
+      '<select id="ffn" aria-label="Function" style="width:auto"><option value="">All functions</option>'+["GO","GOP","GO-2","GOP-2","TO"].map(f=>'<option value="'+f+'"'+(S.f.fn===f?' selected':'')+'>'+f+'</option>').join("")+'</select>'+
+    '</div>'+
+    (rows.length?'<div class="tbl-wrap"><table><thead><tr><th>Due</th><th>Task</th><th>Standard</th><th>Client / facility</th><th>Assignee</th><th>Evidence</th><th>Repeats</th><th>Status</th></tr></thead><tbody>'+
+      rows.map(t=>{const st=state(t),c=clientById(t.clientId),s=stdByCode(t.standard);return '<tr data-task="'+esc(t.id)+'">'+
+        '<td class="num">'+esc(fmt(t.dueDate))+'</td><td style="max-width:320px"><b style="font-weight:500">'+esc(t.title)+'</b>'+(t.sample?' <span class="chip">SAMPLE</span>':'')+'</td>'+
+        '<td>'+(s?'<a class="code" href="'+esc(stdLink(s))+'" target="_blank" rel="noopener" data-stop>'+esc(stdLabel(s))+'</a>':'<span class="mono">'+esc(t.standard||"—")+'</span>')+(t.requirement?'<div class="muted mono" style="font-size:12px">'+esc(t.requirement)+'</div>':'')+'</td>'+
+        '<td>'+esc(c?c.name:"—")+(t.facility?'<div class="muted" style="font-size:12px">'+esc(t.facility)+'</div>':'')+'</td>'+
+        '<td>'+esc(t.assignee||(t.assigneeEmail?"":"—"))+(t.assigneeEmail?'<div class="muted" style="font-size:12px;overflow-wrap:anywhere">'+esc(t.assigneeEmail)+' <span class="chip">EMAIL</span></div>':'')+'</td><td>'+(isLink(t.evidence)?'<a href="'+esc(t.evidence)+'" target="_blank" rel="noopener" data-stop>Evidence ↗</a>':(t.evidence?'<span class="muted" style="font-size:12px">'+esc(t.evidence)+'</span>':'<span class="muted">—</span>'))+'</td><td class="num">'+esc(recurText(t.recur))+'</td>'+
+        '<td><span class="pill '+st+'">'+esc(st==="done"?STATE_LABEL.done:whenText(t))+'</span></td></tr>'}).join("")+
+    '</tbody></table></div>':'<div class="empty"><b>No tasks match these filters</b><span>Change the filters, or create tasks from a standard\'s recurring obligations on the Standards tab.</span></div>')+
+  '</div>';
+}
+const UNIT_TXT={d:["day","days"],m:["month","months"],y:["calendar year","calendar years"]};
+function recurText(r){if(!r||!r.n)return "One-time";const u=UNIT_TXT[r.unit]||UNIT_TXT.m;return (r.unit==="y"&&r.n===1?"Every calendar year":"Every "+r.n+" "+u[r.n===1?0:1])+(r.basis==="done"?" from completion":"")}
+/* calendar years: due by December 31 of the year N calendar years after the base date's year */
+const addInterval=(base,r)=>r.unit==="d"?addDays(base,r.n):r.unit==="y"?(parse(base).getFullYear()+r.n)+"-12-31":addMonths(base,r.n);
+/* the date the next occurrence counts from: the completion date for rolling intervals, otherwise the previous due date */
+const recurBase=(r,dueDate,doneDate)=>r&&r.basis==="done"?(doneDate||ymd(today())):dueDate;
+const nextDueFor=(r,dueDate,doneDate)=>{const b=recurBase(r,dueDate,doneDate);return r&&r.n>0&&b?addInterval(b,r):""};
+/* Suggested "repeat from completion" templates (CGM to confirm in Recurrence settings). Key: standard|requirement */
+const BASIS_SUGGEST={"CIP-002|R2":1,"CIP-003|R1":1,"CIP-004|R2":1,"CIP-004|R4 P4.3":1,"CIP-004|R3 P3.5":1,"CIP-006|R3 P3.1":1,"CIP-007|R2 P2.2":1,"CIP-007|R4 P4.4":1,"CIP-007|R5 P5.6":1,
+ "CIP-008|R2 P2.1":1,"CIP-009|R2 P2.1":1,"CIP-009|R2 P2.2":1,"CIP-009|R2 P2.3":1,"CIP-010|R2 P2.1":1,"CIP-010|R3 P3.1":1,"CIP-010|R3 P3.2":1,"CIP-013|R3":1,"CIP-014|R1":1,
+ "MOD-025|R1":1,"MOD-025|R2":1,"MOD-026|R2":1,"MOD-027|R2":1,"PRC-005|Table 1-1":1,"PRC-005|Table 1-3":1,"PRC-005|Table 1-4":1,"PRC-005|Table 1-5":1,"PRC-012|R8":1,"PRC-019|R1":1,"PRC-027|R2":1};
+const suggestedBasis=(code,req)=>BASIS_SUGGEST[code+"|"+(req||"")]?"done":"due";
+
+function viewStandards(){
+  if(!allLoaded()) return loadingPanel();
+  const q=S.sf.q.trim().toLowerCase();
+  const fams=[...new Set(S.standards.map(s=>s.family))].sort();
+  const rows=S.standards.filter(s=>(!S.sf.fam||s.family===S.sf.fam)&&(!S.sf.fn||(s.applies||[]).includes(S.sf.fn))&&(!q||(s.code+" "+s.title+" "+(s.notes||"")).toLowerCase().includes(q))).sort((a,b)=>a.code.localeCompare(b.code));
+  if(!S.standards.length) return '<div class="panel"><div class="empty"><b>The standards library is empty</b><span>Add the standards your clients must meet.</span>'+(S.readOnly?'':'<button class="btn primary" data-act="newStd">New standard</button>')+'</div></div>';
+  return '<div class="panel"><div class="panel-h"><h2>Standards library</h2><span class="muted mono">'+rows.length+' of '+S.standards.length+'</span>'+
+    '<span class="sp toolbar"><span class="muted" style="font-size:12px">Expand a standard to edit it</span>'+(S.readOnly?'':'<button class="btn sm" data-act="recurSet">Recurrence settings</button><button class="btn sm primary" data-act="newStd">New standard</button>')+'</span></div>'+
+    '<div class="toolbar" style="padding:12px 16px;border-bottom:1px solid var(--line)">'+
+      '<input class="grow" type="text" id="sq" placeholder="Search by number or title…" value="'+esc(S.sf.q)+'" aria-label="Search standards">'+
+      '<select id="sfam" aria-label="Family" style="width:auto"><option value="">All families</option>'+fams.map(f=>'<option'+(S.sf.fam===f?' selected':'')+'>'+esc(f)+'</option>').join("")+'</select>'+
+      '<select id="sfn" aria-label="Function" style="width:auto"><option value="">All functions</option><option value="GO"'+(S.sf.fn==="GO"?' selected':'')+'>GO</option><option value="GOP"'+(S.sf.fn==="GOP"?' selected':'')+'>GOP</option><option value="GO-2"'+(S.sf.fn==="GO-2"?' selected':'')+'>GO-2</option><option value="GOP-2"'+(S.sf.fn==="GOP-2"?' selected':'')+'>GOP-2</option><option value="TO"'+(S.sf.fn==="TO"?' selected':'')+'>TO</option></select>'+
+    '</div><div class="tbl-wrap"><table><thead><tr><th>Standard</th><th>Title</th><th>Applies to</th><th>Recurring obligations</th><th>Open tasks</th></tr></thead><tbody>'+
+    rows.map(s=>{const open=activeTasks().filter(t=>t.standard===s.code).length;const isOpen=S.openStd===s.id;
+      return '<tr class="std-row" data-std="'+esc(s.id)+'" aria-expanded="'+isOpen+'"><td><a class="code" href="'+esc(stdLink(s))+'" target="_blank" rel="noopener" data-stop>'+esc(stdLabel(s))+' ↗</a></td><td>'+esc(s.title)+'</td><td>'+(s.applies||[]).map(a=>'<span class="chip">'+esc(a)+'</span>').join(" ")+'</td><td class="num">'+((s.templates||[]).length||"—")+'</td><td class="num">'+open+'</td></tr>'+
+      (isOpen?'<tr class="std-detail"><td colspan="5"><div class="inner">'+stdDetail(s)+'</div></td></tr>':'')}).join("")+
+    '</tbody></table></div><div class="note">Versions reflect the library as loaded in October 2026. Confirm the version in effect for each obligation against NERC\'s U.S. effective dates before relying on it; edit the version here when NERC retires or replaces a standard and every link updates.</div></div>';
+}
+function stdDetail(s){
+  const tpls=s.templates||[];
+  return (s.custom?'<div><span class="chip">ADDED BY YOU</span></div>':'')+(s.notes?'<div>'+esc(s.notes)+'</div>':'')+
+   (S.readOnly?'':'<div class="toolbar"><button class="btn sm" data-editstd="'+esc(s.id)+'">Edit standard details</button></div>')+
+   '<div class="toolbar"><a class="btn sm" href="'+esc(stdLink(s))+'" target="_blank" rel="noopener">Open '+esc(stdLabel(s))+' ↗</a>'+
+   '<span class="muted" style="font-size:12px">'+(s.url?'Custom link':'Default nerc.com PDF link')+'</span>'+
+   (S.readOnly?'':'<label class="muted" style="font-size:12px" for="ver-'+esc(s.id)+'">Version</label><input type="text" id="ver-'+esc(s.id)+'" value="'+esc(s.version)+'" style="width:90px" class="mono"><button class="btn sm" data-savever="'+esc(s.id)+'">Save version</button>')+'</div>'+
+   (S.readOnly?'':'<div class="field"><label for="url-'+esc(s.id)+'">Standard link</label><div class="toolbar"><input type="url" class="grow mono" id="url-'+esc(s.id)+'" value="'+esc(stdLink(s))+'" autocomplete="off" style="font-size:12px">'+
+     '<button class="btn sm" data-saveurl="'+esc(s.id)+'">Save link</button>'+(s.url?'<button class="btn sm" data-reseturl="'+esc(s.id)+'">Reset to nerc.com default</button>':'')+'</div>'+
+     '<span class="muted" style="font-size:12px">Point this at any page, such as the NERC standard page, a redline, or your SharePoint copy. Every task, the digest emails and the Outlook reminders use this link.</span></div>')+
+   '<div><div class="eyebrow" style="margin-bottom:4px">Recurring and event-driven obligations</div>'+
+   (tpls.length?tpls.map((t,i)=>'<div class="tpl"><div><div style="font-weight:500">'+esc(t.title)+'</div><div class="muted mono" style="font-size:12px">'+esc(t.req||"")+' · '+esc(recurText(t.recur))+'</div></div>'+
+     (S.readOnly?'':'<button class="btn sm" data-tpl="'+esc(s.id)+'|'+i+'">Create task</button>')+'</div>').join(""):'<div class="muted">No templates. Use "New task" to track obligations under this standard.</div>')+'</div>'+
+   (S.readOnly||!tpls.length?'':'<div class="toolbar"><select id="bulkClient-'+esc(s.id)+'" style="width:auto" aria-label="Client for all tasks"><option value="">Choose client…</option>'+byName(S.clients).map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join("")+'</select><button class="btn sm primary" data-bulk="'+esc(s.id)+'">Create all recurring tasks for client</button></div>');
+}
+
+const PORTAL_URL="https://claude.ai/artifact/XdFKUhAb3BRHdAuoG6dgHr";
+function viewForms(){
+  const forms=[["Protection System Misoperation Report","PRC-004-6 / MIDAS"],["Event Report","EOP-004-4"],["Equipment Change Notice","VAR-002-4.1 / MOD-032-1 / MOD-026-1"],["Cold Weather Data","EOP-012"],["Transient Cyber Assets and Removable Media Log","CIP-003-9 / CIP-010-4"],["Weekly Compliance Checklist","Weekly · COM / VAR / CIP / EOP / PRC"],["Vendor Electronic Access Authorization","CIP-003-9 Att. 1 Sec. 3 & 6"],["Cyber Security Incident Report","CIP-008-6 / CIP-003-9 Att. 1 Sec. 4"],["OT Support Request","SCADA / Network / OT / Communications"],["CIP Senior Manager Designation and Delegates Identification","CIP-003-9 R3 / R4"],["BES Cyber System Identification and Classification","CIP-002-5.1a R1 / R2"],["Protection System Settings Development","PRC-027-1 R1"]];
+  return '<div class="panel"><div class="panel-h"><h2>Reporting Forms</h2><span class="sp"><a class="btn sm primary" href="'+PORTAL_URL+'" target="_blank" rel="noopener">Open CGM Compliance Reporting ↗</a></span></div>'+
+   '<div style="padding:16px;display:flex;flex-direction:column;gap:14px;max-width:760px">'+
+   '<p style="margin:0">Clients complete reporting forms in <b>CGM Compliance Reporting</b>, a separate portal you share with each client contact. As the owner you build and edit forms there, and review every submission. New submissions also appear in your weekday digest email.</p>'+
+   '<div><div class="eyebrow" style="margin-bottom:6px">Forms ready to use</div>'+forms.map(([t,c])=>'<div class="tpl"><div style="font-weight:500">'+esc(t)+'</div><span class="mono muted" style="font-size:12px">'+esc(c)+'</span></div>').join("")+'</div>'+
+   '<div class="callout"><b>Give a client access</b><span>Open the portal, choose Share, and invite the client contact by email as an Editor. People outside CGM can only submit forms with Editor access, and only while the portal isn\'t shared by public link. Each client sees only their own submissions; only you see all of them.</span></div>'+
+   '<div class="callout"><b>Add or change a form</b><span>In the portal, open <b>Form builder</b>. Add questions as short text, long text, number, date, time, date and time, choose one, choose all that apply, yes/no or a link, and hide a form from clients without deleting it.</span></div>'+
+   '</div></div>';
+}
+const RSAW_URL="https://claude.ai/artifact/1G1VCyyXCGLyo7XAafhjjc";
+function viewRsaw(){
+  const cl=[...S.clients].filter(c=>!c.sample).sort((a,b)=>a.name.localeCompare(b.name));
+  return '<div class="panel"><div class="panel-h"><h2>Audit Worksheets</h2><span class="muted">GO/GOP/TO RSAW Workbench</span><span class="sp"><a class="btn sm primary" href="'+RSAW_URL+'" target="_blank" rel="noopener">Open RSAW Workbench ↗</a></span></div>'+
+   '<div style="padding:16px;display:flex;flex-direction:column;gap:14px;max-width:760px">'+
+   '<p style="margin:0">Run mock audits and compliance assessments in the <b>RSAW Workbench</b>. Each engagement scopes the GO, GOP and TO standards from the entity\'s registration and facility profile, then gives you a Reliability Standard Audit Worksheet for every requirement: evidence requested, assessment steps, evidence submitted, entity response, assessor notes, and a finding.</p>'+
+   '<div><div class="eyebrow" style="margin-bottom:6px">What it covers</div>'+
+     [["Standards","50 GO, GOP and TO standards, 187 requirements across BAL, CIP, COM, EOP, FAC, IRO, MOD, PER, PRC, TOP, TPL and VAR, plus Texas RE and WECC regionals"],
+      ["Findings","No Finding, Possible Non-Compliance, Area of Concern, Recommendation, Not Applicable"],
+      ["Exports","Findings as CSV, an RSAW-style report that opens in Word, and a JSON backup"]].map(([t,d])=>'<div class="tpl"><div style="font-weight:500">'+esc(t)+'</div><span class="muted" style="font-size:12px;text-align:right;max-width:460px">'+esc(d)+'</span></div>').join("")+'</div>'+
+   '<div class="callout"><b>Start an engagement for a client</b><span>In the Workbench, create an engagement with the same entity name and NCR ID as the client here, so tasks and audit findings line up. Turn Possible Non-Compliance and Area of Concern findings into tasks on the Tasks tab with the matching standard and requirement.</span>'+
+     (cl.length?'<div class="tbl-wrap"><table style="min-width:0"><thead><tr><th>Client</th><th>NCR ID</th><th>Region</th><th>Registered as</th></tr></thead><tbody>'+
+       cl.map(c=>'<tr data-client="'+esc(c.id)+'"><td>'+esc(c.name)+'</td><td class="num">'+esc(c.ncr||"—")+'</td><td>'+esc(c.region||"—")+'</td><td>'+(c.functions||[]).map(f=>'<span class="chip">'+esc(f)+'</span>').join(" ")+'</td></tr>').join("")+'</tbody></table></div>':'')+'</div>'+
+   '<div class="callout"><b>Team access</b><span>The Workbench is its own page with its own sharing. Share it from its Share menu with Contributor access so assessors can edit worksheets.</span></div>'+
+   '</div></div>';
+}
+function viewClients(){
+  if(!allLoaded()) return loadingPanel();
+  return '<div class="panel"><div class="panel-h"><h2>Clients</h2><span class="muted mono">'+S.clients.length+'</span><span class="sp">'+(S.readOnly?'':'<button class="btn sm primary" data-act="newClient">Add client</button>')+'</span></div>'+
+  (S.clients.length?'<div class="tbl-wrap"><table><thead><tr><th>Entity</th><th>NCR ID</th><th>Registered</th><th>Region</th><th>Registered as</th><th>Project Manager</th><th>Plant Manager</th><th>Facilities</th></tr></thead><tbody>'+
+   [...S.clients].sort((a,b)=>a.name.localeCompare(b.name)).map(c=>{
+    return '<tr data-client="'+esc(c.id)+'"><td><b style="font-weight:500">'+esc(c.name)+'</b>'+(c.sample?' <span class="chip">SAMPLE</span>':'')+(c.sharepoint&&/^https:\/\//i.test(c.sharepoint)?' <a href="'+esc(c.sharepoint)+'" target="_blank" rel="noopener" data-stop style="font-size:12px">SharePoint ↗</a>':'')+(c.contact||c.contactEmail?'<div class="muted" style="font-size:12px">'+esc([c.contact,c.contactEmail].filter(Boolean).join(" · "))+(c.contactEmail&&c.digest!==false?' <span class="chip">DIGEST</span>':'')+'</div>':'')+'</td><td class="num">'+esc(c.ncr||"—")+'</td><td class="num">'+esc(c.regDate?fmt(c.regDate):"—")+'</td><td>'+esc(c.region||"—")+'</td><td>'+(c.functions||[]).map(f=>'<span class="chip">'+esc(f)+'</span>').join(" ")+(()=>{const en=entFor(c.functions).filter(e=>c.entities&&c.entities[e.k]);return en.length?'<div class="muted" style="font-size:12px;margin-top:4px">'+en.map(e=>'<b style="font-weight:600">'+e.ab+'</b> '+esc(c.entities[e.k])).join(" · ")+'</div>':''})()+'</td><td>'+esc(c.pmName||(c.pmEmail?"":"—"))+(c.pmEmail?'<div class="muted" style="font-size:12px">'+esc(c.pmEmail)+(c.pmDigest!==false?' <span class="chip">DIGEST</span>':'')+'</div>':'')+'</td><td>'+esc(c.plantMgrName||(c.plantMgrEmail?"":"—"))+(c.plantMgrEmail?'<div class="muted" style="font-size:12px">'+esc(c.plantMgrEmail)+(c.plantMgrDigest===true?' <span class="chip">DIGEST</span>':'')+'</div>':'')+'</td><td style="max-width:260px">'+esc(c.facilities||"—")+'</td></tr>'}).join("")+
+  '</tbody></table></div>':'<div class="empty"><b>No clients yet</b><span>Add each registered entity you support, with its NCR ID, Regional Entity and GO/GOP registration.</span></div>')+
+  (S.clients.some(c=>c.sample)&&!S.readOnly?'<div class="note">Sample records are marked SAMPLE. <button class="btn sm" data-act="clearSample">Remove sample client and tasks</button></div>':'')+'</div>';
+}
+const plain=o=>{const x=JSON.parse(JSON.stringify(o||{}));delete x.id;return x};
+const actColl={task:"tasks",client:"clients",standard:"standards",team:"teamTasks"};
+const recArr=k=>({task:S.tasks,client:S.clients,standard:S.standards,team:S.team})[k];
+const recordExists=(kind,id)=>{const arr=recArr(kind);return !!(arr&&arr.some(r=>r.id===id))};
+function restoreInfo(e){
+  if(S.readOnly||!actColl[e.kind]||!e.target||e.restoredAt)return null;
+  if(e.action==="deleted"&&e.hasSnap)return recordExists(e.kind,e.target)?null:{mode:"restore",label:"Restore"};
+  if((e.action==="updated"||e.action==="completed")&&e.raw&&recordExists(e.kind,e.target)){
+    const cur=recArr(e.kind).find(r=>r.id===e.target);
+    const changed=Object.entries(e.raw).filter(([k,v])=>JSON.stringify(cur[k]??null)!==JSON.stringify(v.to??null)).map(([k])=>k);
+    return {mode:"revert",label:"Revert",changed};
+  }
+  return null;
+}
+async function doRestore(e,btn){
+  const info=restoreInfo(e); if(!info)return;
+  if(btn.dataset.armed!=="1"){btn.dataset.armed="1";btn.classList.add("danger");
+    btn.textContent=info.mode==="restore"?"Confirm restore":(info.changed.length?"Revert anyway? Edited since":"Confirm revert");return}
+  btn.disabled=true; const col=actColl[e.kind];
+  try{
+    if(info.mode==="revert"){
+      const cur=recArr(e.kind).find(r=>r.id===e.target);
+      const body={}; for(const [k,v] of Object.entries(e.raw))body[k]=v.from??(Array.isArray(v.to)?[]:(v.to&&typeof v.to==="object"?null:""));
+      await db.doc(col+"/"+e.target).update(body);
+      const map={task:TASK_F,client:CLIENT_F,standard:STD_F,team:TEAM_F}[e.kind];
+      await logAct({action:"restored",kind:e.kind,target:e.target,label:e.label,client:e.client,note:"Reverted the change made "+new Date(e.ts).toLocaleString(),changes:diffs(cur,body,map)});
+      toast("Change reverted.");
+    } else {
+      const snapDoc=await db.doc("activitySnapshots/"+e.id).get();
+      if(!snapDoc.exists){toast("The saved copy of this record wasn't found, so it can't be restored.");btn.disabled=false;return}
+      const sn=snapDoc.data().snap; let nTasks=0;
+      if(e.kind==="standard"&&S.standards.some(x=>x.code===sn.data.code)){toast(sn.data.code+" is already back in the library.");btn.disabled=false;return}
+      await db.doc(col+"/"+e.target).set(plain(sn.data));
+      for(const t of sn.tasks||[]){ if(!S.tasks.some(x=>x.id===t.id)){await db.doc("tasks/"+t.id).set(plain(t));nTasks++} }
+      await logAct({action:"restored",kind:e.kind,target:e.target,label:e.label,client:e.client,note:"Restored from the deletion on "+new Date(e.ts).toLocaleString()+(nTasks?" with "+nTasks+" task"+(nTasks===1?"":"s"):"")});
+      toast((ACT_KIND[e.kind]||"Record")+" restored"+(nTasks?" with "+nTasks+" task"+(nTasks===1?"":"s"):"")+".");
+    }
+    const ref=db.doc("activity/"+(e.day||ymd(new Date(e.ts))));
+    try{await ref.update({entries:{[e.id]:{restoredAt:new Date().toISOString(),restoredBy:meId||null}}})}catch(_){}
+  }catch(err){btn.disabled=false;writeErr(err)}
+}
+/* ---------- team tasks (internal CGM work) ---------- */
+const TEAM_STATUS=[["notstarted","Not started"],["inprogress","In progress"],["onhold","On hold"],["review","In review"],["done","Complete"]];
+const teamStatusLabel=v=>(TEAM_STATUS.find(x=>x[0]===v)||[,v||"Not started"])[1];
+const teamLate=t=>t.status!=="done"&&t.plannedDate&&daysUntil(t.plannedDate)<0;
+const hrs=n=>{n=+n||0;return (Math.round(n*100)/100).toLocaleString()};
+const teamPill=t=>t.status==="done"?"done":t.status==="inprogress"?"inprogress":(t.status||"notstarted");
+function teamRows(){const f=S.tf;const q=f.q.trim().toLowerCase();
+  return S.team.filter(t=>{
+    if(f.scope==="mine"&&!(meId&&(t.owner===meId||(t.collaborators||[]).includes(meId))))return false;
+    if(f.scope==="owned"&&!(meId&&t.owner===meId))return false;
+    if(f.scope==="unassigned"&&t.owner)return false;
+    if(f.status==="active"&&t.status==="done")return false;
+    if(f.status==="late"&&!teamLate(t))return false;
+    if(!["active","all","late"].includes(f.status)&&(t.status||"notstarted")!==f.status)return false;
+    if(f.client&&(f.client==="none"?t.clientId:t.clientId!==f.client))return false;
+    if(q){const c=clientById(t.clientId);if(![t.title,t.description,...(t.links||[]).map(l=>l.label+" "+l.url),c&&c.name,whoName(t.owner),...(t.collaborators||[]).map(whoName)].join(" ").toLowerCase().includes(q))return false}
+    return true}).sort((a,b)=>(a.status==="done")-(b.status==="done")||(a.plannedDate||"9").localeCompare(b.plannedDate||"9"));
+}
+function viewTeam(){
+  if(!S.teamLoaded&&!S.offline)return loadingPanel();
+  resolvePeople(S.team.flatMap(t=>[t.owner,...(t.collaborators||[])]).concat(meId?[meId]:[]));
+  const rows=teamRows(); const mine=S.team.filter(t=>t.status!=="done"&&meId&&(t.owner===meId||(t.collaborators||[]).includes(meId)));
+  const late=S.team.filter(teamLate); const openAll=S.team.filter(t=>t.status!=="done");
+  const now=new Date(); const m0=ymd(new Date(now.getFullYear(),now.getMonth(),1)); const doneM=S.team.filter(t=>t.status==="done"&&(t.actualDate||"")>=m0);
+  const sum=a=>hrs(a.reduce((x,t)=>x+(+t.estHours||0),0));
+  const sel=(id,cur,opts,lbl)=>'<select id="'+id+'" aria-label="'+lbl+'" style="width:auto">'+opts.map(([v,l])=>'<option value="'+esc(v)+'"'+(cur===v?' selected':'')+'>'+esc(l)+'</option>').join("")+'</select>';
+  return '<div class="strip">'+
+    '<button class="stat" data-tjump="mine"><span class="eyebrow">My open tasks</span><span class="v">'+mine.length+'</span><span class="muted">'+sum(mine)+' estimated hours</span></button>'+
+    '<button class="stat crit" data-tjump="late"><span class="eyebrow">Past anticipated date</span><span class="v">'+late.length+'</span><span class="muted">not yet complete</span></button>'+
+    '<button class="stat" data-tjump="allopen"><span class="eyebrow">Team open tasks</span><span class="v">'+openAll.length+'</span><span class="muted">'+sum(openAll)+' estimated hours</span></button>'+
+    '<button class="stat ok" data-tjump="done"><span class="eyebrow">Completed this month</span><span class="v">'+doneM.length+'</span><span class="muted">since '+esc(fmt(m0))+'</span></button></div>'+
+   '<div class="panel"><div class="panel-h"><h2>Team Tasks</h2><span class="muted mono">'+rows.length+' shown</span><span class="sp toolbar">'+(downloads?'<button class="btn sm" data-act="teamcsv">Export CSV</button>':'')+(S.readOnly?'':'<button class="btn sm primary" data-act="newTeam">New team task</button>')+'</span></div>'+
+   '<div class="toolbar" style="padding:12px 16px;border-bottom:1px solid var(--line)">'+
+    '<input class="grow" type="text" id="tq" placeholder="Search task, description, client or person…" value="'+esc(S.tf.q)+'" aria-label="Search team tasks">'+
+    sel("tscope",S.tf.scope,[["mine","Assigned to me or collaborating"],["owned","Assigned to me"],["all","Everyone"],["unassigned","Unassigned"]],"Whose tasks")+
+    sel("tstatus",S.tf.status,[["active","All open"],["late","Past anticipated date"]].concat(TEAM_STATUS).concat([["all","All statuses"]]),"Status")+
+    sel("tclient",S.tf.client,[["","All clients"],["none","Internal (no client)"]].concat([...S.clients].sort((a,b)=>a.name.localeCompare(b.name)).map(c=>[c.id,c.name])),"Client")+
+   '</div>'+
+   (rows.length?'<div class="tbl-wrap"><table><thead><tr><th>Task</th><th>Client</th><th>Assigned to</th><th>Collaborators</th><th>Est. hrs</th><th>Anticipated</th><th>Actual</th><th>Status</th></tr></thead><tbody>'+
+    rows.map(t=>{const c=clientById(t.clientId);const lt=teamLate(t);return '<tr data-team="'+esc(t.id)+'"><td style="max-width:320px"><b style="font-weight:500">'+esc(t.title)+'</b>'+
+     ((t.links||[]).length?'<div style="font-size:12px;display:flex;gap:10px;flex-wrap:wrap;margin-top:2px">'+t.links.slice(0,3).map(l=>'<a href="'+esc(l.url)+'" target="_blank" rel="noopener" data-stop>'+esc(l.label||"Link")+' ↗</a>').join("")+(t.links.length>3?'<span class="muted">+'+(t.links.length-3)+' more</span>':'')+'</div>':'')+(t.description?'<div class="muted" style="font-size:12px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">'+esc(t.description)+'</div>':'')+'</td>'+
+     '<td>'+esc(c?c.name:(t.clientId?"(removed client)":"Internal"))+'</td>'+
+     '<td>'+(t.owner?'<span class="who">'+avatar(t.owner)+'<span data-name="'+esc(t.owner)+'"></span></span>':'<span class="muted">Unassigned</span>')+'</td>'+
+     '<td>'+((t.collaborators||[]).length?'<span class="who"><span class="avs">'+t.collaborators.slice(0,4).map(i=>avatar(i)).join("")+'</span><span class="muted" style="font-size:12px">'+esc(t.collaborators.slice(0,2).map(whoName).join(", ")+(t.collaborators.length>2?" +"+(t.collaborators.length-2):""))+'</span></span>':'<span class="muted">—</span>')+'</td>'+
+     '<td class="num">'+(t.estHours!==""&&t.estHours!=null?hrs(t.estHours):"—")+'</td>'+
+     '<td class="num" style="'+(lt?'color:var(--crit)':'')+'">'+esc(fmt(t.plannedDate))+'</td><td class="num">'+esc(fmt(t.actualDate))+'</td>'+
+     '<td><span class="pill '+(lt?"overdue":teamPill(t))+'">'+esc(teamStatusLabel(t.status)+(lt?" · late":""))+'</span></td></tr>'}).join("")+
+    '</tbody></table></div><div class="note">'+sum(rows)+' estimated hours across the '+rows.length+' task'+(rows.length===1?'':'s')+' shown.</div>'
+   :'<div class="empty"><b>'+(S.team.length?'No team tasks match these filters':'No team tasks yet')+'</b><span>Track internal CGM work here: assign it to yourself or a colleague, add collaborators, link a client, and record estimated hours and completion dates.</span>'+(S.readOnly?'':'<button class="btn primary" data-act="newTeam">New team task</button>')+'</div>')+
+   '</div>';
+}
+/* person picker: stores ids only; names and avatars resolve per viewer */
+function personPicker(root,ids,multi,onChange){
+  let cur=[...ids]; let timer=null;
+  const draw=()=>{root.innerHTML=cur.map(i=>'<span class="pc">'+(S.people[i]&&S.people[i].avatarUrl?'<img alt="" src="'+esc(S.people[i].avatarUrl)+'">':'')+'<span data-pn="'+esc(i)+'"></span><button type="button" data-rm="'+esc(i)+'" aria-label="Remove">×</button></span>').join("")+
+     ((multi||!cur.length)?'<input type="text" placeholder="'+(userNS?(multi?"Add a colleague by name…":"Search for a colleague…"):"People search isn't available here")+'" autocomplete="off"'+(userNS?'':' disabled')+' aria-label="'+(multi?"Add collaborator":"Assign to")+'">':'')+'<div class="pp-menu" hidden></div>';
+    root.querySelectorAll("[data-pn]").forEach(el=>el.textContent=whoName(el.dataset.pn));
+    root.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{cur=cur.filter(x=>x!==b.dataset.rm);draw();onChange(cur);const i=root.querySelector("input");if(i)i.focus()});
+    const inp=root.querySelector("input"),menu=root.querySelector(".pp-menu"); if(!inp||!userNS)return;
+    const run=async q=>{const hits=(await userNS.search(q)).filter(p=>!cur.includes(p.id));for(const p of hits)S.people[p.id]=p;
+      menu.innerHTML=hits.length?hits.map(p=>'<button type="button" data-pick="'+esc(p.id)+'">'+(p.avatarUrl?'<img alt="" src="'+esc(p.avatarUrl)+'">':'')+'<span data-pn="'+esc(p.id)+'"></span>'+(p.isMe?' <span class="chip">YOU</span>':'')+'</button>').join(""):'<div class="muted" style="padding:8px 10px;font-size:13px">'+(q?'No one found':'Type a name to search CGM')+'</div>';
+      menu.querySelectorAll("[data-pn]").forEach(el=>el.textContent=(S.people[el.dataset.pn]&&S.people[el.dataset.pn].name)||"Someone");
+      menu.querySelectorAll("[data-pick]").forEach(b=>b.onmousedown=e=>{e.preventDefault();cur=multi?cur.concat(b.dataset.pick):[b.dataset.pick];draw();onChange(cur);const i=root.querySelector("input");if(i)i.focus()});
+      menu.hidden=false};
+    inp.addEventListener("focus",()=>run(""));inp.addEventListener("input",()=>{clearTimeout(timer);timer=setTimeout(()=>run(inp.value.trim()),180)});
+    inp.addEventListener("blur",()=>setTimeout(()=>{menu.hidden=true},150));
+    inp.addEventListener("keydown",e=>{if(e.key==="Escape"){menu.hidden=true;e.stopPropagation()}if(e.key==="Enter"){e.preventDefault();const b=menu.querySelector("[data-pick]");if(b&&!menu.hidden)b.dispatchEvent(new MouseEvent("mousedown"))}});
+  };
+  draw(); return {get:()=>cur,set:v=>{cur=[...v];draw();onChange(cur)}};
+}
+function openTeam(id,preset){
+  if(!id&&S.readOnly)return;
+  const t=id?S.team.find(x=>x.id===id):Object.assign({title:"",description:"",clientId:S.tf.client&&S.tf.client!=="none"?S.tf.client:"",owner:meId||"",ownerEmail:"",collaborators:[],plannedDate:"",actualDate:"",estHours:"",status:"notstarted"},preset||{});
+  if(!t)return; const ro=S.readOnly, dis=ro?" disabled":"";
+  resolvePeople([t.owner,...(t.collaborators||[]),t.createdBy]);
+  $("#modalRoot").innerHTML='<div class="scrim" id="scrim"><form class="drawer" id="tmForm" role="dialog" aria-modal="true" aria-labelledby="tmh" novalidate>'+
+   '<div class="drawer-h"><h2 id="tmh">'+(id?"Team task":"New team task")+'</h2>'+(id?'<span class="pill '+teamPill(t)+'">'+esc(teamStatusLabel(t.status))+'</span>':'')+'<button type="button" class="btn sm" id="xBtn">Close</button></div><div class="drawer-b">'+
+   '<div class="field"><label for="tm_title">Task</label><input type="text" id="tm_title" value="'+esc(t.title)+'"'+dis+' placeholder="e.g. Draft CIP-003 low impact plan update"></div>'+
+   '<div class="field"><label for="tm_desc">Description</label><textarea id="tm_desc" rows="5"'+dis+' placeholder="Scope, deliverables, next steps">'+esc(t.description)+'</textarea></div>'+
+   '<div class="field"><span class="lbl">Links</span><div id="tm_links" style="display:flex;flex-direction:column;gap:6px"></div>'+(ro?'':'<div><button type="button" class="btn sm" id="tm_addlink">Add link</button></div>')+'<span class="muted" style="font-size:12px">Share the working files for this task, such as a SharePoint folder, Teams channel, OneDrive document or meeting notes.</span></div>'+
+   '<div class="field"><label for="tm_client">Client</label><select id="tm_client"'+dis+'><option value="">Internal (no client)</option>'+[...S.clients].sort((a,b)=>a.name.localeCompare(b.name)).map(c=>'<option value="'+esc(c.id)+'"'+(t.clientId===c.id?' selected':'')+'>'+esc(c.name)+'</option>').join("")+'</select></div>'+
+   '<div class="field"><span class="lbl">Assigned to</span><div class="pp" id="tm_owner"></div>'+(ro||!meId?'':'<div><button type="button" class="btn sm" id="tm_me">Assign to me</button></div>')+'</div>'+
+   '<div class="field"><label for="tm_oemail">Owner email</label><input type="email" id="tm_oemail" value="'+esc(t.ownerEmail||"")+'"'+dis+' placeholder="name@cgmconsultinggroup.com" autocomplete="off"><span class="muted" style="font-size:12px">The owner gets a weekday-morning email once the anticipated completion date is 7 days out, on the date, and every weekday while it is past due.</span></div>'+
+   '<div class="field"><span class="lbl">Collaborators</span><div class="pp" id="tm_collab"></div><span class="muted" style="font-size:12px">Collaborators see this task under "Assigned to me or collaborating". Adding someone doesn\'t notify them or change their access to the tracker.</span></div>'+
+   '<div class="row2"><div class="field"><label for="tm_plan">Anticipated completion date</label><input type="date" id="tm_plan" value="'+esc(t.plannedDate)+'"'+dis+'></div>'+
+   '<div class="field"><label for="tm_actual">Actual completion date</label><input type="date" id="tm_actual" value="'+esc(t.actualDate)+'" max="'+ymd(today())+'"'+dis+'></div></div>'+
+   '<div class="row2"><div class="field"><label for="tm_hrs">Estimated hours</label><input type="number" id="tm_hrs" min="0" step="0.25" class="mono" value="'+esc(t.estHours)+'"'+dis+'></div>'+
+   '<div class="field"><label for="tm_status">Status</label><select id="tm_status"'+dis+'>'+TEAM_STATUS.map(([v,l])=>'<option value="'+v+'"'+((t.status||"notstarted")===v?' selected':'')+'>'+l+'</option>').join("")+'</select></div></div>'+
+   (id&&t.createdBy?'<div class="muted" style="font-size:12px">Created '+esc(fmt(t.createdAt))+' by <span data-name="'+esc(t.createdBy)+'"></span></div>':'')+
+   '<div id="delZone"></div></div>'+
+   (ro?'':'<div class="drawer-f"><button type="submit" class="btn primary">'+(id?"Save":"Create task")+'</button>'+(id&&t.status!=="done"?'<button type="button" class="btn" id="tm_done">Mark complete</button>':'')+'<span style="flex:1"></span>'+(id?'<button type="button" class="btn danger" id="delBtn">Delete</button>':'')+'</div>')+'</form></div>';
+  const close=closeModal; $("#xBtn").onclick=close; $("#scrim").addEventListener("click",e=>{if(e.target.id==="scrim")close()});
+  document.querySelectorAll("#modalRoot [data-name]").forEach(el=>el.textContent=whoName(el.dataset.name));
+  let owner=t.owner?[t.owner]:[], collab=[...(t.collaborators||[])];
+  if(ro){$("#tm_links").innerHTML=(t.links||[]).length?(t.links||[]).map(l=>/^https:\/\/\S+$/i.test(l.url)?'<a href="'+esc(l.url)+'" target="_blank" rel="noopener">'+esc(l.label||l.url)+' ↗</a>':'<span>'+esc(l.label||l.url)+'</span>').join(""):'<span class="muted">No links.</span>';
+    $("#tm_owner").textContent=t.owner?whoName(t.owner):"Unassigned";$("#tm_collab").textContent=collab.map(whoName).join(", ")||"None";return}
+  const meBtn=$("#tm_me");
+  const op=personPicker($("#tm_owner"),owner,false,v=>{owner=v;if(meBtn)meBtn.hidden=owner[0]===meId});
+  personPicker($("#tm_collab"),collab,true,v=>{collab=v});
+  let links=(t.links||[]).map(l=>({label:l.label||"",url:l.url||""}));
+  const drawLinks=()=>{const box=$("#tm_links");
+    box.innerHTML=links.length?links.map((l,i)=>'<div class="toolbar" style="flex-wrap:nowrap"><input type="text" data-lk="'+i+'|label" value="'+esc(l.label)+'" placeholder="Label (optional)" style="flex:0 1 170px" aria-label="Link label">'+
+      '<input type="url" data-lk="'+i+'|url" value="'+esc(l.url)+'" placeholder="https://" style="flex:1 1 auto" class="mono" aria-label="Link address">'+
+      (/^https:\/\/\S+$/i.test(l.url)?'<a class="btn sm" href="'+esc(l.url)+'" target="_blank" rel="noopener" aria-label="Open link">Open ↗</a>':'')+
+      '<button type="button" class="btn sm" data-lkrm="'+i+'" aria-label="Remove link">×</button></div>').join(""):'<span class="muted" style="font-size:13px">No links yet.</span>';
+    box.querySelectorAll("[data-lk]").forEach(el=>el.addEventListener("input",()=>{const [i,k]=el.dataset.lk.split("|");links[+i][k]=el.value}));
+    box.querySelectorAll("[data-lk$='|url']").forEach(el=>el.addEventListener("change",drawLinks));
+    box.querySelectorAll("[data-lkrm]").forEach(b=>b.onclick=()=>{links.splice(+b.dataset.lkrm,1);drawLinks()})};
+  drawLinks(); $("#tm_addlink").onclick=()=>{links.push({label:"",url:""});drawLinks();const ins=$("#tm_links").querySelectorAll('input[type=url]');if(ins.length)ins[ins.length-1].focus()};
+  if(meBtn){meBtn.hidden=owner[0]===meId;meBtn.onclick=async()=>{if(meId&&!S.people[meId]&&userNS){try{S.people[meId]=await userNS.me()}catch(_){}}op.set([meId])}}
+  $("#tm_title").focus();
+  $("#tm_status").addEventListener("change",e=>{if(e.target.value==="done"&&!$("#tm_actual").value)$("#tm_actual").value=ymd(today())});
+  const read=()=>({title:$("#tm_title").value.trim(),description:$("#tm_desc").value.trim(),clientId:$("#tm_client").value,owner:owner[0]||"",ownerEmail:$("#tm_oemail").value.trim(),collaborators:collab.filter(x=>x!==owner[0]),
+    plannedDate:$("#tm_plan").value,actualDate:$("#tm_actual").value,estHours:$("#tm_hrs").value===""?"":Math.max(0,+$("#tm_hrs").value),status:$("#tm_status").value,
+    links:links.map(l=>({label:l.label.trim(),url:l.url.trim()})).filter(l=>l.url)});
+  const save=async v=>{
+    if(!v.title){toast("Give the task a name.");$("#tm_title").focus();return}
+    if(v.actualDate&&v.actualDate>ymd(today())){toast("The actual completion date can't be in the future.");$("#tm_actual").focus();return}
+    if(v.ownerEmail&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.ownerEmail)){toast("Enter a valid owner email, or leave it blank.");$("#tm_oemail").focus();return}
+    if(v.estHours!==""&&isNaN(v.estHours)){toast("Enter estimated hours as a number.");$("#tm_hrs").focus();return}
+    const badLink=v.links.find(l=>!/^https:\/\/\S+$/i.test(l.url)); if(badLink){toast("Links must be full web addresses starting with https://");return}
+    if(v.status==="done"&&!v.actualDate)v.actualDate=ymd(today());
+    try{ if(id){const ch=diffs(t,v,TEAM_F);await db.doc("teamTasks/"+id).update(v);if(ch.length)logAct({action:v.status==="done"&&t.status!=="done"?"completed":"updated",kind:"team",target:id,label:v.title,client:v.clientId,changes:ch});toast(v.status==="done"&&t.status!=="done"?"Task completed.":"Saved.")}
+      else{const nid=uid();await db.doc("teamTasks/"+nid).set(Object.assign(v,{createdAt:ymd(today()),createdBy:meId||null}));logAct({action:"created",kind:"team",target:nid,label:v.title,client:v.clientId,changes:diffs(null,v,TEAM_F)});toast("Team task created.")}
+      close();
+    }catch(err){writeErr(err)}};
+  $("#tmForm").addEventListener("submit",e=>{e.preventDefault();save(read())});
+  const dn=$("#tm_done"); if(dn)dn.onclick=()=>{const v=read();v.status="done";if(!v.actualDate)v.actualDate=ymd(today());save(v)};
+  const del=$("#delBtn"); if(del)del.onclick=()=>{$("#delZone").innerHTML='<div class="confirm"><span>Delete this team task?</span><button type="button" class="btn sm danger" id="delYes">Delete</button><button type="button" class="btn sm" id="delNo">Keep</button></div>';
+    $("#delNo").onclick=()=>$("#delZone").innerHTML="";
+    $("#delYes").onclick=async()=>{try{await db.doc("teamTasks/"+id).delete();logAct({action:"deleted",kind:"team",target:id,label:t.title,client:t.clientId,snap:{data:t},note:teamStatusLabel(t.status)+(t.owner?" · assigned to "+whoName(t.owner):"")});toast("Team task deleted.");close()}catch(err){writeErr(err)}}};
+}
+async function exportTeamCSV(){
+  if(!downloads)return; const rows=teamRows(); const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+  const head=["Task","Description","Client","Assigned to","Collaborators","Estimated hours","Anticipated completion","Actual completion","Status","Links"];
+  const lines=[head.map(q).join(",")].concat(rows.map(t=>[t.title,t.description,(clientById(t.clientId)||{}).name||"Internal",t.owner?whoName(t.owner):"",(t.collaborators||[]).map(whoName).join("; "),t.estHours,t.plannedDate,t.actualDate,teamStatusLabel(t.status),(t.links||[]).map(l=>(l.label?l.label+": ":"")+l.url).join(" | ")].map(q).join(",")));
+  try{await downloads.save({filename:"cgm-team-tasks-"+ymd(today())+".csv",data:lines.join("\r\n")});logAct({action:"exported",kind:"export",label:"Team tasks CSV",note:rows.length+" team task"+(rows.length===1?"":"s")+" exported"})}catch(e){if(e&&e.code!=="declined")toast("Couldn't export: "+(e.message||e.code))}
+}
+
+function actRows(){
+  const f=S.af; const q=f.q.trim().toLowerCase();
+  const since=f.range==="all"?"":new Date(Date.now()-(+f.range)*86400000).toISOString();
+  return S.activity.filter(e=>(!since||e.ts>=since)&&(!f.who||(e.by||"")===f.who)&&(!f.kind||e.kind===f.kind)&&(!f.client||e.client===f.client)&&
+    (!q||[e.label,e.note,e.action,e.kind,...(e.changes||[]).map(c=>c.f+" "+c.from+" "+c.to)].join(" ").toLowerCase().includes(q)));
+}
+const ACT_KIND={team:"Team task",task:"Task",client:"Client",standard:"Standard",export:"Export",outlook:"Outlook"};
+function resolvePeople(ids){ids=[...new Set(ids.filter(Boolean))];if(userNS&&ids.some(i=>!(i in S.people)))userNS.profiles(ids).then(ps=>{let ch=false;for(const i of ids){if(!S.people[i]||S.people[i].name!==ps[i].name||S.people[i].avatarUrl!==ps[i].avatarUrl){S.people[i]=ps[i];ch=true}}if(ch)render()}).catch(()=>{})}
+const avatar=(id,title)=>{const p=S.people[id];return p&&p.avatarUrl?'<img class="av" alt="" src="'+esc(p.avatarUrl)+'" title="'+esc(title||whoName(id))+'">':'<span class="av" style="display:inline-grid;place-items:center;background:var(--surface-2);font-size:10px" title="'+esc(title||whoName(id))+'">?</span>'};
+function whoName(id){if(!id)return "Unknown user";const p=S.people[id];return (p&&p.name)||(id===meId?"You":"CGM user")}
+function viewActivity(){
+  if(!S.actLoaded&&!S.offline)return loadingPanel();
+  const rows=actRows(); const shown=rows.slice(0,S.af.n);
+  const ids=[...new Set(S.activity.map(e=>e.by).filter(Boolean))];
+  if(userNS&&ids.some(i=>!(i in S.people)))userNS.profiles(ids).then(ps=>{let ch=false;for(const i of ids){if(!S.people[i]||S.people[i].name!==ps[i].name){S.people[i]=ps[i];ch=true}}if(ch&&S.view==="activity")render()}).catch(()=>{});
+  const fmtTs=ts=>{const d=new Date(ts);return d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})+'<div class="muted" style="font-size:12px">'+d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})+'</div>'};
+  const sel=(id,cur,opts,lbl)=>'<select id="'+id+'" aria-label="'+lbl+'" style="width:auto">'+opts.map(([v,l])=>'<option value="'+esc(v)+'"'+(cur===v?' selected':'')+'>'+esc(l)+'</option>').join("")+'</select>';
+  return '<div class="panel"><div class="panel-h"><h2>Activity Log</h2><span class="muted mono">'+rows.length+' event'+(rows.length===1?'':'s')+'</span><span class="sp toolbar">'+(downloads?'<button class="btn sm" data-act="actcsv">Export CSV</button>':'')+'</span></div>'+
+   '<div class="toolbar" style="padding:12px 16px;border-bottom:1px solid var(--line)">'+
+    '<input class="grow" type="text" id="aq" placeholder="Search task, client, field or value…" value="'+esc(S.af.q)+'" aria-label="Search activity">'+
+    sel("arange",S.af.range,[["1","Last 24 hours"],["7","Last 7 days"],["30","Last 30 days"],["90","Last 90 days"],["365","Last 12 months"],["all","All activity"]],"Date range")+
+    sel("awho",S.af.who,[["","Everyone"]].concat(ids.map(i=>[i,whoName(i)]).sort((a,b)=>a[1].localeCompare(b[1]))),"Person")+
+    sel("akind",S.af.kind,[["","All records"],["task","Tasks"],["team","Team tasks"],["client","Clients"],["standard","Standards"],["outlook","Outlook reminders"],["export","Exports"]],"Record type")+
+    sel("aclient",S.af.client,[["","All clients"]].concat([...S.clients].sort((a,b)=>a.name.localeCompare(b.name)).map(c=>[c.id,c.name])),"Client")+
+   '</div>'+
+   (shown.length?'<div class="tbl-wrap"><table><thead><tr><th>When</th><th>Who</th><th>Action</th><th>Record</th><th>Client</th><th>Details</th></tr></thead><tbody>'+
+    shown.map(e=>{const p=S.people[e.by]; const c=clientById(e.client);
+      const tagc=e.action==="restored"?"completed":["created","updated","completed","deleted"].includes(e.action)?e.action:"other";
+      const linkable=(e.kind==="task"||e.kind==="team")&&e.action!=="deleted"&&recordExists(e.kind,e.target);
+      return '<tr'+(linkable?' data-acttask="'+esc(e.target)+'" data-actkind="'+e.kind+'"':' style="cursor:default"')+'><td class="num" style="white-space:nowrap">'+fmtTs(e.ts)+'</td>'+
+       '<td><span class="act-who">'+(p&&p.avatarUrl?'<img alt="" src="'+esc(p.avatarUrl)+'">':'')+'<span data-name="'+esc(e.by||"")+'"></span></span></td>'+
+       '<td><span class="tag '+tagc+'">'+esc(e.action.toUpperCase())+'</span><div class="muted" style="font-size:12px">'+esc(ACT_KIND[e.kind]||e.kind)+'</div></td>'+
+       '<td style="max-width:300px">'+esc(e.label||"—")+'</td><td>'+esc(c?c.name:(e.clientName||"—"))+'</td>'+
+       '<td><div class="act-chg">'+(e.note?'<span>'+esc(e.note)+'</span>':'')+(e.changes||[]).map(x=>'<span><b>'+esc(x.f)+':</b> '+(x.from?'<s>'+esc(x.from)+'</s> → ':'')+esc(x.to||"(cleared)")+'</span>').join("")+
+       (e.restoredAt?'<span class="tag other" style="align-self:flex-start;margin-top:4px">'+(e.action==="deleted"?'RESTORED':'REVERTED')+' '+esc(new Date(e.restoredAt).toLocaleDateString(undefined,{month:"short",day:"numeric"}))+'</span>':'')+
+       ((r=>r?'<span style="margin-top:4px"><button type="button" class="btn sm" data-restore="'+esc(e.id)+'" title="'+(r.mode==="restore"?'Recreate this record exactly as it was before it was deleted':'Set these fields back to their earlier values')+'">'+r.label+'</button></span>':'')(restoreInfo(e)))+'</div></td></tr>'}).join("")+
+    '</tbody></table></div>'+(rows.length>shown.length?'<div class="note"><button class="btn sm" data-act="actmore">Show '+Math.min(200,rows.length-shown.length)+' more</button> <span>'+(rows.length-shown.length)+' older events not shown</span></div>':'')
+   :'<div class="empty"><b>No activity '+(S.activity.length?'matches these filters':'recorded yet')+'</b><span>Every change made in the tracker from now on is recorded here: tasks, clients and standards created, edited, completed or deleted, plus Outlook reminders and exports.</span></div>')+
+   '<div class="note">Recorded by the tracker for changes made in this page, with who made each change and the before and after values. Changes made outside the tracker, such as bulk updates Claude makes on request, are not recorded. Use Restore to bring back a deleted task, client (with its tasks) or standard, and Revert to set edited fields back to their earlier values; both are recorded here too. Contributors can technically alter the log, so treat it as an operational record rather than a tamper-proof audit trail.</div></div>';
+}
+const allLoaded=()=>S.offline||(S.loaded.standards&&S.loaded.clients&&S.loaded.tasks);
+const loadingPanel=()=>'<div class="panel"><div class="empty"><b>Loading…</b></div></div>';
+
+/* ---------- events ---------- */
+function bindView(){
+  const m=$("#main");
+  m.querySelectorAll("[data-stop]").forEach(a=>a.addEventListener("click",e=>e.stopPropagation()));
+  m.querySelectorAll("[data-task]").forEach(el=>{el.addEventListener("click",()=>openTask(el.dataset.task));el.addEventListener("keydown",e=>{if(e.key==="Enter")openTask(el.dataset.task)})});
+  m.querySelectorAll("[data-client]").forEach(el=>el.addEventListener("click",()=>openClient(el.dataset.client)));
+  m.querySelectorAll("[data-clientjump]").forEach(el=>el.addEventListener("click",()=>{S.f={q:"",client:el.dataset.clientjump,std:"",status:"open",fn:""};S.view="tasks";render()}));
+  m.querySelectorAll("[data-jump]").forEach(el=>el.addEventListener("click",()=>{S.f={q:"",client:"",std:"",status:el.dataset.jump,fn:""};S.view="tasks";render()}));
+  m.querySelectorAll("[data-std]").forEach(el=>el.addEventListener("click",()=>{S.openStd=S.openStd===el.dataset.std?null:el.dataset.std;render()}));
+  m.querySelectorAll("[data-tpl]").forEach(el=>el.addEventListener("click",()=>{const [sid,i]=el.dataset.tpl.split("|");const s=S.standards.find(x=>x.id===sid);const tp=s.templates[+i];
+    openTask(null,{title:tp.title,standard:s.code,requirement:tp.req||"",recur:tp.recur||{n:0,unit:"m"},dueDate:tp.recur&&tp.recur.n?addInterval(ymd(today()),tp.recur):"",remindDays:tp.recur&&tp.recur.unit==="d"?[7,1]:[30,7]})}));
+  m.querySelectorAll("[data-bulk]").forEach(el=>el.addEventListener("click",()=>bulkCreate(el.dataset.bulk)));
+  m.querySelectorAll("[data-saveurl]").forEach(el=>el.addEventListener("click",async()=>{const id=el.dataset.saveurl;const s=S.standards.find(x=>x.id===id);const v=$("#url-"+CSS.escape(id)).value.trim();
+    if(!/^https:\/\/\S+$/i.test(v)){toast("Enter a full link starting with https://");return}
+    try{await db.doc("standards/"+id).update({url:v===stdDefaultLink(s)?"":v});logAct({action:"updated",kind:"standard",target:id,label:stdLabel(s)+" "+s.title,changes:[{f:"Link",from:stdLink(s),to:v,k:"url",rf:s.url||"",rt:v===stdDefaultLink(s)?"":v}]});toast("Link saved for "+s.code+".")}catch(e){writeErr(e)}}));
+  m.querySelectorAll("[data-reseturl]").forEach(el=>el.addEventListener("click",async()=>{const id=el.dataset.reseturl;const s=S.standards.find(x=>x.id===id);try{await db.doc("standards/"+id).update({url:""});logAct({action:"updated",kind:"standard",target:id,label:stdLabel(s)+" "+s.title,changes:[{f:"Link",from:s.url,to:stdDefaultLink(s),k:"url",rf:s.url||"",rt:""}]});toast("Link reset to the nerc.com PDF.")}catch(e){writeErr(e)}}));
+  m.querySelectorAll("[data-editstd]").forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();openStandard(el.dataset.editstd)}));
+  m.querySelectorAll("[data-savever]").forEach(el=>el.addEventListener("click",async()=>{const id=el.dataset.savever;const v=$("#ver-"+CSS.escape(id)).value.trim();if(!v)return;const s=S.standards.find(x=>x.id===id);if(v===s.version)return;try{await db.doc("standards/"+id).update({version:v});logAct({action:"updated",kind:"standard",target:id,label:s.code+" "+s.title,changes:[{f:"Version",from:s.version,to:v,k:"version",rf:s.version,rt:v}]});toast("Version saved.")}catch(e){writeErr(e)}}));
+  m.querySelectorAll("[data-act]").forEach(el=>el.addEventListener("click",()=>{const a=el.dataset.act;if(a==="newTask")openTask(null);if(a==="newClient")openClient(null);if(a==="newStd")openStandard(null);if(a==="newTeam")openTeam(null);if(a==="teamcsv")exportTeamCSV();if(a==="recurSet")openRecurSettings();if(a==="csv")exportCSV();if(a==="actcsv")exportActCSV();if(a==="actmore"){S.af.n+=200;render()}if(a==="clearSample")clearSample(el)}));
+  const on=(id,fn)=>{const el=document.getElementById(id);if(el)el.addEventListener(el.tagName==="INPUT"?"input":"change",fn)};
+  on("fq",e=>{S.f.q=e.target.value;rerenderKeepFocus("fq")});
+  on("fstatus",e=>{S.f.status=e.target.value;render()});on("fclient",e=>{S.f.client=e.target.value;render()});on("fstd",e=>{S.f.std=e.target.value;render()});on("ffn",e=>{S.f.fn=e.target.value;render()});
+  on("sq",e=>{S.sf.q=e.target.value;rerenderKeepFocus("sq")});
+  on("aq",e=>{S.af.q=e.target.value;S.af.n=200;rerenderKeepFocus("aq")});
+  on("arange",e=>{S.af.range=e.target.value;S.af.n=200;render()});on("awho",e=>{S.af.who=e.target.value;S.af.n=200;render()});on("akind",e=>{S.af.kind=e.target.value;S.af.n=200;render()});on("aclient",e=>{S.af.client=e.target.value;S.af.n=200;render()});
+  m.querySelectorAll("[data-name]").forEach(el=>{el.textContent=whoName(el.dataset.name)});
+  m.querySelectorAll("[data-acttask]").forEach(el=>el.addEventListener("click",()=>el.dataset.actkind==="team"?openTeam(el.dataset.acttask):openTask(el.dataset.acttask)));
+  m.querySelectorAll("[data-tjump]").forEach(el=>el.addEventListener("click",()=>{const j=el.dataset.tjump;S.tf=Object.assign(S.tf,{q:"",client:""},j==="mine"?{scope:"mine",status:"active"}:j==="late"?{scope:"all",status:"late"}:j==="allopen"?{scope:"all",status:"active"}:{scope:"all",status:"done"});render()}));
+  m.querySelectorAll("[data-team]").forEach(el=>el.addEventListener("click",()=>openTeam(el.dataset.team)));
+  on("tq",e=>{S.tf.q=e.target.value;rerenderKeepFocus("tq")});
+  on("tscope",e=>{S.tf.scope=e.target.value;render()});on("tstatus",e=>{S.tf.status=e.target.value;render()});on("tclient",e=>{S.tf.client=e.target.value;render()});
+  m.querySelectorAll("[data-restore]").forEach(el=>el.addEventListener("click",ev=>{ev.stopPropagation();const e=S.activity.find(x=>x.id===el.dataset.restore);if(e)doRestore(e,el)}));on("sfam",e=>{S.sf.fam=e.target.value;render()});on("sfn",e=>{S.sf.fn=e.target.value;render()});
+}
+function rerenderKeepFocus(id){const el=document.getElementById(id);const p=el.selectionStart;render();const n=document.getElementById(id);if(n){n.focus();try{n.setSelectionRange(p,p)}catch(e){}}}
+document.getElementById("tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-v]");if(!b)return;S.view=b.dataset.v;try{localStorage.setItem("nct_view",S.view)}catch(_){}render()});
+$("#bellBtn").addEventListener("click",()=>{S.f={q:"",client:"",std:"",status:"window",fn:""};S.view="tasks";render()});
+$("#newTaskTop").addEventListener("click",()=>openTask(null));
+
+function writeErr(e){
+  const c=e&&e.code;
+  if(c==="invalid_argument"&&!S.readOnly){S.readOnly=true;render();toast("Your access is view-only, so changes can't be saved.");return}
+  if(c==="quota_exceeded"){toast("The tracker's storage is full. Remove completed or sample records, then try again.");return}
+  if(c==="unavailable"){toast("Couldn't reach the store. Check your connection and try again.");return}
+  toast("Couldn't save: "+((e&&e.message)||"unknown error"));
+}
+
+/* ---------- task drawer ---------- */
+function closeModal(){$("#modalRoot").innerHTML=""}
+function openTask(id,preset){
+  if(!id&&S.readOnly)return;
+  const t=id?S.tasks.find(x=>x.id===id):Object.assign({title:"",clientId:S.f.client||(S.clients[0]&&S.clients[0].id)||"",standard:"",requirement:"",facility:"",assignee:"",assigneeEmail:"",dueDate:"",remindDays:[30,7],recur:{n:0,unit:"m"},status:"open",evidence:"",notes:""},preset||{});
+  if(id&&!t)return;
+  const ro=S.readOnly; const dis=ro?" disabled":"";
+  const s=stdByCode(t.standard); const st=id?state(t):null; const nr=id?nextReminder(t):null;
+  const stds=[...S.standards].sort((a,b)=>a.code.localeCompare(b.code));
+  const r=t.recur||{n:0,unit:"m"};
+  $("#modalRoot").innerHTML='<div class="scrim" id="scrim"><form class="drawer" id="taskForm" role="dialog" aria-modal="true" aria-labelledby="tdh" novalidate>'+
+   '<div class="drawer-h"><h2 id="tdh">'+(id?"Task":"New task")+'</h2>'+(st?'<span class="pill '+st+'">'+esc(STATE_LABEL[st])+'</span>':'')+'<button type="button" class="btn sm" id="xBtn" aria-label="Close">Close</button></div>'+
+   '<div class="drawer-b">'+
+    '<div class="field"><label for="t_title">Task</label><input type="text" id="t_title" required value="'+esc(t.title)+'"'+dis+' placeholder="e.g. Annual CIP-002 BES Cyber System categorization review"></div>'+
+    '<div class="row2"><div class="field"><label for="t_client">Client</label><select id="t_client"'+dis+'><option value="">—</option>'+byName(S.clients).map(c=>'<option value="'+esc(c.id)+'"'+(t.clientId===c.id?' selected':'')+'>'+esc(c.name)+'</option>').join("")+'</select></div>'+
+    '<div class="field"><label for="t_fac">Facility / unit</label><input type="text" id="t_fac" value="'+esc(t.facility)+'"'+dis+' placeholder="e.g. Unit 2, 230 kV GSU"></div></div>'+
+    '<div class="row2"><div class="field"><label for="t_std">Standard</label><select id="t_std"'+dis+'><option value="">—</option>'+stds.map(x=>'<option value="'+esc(x.code)+'"'+(t.standard===x.code?' selected':'')+'>'+esc(stdLabel(x))+' — '+esc(x.title)+'</option>').join("")+'</select>'+
+      '<span id="t_stdlink" style="font-size:12px">'+(s?'<a href="'+esc(stdLink(s))+'" target="_blank" rel="noopener">Open '+esc(stdLabel(s))+' on nerc.com ↗</a>':'')+'</span></div>'+
+    '<div class="field"><label for="t_req">Requirement</label><input type="text" id="t_req" class="mono" value="'+esc(t.requirement)+'"'+dis+' placeholder="e.g. R2, Part 2.1"></div></div>'+
+    '<div class="row2"><div class="field"><label for="t_due">Due date</label><input type="date" id="t_due" value="'+esc(t.dueDate)+'"'+dis+'></div>'+
+    '<div class="field"><label for="t_asg">Assignee</label><input type="text" id="t_asg" value="'+esc(t.assignee)+'"'+dis+' placeholder="Name"></div></div>'+
+    '<div class="field"><label for="t_asgemail">Assignee email</label><input type="email" id="t_asgemail" value="'+esc(t.assigneeEmail||"")+'"'+dis+' placeholder="name@company.com" autocomplete="off"><span class="muted" style="font-size:12px">The assignee gets a weekday-morning email for this task once it enters a reminder window below, on the due date, and every weekday while it is overdue.</span></div>'+
+    '<div class="field"><span class="lbl">Reminder windows before the due date</span><div class="checks">'+REM_OPTS.map(o=>'<label><input type="checkbox" name="rem" value="'+o+'"'+((t.remindDays||[]).includes(o)?' checked':'')+dis+'> '+o+(o===1?' day':' days')+'</label>').join("")+'</div>'+
+      (nr?'<span class="muted" style="font-size:12px">Next reminder: '+esc(fmt(nr.date))+' ('+nr.off+' days before due)</span>':'')+'</div>'+
+    '<div class="row2"><div class="field"><label for="t_rn">Repeats every</label><div style="display:flex;gap:6px"><input type="number" min="0" id="t_rn" value="'+esc(r.n||0)+'"'+dis+' style="width:90px" class="mono"><select id="t_ru"'+dis+'><option value="m"'+(r.unit!=="d"&&r.unit!=="y"?' selected':'')+'>calendar months</option><option value="y"'+(r.unit==="y"?' selected':'')+'>calendar years</option><option value="d"'+(r.unit==="d"?' selected':'')+'>days</option></select></div><span class="muted" style="font-size:12px">0 = one-time. Completing a repeating task schedules the next one.</span></div>'+
+    '<div class="field"><label for="t_status">Status</label><select id="t_status"'+dis+'>'+[["open","Open"],["inprogress","In progress"],["done","Complete"]].map(([v,l])=>'<option value="'+v+'"'+(t.status===v?' selected':'')+'>'+l+'</option>').join("")+'</select></div></div>'+
+    '<div class="field" id="basisField"'+(r.n>0?'':' hidden')+'><label for="t_basis">Repeat from</label><select id="t_basis"'+dis+' style="max-width:420px"><option value="due"'+(r.basis!=="done"?' selected':'')+'>Previous due date (fixed schedule)</option><option value="done"'+(r.basis==="done"?' selected':'')+'>Completion date (rolling interval)</option></select>'+
+      '<span class="muted" style="font-size:12px">Use completion date when the standard measures the interval from the last time the work was performed, such as 15 calendar months since the last training.</span></div>'+
+    '<div class="field"><label for="t_ev">Evidence location</label>'+(isLink(t.evidence)?'<a class="btn sm" style="align-self:flex-start" href="'+esc(t.evidence)+'" target="_blank" rel="noopener">Open evidence folder ↗</a>':'')+(ro?'':'<input type="text" id="t_ev" value="'+esc(t.evidence)+'" placeholder="Paste the SharePoint link to the dated evidence" style="font-size:12px">')+'</div>'+
+    '<div class="field"><label for="t_notes">Notes</label><textarea id="t_notes"'+dis+'>'+esc(t.notes)+'</textarea></div>'+
+    (id&&!ro?'<div class="callout"><b>Outlook reminders</b><span>Adds a 15-minute calendar entry to your Outlook calendar on each reminder date and on the due date, so Outlook notifies you even when this tracker is closed.</span>'+
+      (t.outlook?'<span class="muted">Added '+esc(fmt(t.outlook.date))+' ('+esc(t.outlook.count)+' entries for due date '+esc(fmt(t.outlook.due))+').</span>':'')+
+      '<div><button type="button" class="btn sm" id="olBtn"'+(mcp?'':' disabled')+'>'+(t.outlook?'Add again for current dates':'Add reminders to Outlook')+'</button></div>'+
+      (mcp?'':'<span class="muted">Outlook isn\'t available in this view.</span>')+'</div>':'')+
+    '<div class="field" id="doneField"'+(t.status==="done"?'':' hidden')+'><label for="t_done">Date completed</label><input type="date" id="t_done" value="'+esc(t.completedAt||ymd(today()))+'" max="'+ymd(today())+'"'+dis+' style="max-width:220px"><span class="muted" style="font-size:12px">Use the date the work was actually performed, as shown in the evidence.</span>'+
+      (t.nextId?'<div id="nextUpd" class="callout" style="margin-top:6px" hidden><b>Next occurrence</b><span id="nextUpdTxt"></span><div class="checks"><label><input type="checkbox" id="t_nextUpd" checked> Update the next occurrence\'s due date</label></div></div>':'')+
+      (t.nextId?'':'<div id="nextWrap" class="callout" style="margin-top:6px" hidden><b>Next occurrence</b><div class="toolbar"><label for="t_next" class="muted" style="font-size:12px">Next due</label><input type="date" id="t_next" style="max-width:200px"><button type="button" class="btn sm" id="t_nextReset" hidden>Use calculated date</button></div><span class="muted" style="font-size:12px" id="t_nextWhy"></span></div>')+'</div>'+
+    '<div id="delZone"></div>'+
+   '</div>'+
+   (ro?'':'<div class="drawer-f"><button type="submit" class="btn primary">'+(id?"Save":"Create task")+'</button>'+(id&&t.status!=="done"?'<button type="button" class="btn" id="doneBtn">Mark complete</button>':'')+'<span style="flex:1"></span>'+(id?'<button type="button" class="btn danger" id="delBtn">Delete</button>':'')+'</div>')+
+  '</form></div>';
+  const close=()=>closeModal();
+  $("#xBtn").onclick=close; $("#scrim").addEventListener("click",e=>{if(e.target.id==="scrim")close()});
+  document.addEventListener("keydown",function k(e){if(e.key==="Escape"){close();document.removeEventListener("keydown",k)}});
+  $("#t_std").addEventListener("change",e=>{const x=stdByCode(e.target.value);$("#t_stdlink").innerHTML=x?'<a href="'+esc(stdLink(x))+'" target="_blank" rel="noopener">Open '+esc(stdLabel(x))+' on nerc.com ↗</a>':''});
+  $("#t_title").focus();
+  if(ro)return;
+  const read=()=>({title:$("#t_title").value.trim(),clientId:$("#t_client").value,facility:$("#t_fac").value.trim(),standard:$("#t_std").value,requirement:$("#t_req").value.trim(),
+    dueDate:$("#t_due").value,assignee:$("#t_asg").value.trim(),assigneeEmail:$("#t_asgemail").value.trim(),remindDays:[...document.querySelectorAll('input[name=rem]:checked')].map(i=>+i.value),
+    recur:{n:Math.max(0,parseInt($("#t_rn").value,10)||0),unit:$("#t_ru").value,basis:$("#t_basis").value},status:$("#t_status").value,evidence:$("#t_ev").value.trim(),notes:$("#t_notes").value.trim(),doneDate:$("#t_done").value,
+    nextDue:($("#t_next")&&!$("#nextWrap").hidden)?$("#t_next").value:"",
+    moveNext:($("#nextUpd")&&!$("#nextUpd").hidden&&$("#t_nextUpd").checked)?$("#nextUpd").dataset.to:""});
+  const nx=$("#t_next");
+  const nextT=t.nextId?S.tasks.find(x=>x.id===t.nextId):null;
+  const calcNext=()=>{const rn=Math.max(0,parseInt($("#t_rn").value,10)||0);$("#basisField").hidden=rn===0;
+    const nu=$("#nextUpd"); if(nu){const rr={n:rn,unit:$("#t_ru").value,basis:$("#t_basis").value};const done=$("#t_done").value;
+      const to=(nextT&&nextT.status!=="done"&&$("#t_status").value==="done"&&rr.basis==="done"&&done&&done!==t.completedAt)?nextDueFor(rr,$("#t_due").value,done):"";
+      nu.hidden=!to||to===nextT.dueDate; nu.dataset.to=to;
+      if(!nu.hidden)$("#nextUpdTxt").textContent="The next occurrence is due "+fmt(nextT.dueDate)+". With the completion date changed to "+fmt(done)+", it moves to "+fmt(to)+" ("+recurText(rr).replace(" from completion","")+" from completion)."}
+    const w=$("#nextWrap"); if(!w)return; const show=rn>0&&$("#t_status").value==="done"&&t.status!=="done"; w.hidden=!show; if(!show)return;
+    const rr={n:rn,unit:$("#t_ru").value,basis:$("#t_basis").value}; const done=$("#t_done").value||ymd(today()); const calc=nextDueFor(rr,$("#t_due").value,done);
+    if(!nx.dataset.touched)nx.value=calc; $("#t_nextReset").hidden=!nx.dataset.touched||nx.value===calc;
+    $("#t_nextWhy").textContent=calc?(recurText(rr).replace(" from completion","")+" from the "+(rr.basis==="done"?"completion date, "+fmt(done):"previous due date, "+fmt($("#t_due").value))+" = "+fmt(calc)+". Change the date above if this occurrence needs a different one."):"Set a due date to calculate the next one."};
+  ["t_rn","t_ru","t_basis","t_due","t_done","t_status"].forEach(i=>{const el=$("#"+i);if(el){el.addEventListener("change",calcNext);el.addEventListener("input",calcNext)}});
+  if(nx){nx.addEventListener("input",()=>{nx.dataset.touched="1";calcNext()});$("#t_nextReset").onclick=()=>{delete nx.dataset.touched;calcNext()}}
+  calcNext();
+  $("#t_status").addEventListener("change",e=>{$("#doneField").hidden=e.target.value!=="done"});
+  $("#taskForm").addEventListener("submit",async e=>{e.preventDefault();const v=read();
+    if(!v.title){toast("Give the task a name.");$("#t_title").focus();return}
+    if(!v.dueDate){toast("Set a due date so reminders can be scheduled.");$("#t_due").focus();return}
+    if(v.assigneeEmail&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.assigneeEmail)){toast("Enter a valid assignee email, or leave it blank.");$("#t_asgemail").focus();return}
+    if(v.status==="done"&&v.doneDate&&v.doneDate>ymd(today())){toast("The completion date can't be in the future.");$("#t_done").focus();return}
+    if(v.nextDue&&v.nextDue<=(v.doneDate||ymd(today()))&&!confirm1(e.submitter||$("#taskForm button[type=submit]"),"Next due is on or before the completion date. Save anyway?"))return;
+    try{ if(id){await saveExisting(t,v)} else {const nid=uid();const dd=v.doneDate;delete v.doneDate;await db.doc("tasks/"+nid).set(Object.assign(v,{createdAt:ymd(today()),completedAt:v.status==="done"?(dd||ymd(today())):null}));logAct({action:"created",kind:"task",target:nid,label:taskLabel(v),client:v.clientId,changes:diffs(null,v,TASK_F)});toast("Task created.")} close(); }catch(err){writeErr(err)} });
+  const db_=$("#doneBtn"); if(db_)db_.onclick=async()=>{
+    if($("#t_status").value!=="done"){$("#t_status").value="done";$("#doneField").hidden=false;calcNext();db_.textContent="Confirm completion";db_.classList.add("primary");$("#t_done").focus();$("#doneField").scrollIntoView({block:"nearest"});return}
+    $("#taskForm").requestSubmit()};
+  const del=$("#delBtn"); if(del)del.onclick=()=>{$("#delZone").innerHTML='<div class="confirm"><span>Delete this task permanently?</span><button type="button" class="btn sm danger" id="delYes">Delete task</button><button type="button" class="btn sm" id="delNo">Keep</button></div>';
+    $("#delNo").onclick=()=>$("#delZone").innerHTML=""; $("#delYes").onclick=async()=>{try{await db.doc("tasks/"+t.id).delete();logAct({action:"deleted",kind:"task",target:t.id,label:taskLabel(t),client:t.clientId,snap:{data:t},note:"Due "+fmt(t.dueDate)+" · status "+showVal("status",t.status)});toast("Task deleted.");close()}catch(err){writeErr(err)}}};
+  const ol=$("#olBtn"); if(ol)ol.onclick=()=>addOutlook(t,ol);
+
+}
+async function saveExisting(t,v){
+  const wasDone=t.status==="done", nowDone=v.status==="done";
+  const doneDate=v.doneDate; delete v.doneDate; const nextDue=v.nextDue; delete v.nextDue; const moveNext=v.moveNext; delete v.moveNext;
+  const body=Object.assign({},v,{completedAt:nowDone?(doneDate||(wasDone?t.completedAt:ymd(today()))):null});
+  await db.doc("tasks/"+t.id).update(body);
+  const ch=diffs(t,body,TASK_F);
+  if(ch.length)logAct({action:nowDone&&!wasDone?"completed":"updated",kind:"task",target:t.id,label:taskLabel(Object.assign({},t,body)),client:body.clientId||t.clientId,changes:ch});
+  if(moveNext&&t.nextId){const nt=S.tasks.find(x=>x.id===t.nextId);
+    if(nt&&nt.status!=="done"&&nt.dueDate!==moveNext){await db.doc("tasks/"+nt.id).update({dueDate:moveNext});
+      logAct({action:"updated",kind:"task",target:nt.id,label:taskLabel(nt),client:nt.clientId,note:"Rescheduled because the previous occurrence's completion date changed",changes:diffs(nt,{dueDate:moveNext},TASK_F)});
+      toast("Saved. Next occurrence moved to "+fmt(moveNext)+".");return}}
+  if(nowDone&&!wasDone&&v.recur&&v.recur.n>0&&v.dueDate&&!t.nextId){
+    const nd=nextDue||nextDueFor(v.recur,v.dueDate,body.completedAt);
+    const nid=uid();
+    await db.doc("tasks/"+nid).set({title:v.title,clientId:v.clientId,facility:v.facility,standard:v.standard,requirement:v.requirement,dueDate:nd,assignee:v.assignee,assigneeEmail:v.assigneeEmail||"",remindDays:v.remindDays,recur:v.recur,status:"open",evidence:"",notes:"",createdAt:ymd(today()),completedAt:null,prevId:t.id,sample:!!t.sample});
+    await db.doc("tasks/"+t.id).update({nextId:nid});
+    logAct({action:"created",kind:"task",target:nid,label:taskLabel(v),client:v.clientId,note:"Next occurrence scheduled, due "+fmt(nd)+(nextDue&&nextDue!==nextDueFor(v.recur,v.dueDate,body.completedAt)?" (date set manually)":" ("+recurText(v.recur).toLowerCase()+(v.recur.basis==="done"?"":" from the previous due date")+")")});
+    toast("Completed. Next occurrence scheduled for "+fmt(nd)+".");
+  } else toast(nowDone&&!wasDone?"Task completed.":"Saved.");
+}
+async function bulkCreate(sid){
+  const s=S.standards.find(x=>x.id===sid); const cid=$("#bulkClient-"+CSS.escape(sid)).value;
+  if(!cid){toast("Choose a client first.");return}
+  const tpls=(s.templates||[]).filter(t=>t.recur&&t.recur.n>0);
+  if(!tpls.length){toast("This standard has only event-driven obligations; create those tasks individually.");return}
+  try{for(const tp of tpls){const due=addInterval(ymd(today()),tp.recur);
+    await db.doc("tasks/"+uid()).set({title:tp.title,clientId:cid,facility:"",standard:s.code,requirement:tp.req||"",dueDate:due,assignee:"",remindDays:tp.recur.unit==="d"?[7,1]:[30,7],recur:tp.recur,status:"open",evidence:"",notes:"Due date set one interval from today; adjust to the last completed date.",createdAt:ymd(today()),completedAt:null})}
+   logAct({action:"created",kind:"task",target:s.code,label:s.code+" recurring tasks",client:cid,note:tpls.length+" recurring task"+(tpls.length===1?"":"s")+" created from the "+s.code+" library: "+tpls.map(t=>t.title).join("; ")});
+   toast(tpls.length+" recurring task"+(tpls.length===1?"":"s")+" created for "+clientById(cid).name+". Adjust due dates to your last completion.");}catch(e){writeErr(e)}
+}
+
+/* ---------- Outlook ---------- */
+async function addOutlook(t,btn){
+  if(!mcp)return; btn.disabled=true; btn.textContent="Adding…";
+  const tz=(Intl.DateTimeFormat().resolvedOptions().timeZone)||"America/New_York";
+  const c=clientById(t.clientId), s=stdByCode(t.standard);
+  const dates=[...new Set([...(t.remindDays||[]).map(o=>({d:addDays(t.dueDate,-o),o})),{d:t.dueDate,o:0}].filter(x=>daysUntil(x.d)>=0).map(x=>JSON.stringify(x)))].map(x=>JSON.parse(x));
+  if(!dates.length){toast("All reminder dates for this task have passed.");btn.disabled=false;btn.textContent="Add reminders to Outlook";return}
+  const body="NERC compliance task: "+t.title+"\nClient: "+(c?c.name:"—")+(t.facility?"\nFacility: "+t.facility:"")+"\nStandard: "+(s?stdLabel(s):t.standard||"—")+(t.requirement?" "+t.requirement:"")+"\nDue: "+fmt(t.dueDate)+(t.assignee?"\nAssignee: "+t.assignee:"")+(s?"\nStandard text: "+stdLink(s):"");
+  let made=0;
+  try{
+    for(const x of dates){
+      const subj=(x.o?"Reminder ("+x.o+"d): ":"DUE TODAY: ")+(s?s.code+" ":"")+t.title+(c?" — "+c.name:"");
+      await mcp.callTool("Microsoft 365","outlook_create_event",{subject:subj.slice(0,255),start:{dateTime:x.d+"T08:00:00",timeZone:tz},end:{dateTime:x.d+"T08:15:00",timeZone:tz},body,bodyType:"text",showAs:"free",importance:x.o<=7?"high":"normal"});
+      made++;
+    }
+    await db.doc("tasks/"+t.id).update({outlook:{date:ymd(today()),count:made,due:t.dueDate}});
+    logAct({action:"reminders added",kind:"outlook",target:t.id,label:taskLabel(t),client:t.clientId,note:made+" Outlook calendar reminder"+(made===1?"":"s")+" for due date "+fmt(t.dueDate)});
+    toast(made+" Outlook reminder"+(made===1?"":"s")+" added to your calendar.");
+    closeModal();
+  }catch(e){
+    const code=e&&e.code; let msg;
+    if(code==="needs_reauth")msg="Reconnect Microsoft 365 in claude.ai Settings → Connectors, then try again.";
+    else if(code==="server_not_connected"||code==="selection_required")msg="Add the Microsoft 365 connector in claude.ai Settings → Connectors to send reminders to Outlook.";
+    else if(code==="not_in_manifest")msg="Outlook access is turned off for this tracker. Allow Microsoft 365 in the tracker's permissions to use it.";
+    else if(code==="blocked_by_policy"||code==="approval_required")msg="Your organization's policy blocks creating Outlook events from here.";
+    else if(code==="tool_error")msg="Outlook refused the event: "+(e.message||"");
+    else msg="Outlook didn't confirm. Check your calendar before trying again.";
+    toast((made?made+" added before the error. ":"")+msg);
+    btn.disabled=false; btn.textContent="Add reminders to Outlook";
+  }
+}
+
+/* ---------- clients ---------- */
+/* ---------- recurrence basis settings ---------- */
+function openRecurSettings(){
+  if(S.readOnly)return;
+  const rows=[]; for(const s of [...S.standards].sort((a,b)=>a.code.localeCompare(b.code)))(s.templates||[]).forEach((tp,i)=>{if(tp.recur&&tp.recur.n>0){
+    const key=taskKey({title:tp.title,standard:s.code,requirement:tp.req});
+    const tasks=S.tasks.filter(t=>t.status!=="done"&&t.recur&&t.recur.n>0&&taskKey(t)===key);
+    const sug=suggestedBasis(s.code,tp.req); const saved=tp.recur.basis||"";
+    rows.push({s,i,tp,tasks,sug,saved,cur:saved||sug,mixed:new Set(tasks.map(t=>t.recur.basis==="done"?"done":"due")).size>1})}});
+  const unconfirmed=rows.filter(r=>!r.saved).length;
+  $("#modalRoot").innerHTML='<div class="scrim" id="scrim"><form class="drawer" id="rForm" role="dialog" aria-modal="true" aria-labelledby="rdh" style="width:min(820px,100%)" novalidate>'+
+   '<div class="drawer-h"><h2 id="rdh">Recurrence settings</h2><button type="button" class="btn sm" id="xBtn">Close</button></div><div class="drawer-b">'+
+   '<p style="margin:0">Choose what each recurring obligation counts its next due date from. <b>Due date</b> keeps a fixed schedule. <b>Completion</b> restarts the interval from the date the work was performed. New tasks created from these templates inherit the setting.</p>'+
+   (unconfirmed?'<div class="banner warn">'+unconfirmed+' obligation'+(unconfirmed===1?' has':'s have')+' no confirmed setting. Rows marked <span class="chip">SUGGESTED</span> are pre-filled with a suggested reading of where the standard measures the interval from the last performance. Confirm each one against the standard, then apply. Nothing changes until you do.</div>':'')+
+   '<div class="tbl-wrap"><table style="min-width:640px"><thead><tr><th>Standard</th><th>Obligation</th><th>Interval</th><th>Repeat from</th><th>Open tasks</th></tr></thead><tbody>'+
+   rows.map((r,k)=>'<tr style="cursor:default"><td class="mono" style="white-space:nowrap">'+esc(r.s.code)+'<div class="muted" style="font-size:11px">'+esc(r.tp.req||"")+'</div></td><td style="max-width:300px">'+esc(r.tp.title)+'</td><td class="num">'+esc(r.tp.recur.n+" "+({d:"days",y:"cal yr"}[r.tp.recur.unit]||"mo"))+'</td>'+
+     '<td><select data-rk="'+k+'" style="width:auto"><option value="due"'+(r.cur==="due"?' selected':'')+'>Due date</option><option value="done"'+(r.cur==="done"?' selected':'')+'>Completion</option></select>'+(r.saved?'':' <span class="chip">SUGGESTED</span>')+'</td>'+
+     '<td class="num">'+r.tasks.length+(r.mixed?' <span class="chip" title="These tasks currently use different settings">MIXED</span>':'')+'</td></tr>').join("")+
+   '</tbody></table></div>'+
+   '<div class="field"><div class="checks"><label><input type="checkbox" id="r_tasks" checked> Also update the open repeating tasks that came from each obligation</label></div><span class="muted" style="font-size:12px">Changes only how future occurrences are scheduled. Current due dates stay as they are. Custom tasks not created from a template keep their own setting, set on the task.</span></div>'+
+   '</div><div class="drawer-f"><button type="submit" class="btn primary" id="rApply">Apply settings</button><span class="muted" id="rSum" style="font-size:12px;align-self:center"></span></div></form></div>';
+  const close=closeModal; $("#xBtn").onclick=close; $("#scrim").addEventListener("click",e=>{if(e.target.id==="scrim")close()});
+  const plan=()=>{const withT=$("#r_tasks").checked;let nt=0,ntask=0;rows.forEach((r,k)=>{const v=document.querySelector('[data-rk="'+k+'"]').value;if(v!==r.saved)nt++;if(withT)ntask+=r.tasks.filter(t=>(t.recur.basis==="done"?"done":"due")!==v).length});return {nt,ntask}};
+  const sum=()=>{const p=plan();$("#rSum").textContent=p.nt||p.ntask?p.nt+" obligation"+(p.nt===1?"":"s")+" and "+p.ntask+" task"+(p.ntask===1?"":"s")+" will change":"Nothing to change";$("#rApply").disabled=!(p.nt||p.ntask)};
+  document.querySelectorAll("[data-rk]").forEach(el=>el.addEventListener("change",sum)); $("#r_tasks").addEventListener("change",sum); sum();
+  $("#rForm").addEventListener("submit",async e=>{e.preventDefault(); const btn=$("#rApply"); btn.disabled=true; btn.textContent="Applying…";
+    const withT=$("#r_tasks").checked; const byStd=new Map();
+    rows.forEach((r,k)=>{const v=document.querySelector('[data-rk="'+k+'"]').value; if(!byStd.has(r.s.id))byStd.set(r.s.id,{s:r.s,items:[]}); byStd.get(r.s.id).items.push({r,v})});
+    let nStd=0,nTask=0;
+    try{
+      for(const {s,items} of byStd.values()){
+        const tpls=JSON.parse(JSON.stringify(s.templates||[])); const ch=[];
+        for(const {r,v} of items){ if(r.saved!==v){tpls[r.i].recur=Object.assign({},tpls[r.i].recur,{basis:v});ch.push({f:(r.tp.req||r.tp.title),from:r.saved?(r.saved==="done"?"Completion":"Due date"):"Not set",to:v==="done"?"Completion":"Due date"})}
+          if(withT)for(const t of r.tasks){ if((t.recur.basis==="done"?"done":"due")!==v){await db.doc("tasks/"+t.id).update({recur:Object.assign({},t.recur,{basis:v})});nTask++} } }
+        if(ch.length){await db.doc("standards/"+s.id).update({templates:tpls});nStd++;logAct({action:"updated",kind:"standard",target:s.id,label:stdLabel(s)+" recurrence",note:"Repeat-from setting"+(withT?" applied to open tasks too":""),changes:ch.map(c=>Object.assign(c,{f:"Repeat from ("+c.f+")"}))})}
+      }
+      if(nTask&&!nStd)logAct({action:"updated",kind:"task",target:"",label:"Recurrence settings",note:nTask+" open task"+(nTask===1?"":"s")+" aligned with their standard's repeat-from setting"});
+      else if(nTask)logAct({action:"updated",kind:"task",target:"",label:"Recurrence settings",note:nTask+" open task"+(nTask===1?"":"s")+" updated to match"});
+      toast("Recurrence settings saved"+(nTask?" and "+nTask+" task"+(nTask===1?"":"s")+" updated":"")+".");close();
+    }catch(err){btn.disabled=false;btn.textContent="Apply settings";writeErr(err)}});
+}
+/* ---------- standards (create / edit) ---------- */
+function openStandard(id){
+  if(S.readOnly)return;
+  const s=id?S.standards.find(x=>x.id===id):{code:"",version:"",title:"",family:"",applies:["GO"],url:"",notes:"",templates:[]};
+  if(!s)return;
+  const FN=["GO","GOP","GO-2","GOP-2","TO"]; const nTasks=id?S.tasks.filter(t=>t.standard===s.code).length:0;
+  $("#modalRoot").innerHTML='<div class="scrim" id="scrim"><form class="drawer" id="sForm" role="dialog" aria-modal="true" aria-labelledby="sdh" novalidate>'+
+  '<div class="drawer-h"><h2 id="sdh">'+(id?esc(stdLabel(s)):"New standard")+'</h2><button type="button" class="btn sm" id="xBtn">Close</button></div><div class="drawer-b">'+
+  '<div class="row2"><div class="field"><label for="s_code">Standard number</label><input type="text" id="s_code" class="mono" value="'+esc(s.code)+'"'+(id?' disabled':'')+' placeholder="e.g. PRC-031 or BAL-001-TRE"></div>'+
+  '<div class="field"><label for="s_ver">Version</label><input type="text" id="s_ver" class="mono" value="'+esc(s.version)+'" placeholder="e.g. 1"></div></div>'+
+  '<div class="field"><label for="s_title">Title</label><input type="text" id="s_title" value="'+esc(s.title)+'" placeholder="Standard title as published by NERC"></div>'+
+  '<div class="row2"><div class="field"><label for="s_fam">Family</label><input type="text" id="s_fam" class="mono" value="'+esc(s.family)+'" placeholder="Filled from the number, e.g. PRC"></div>'+
+  '<div class="field"><span class="lbl">Applies to</span><div class="checks">'+FN.map(f=>'<label><input type="checkbox" name="sfn" value="'+f+'"'+((s.applies||[]).includes(f)?' checked':'')+'> '+f+'</label>').join("")+'</div></div></div>'+
+  '<div class="field"><label for="s_url">Link (optional)</label><input type="url" id="s_url" class="mono" style="font-size:12px" value="'+esc(s.url||"")+'" placeholder="Leave blank to use the nerc.com PDF for this number and version"></div>'+
+  '<div class="field"><label for="s_notes">Notes</label><textarea id="s_notes" placeholder="Applicability, effective dates, implementation plan">'+esc(s.notes||"")+'</textarea></div>'+
+  (id?'<div class="muted" style="font-size:12px">'+nTasks+' task'+(nTasks===1?' uses':'s use')+' this standard. The number can\'t be changed once tasks reference it.</div>':'')+
+  '<div id="delZone"></div></div>'+
+  '<div class="drawer-f"><button type="submit" class="btn primary">'+(id?"Save":"Add standard")+'</button><span style="flex:1"></span>'+(id?'<button type="button" class="btn danger" id="delBtn"'+(nTasks?' disabled title="Reassign or delete its tasks first"':'')+'>Delete</button>':'')+'</div></form></div>';
+  const close=closeModal; $("#xBtn").onclick=close; $("#scrim").addEventListener("click",e=>{if(e.target.id==="scrim")close()});
+  const code=$("#s_code"); (id?$("#s_title"):code).focus();
+  if(!id)code.addEventListener("input",()=>{const f=code.value.trim().toUpperCase().split("-")[0];const fam=$("#s_fam");if(!fam.dataset.touched)fam.value=/^[A-Z]{2,4}$/.test(f)?f:""});
+  $("#s_fam").addEventListener("input",e=>e.target.dataset.touched="1");
+  $("#sForm").addEventListener("submit",async e=>{e.preventDefault();
+    const c=id?s.code:code.value.trim().toUpperCase().replace(/\s+/g,"");
+    const v={version:$("#s_ver").value.trim(),title:$("#s_title").value.trim(),family:($("#s_fam").value.trim().toUpperCase()||c.split("-")[0]),
+      applies:[...document.querySelectorAll('input[name=sfn]:checked')].map(i=>i.value),url:$("#s_url").value.trim(),notes:$("#s_notes").value.trim()};
+    if(!id){ if(!/^[A-Z]{2,4}-[A-Z0-9.\-]+$/.test(c)){toast("Enter the standard number like PRC-031 or BAL-001-TRE.");code.focus();return}
+      if(S.standards.some(x=>x.code===c||x.id===c)){toast(c+" is already in the library. Expand it to edit.");return} }
+    if(!v.version){toast("Enter the version, such as 1 or 2.1.");$("#s_ver").focus();return}
+    if(!v.title){toast("Enter the standard's title.");$("#s_title").focus();return}
+    if(v.url&&!/^https:\/\/\S+$/i.test(v.url)){toast("The link must start with https://");$("#s_url").focus();return}
+    try{ if(id){await db.doc("standards/"+id).update(v);logAct({action:"updated",kind:"standard",target:id,label:stdLabel(Object.assign({},s,v))+" "+v.title,changes:diffs(s,v,STD_F)});toast(stdLabel(Object.assign({},s,v))+" saved.")}
+      else{await db.doc("standards/"+c).set(Object.assign({code:c,templates:[],custom:true},v));logAct({action:"created",kind:"standard",target:c,label:c+"-"+v.version+" "+v.title,changes:diffs(null,v,STD_F)});S.openStd=c;toast(c+"-"+v.version+" added to the library.")}
+      close(); render(); }catch(err){writeErr(err)} });
+  const del=$("#delBtn"); if(del&&!nTasks)del.onclick=()=>{$("#delZone").innerHTML='<div class="confirm"><span>Remove '+esc(s.code)+' from the library?</span><button type="button" class="btn sm danger" id="delYes">Delete</button><button type="button" class="btn sm" id="delNo">Keep</button></div>';
+    $("#delNo").onclick=()=>$("#delZone").innerHTML=""; $("#delYes").onclick=async()=>{try{await db.doc("standards/"+id).delete();logAct({action:"deleted",kind:"standard",target:id,label:stdLabel(s)+" "+s.title,snap:{data:s}});S.openStd=null;toast(s.code+" removed.");close()}catch(err){writeErr(err)}}};
+}
+/* NERC functional entities a registered GO/GOP/TO coordinates with, keyed to the client's registered functions */
+const ENTITIES=[
+  {k:"rc",label:"Reliability Coordinator",ab:"RC",fns:["GO","GOP","GO-2","GOP-2","TO"],why:"IRO-001, IRO-010, COM-002, EOP-004"},
+  {k:"ba",label:"Balancing Authority",ab:"BA",fns:["GO","GOP","GO-2","GOP-2"],why:"TOP-003, BAL-001-TRE, COM-001, COM-002, EOP-004"},
+  {k:"top",label:"Transmission Operator",ab:"TOP",fns:["GO","GOP","GO-2","GOP-2","TO"],why:"VAR-002, TOP-001, TOP-003, COM-001, COM-002, EOP-005"},
+  {k:"tp",label:"Transmission Planner",ab:"TP",fns:["GO","GO-2","TO"],why:"MOD-025, MOD-026, MOD-027, MOD-032, FAC-002, TPL-007, PRC-024"},
+  {k:"pc",label:"Planning Coordinator",ab:"PC",fns:["GO","GO-2","TO"],why:"MOD-032, FAC-002, TPL-007, PRC-006"},
+  {k:"to",label:"Interconnecting Transmission Owner",ab:"TO",fns:["GO","GO-2"],why:"FAC-001, FAC-002, PRC-005, PRC-027, VAR-002 R5"},
+  {k:"tsp",label:"Transmission Service Provider",ab:"TSP",fns:["TO"],why:"FAC-002, MOD-001"},
+  {k:"go",label:"Interconnected Generator Owner(s)",ab:"GO",fns:["TO"],why:"FAC-001, PRC-027, PRC-005, MOD-032"},
+  {k:"gop",label:"Interconnected Generator Operator(s)",ab:"GOP",fns:["TO"],why:"COM-001, COM-002, TOP-003"}];
+const entFor=fns=>ENTITIES.filter(e=>e.fns.some(f=>(fns||[]).includes(f)));
+function openClient(id){
+  const c=id?S.clients.find(x=>x.id===id):{name:"",ncr:"",region:"",functions:["GO","GOP"],facilities:"",contact:"",notes:""};
+  if(!c||(!id&&S.readOnly))return; const ro=S.readOnly, dis=ro?" disabled":"";
+  const regions=["MRO","NPCC","RF","SERC","Texas RE","WECC"];
+  $("#modalRoot").innerHTML='<div class="scrim" id="scrim"><form class="drawer" id="cForm" role="dialog" aria-modal="true" aria-labelledby="cdh" novalidate>'+
+  '<div class="drawer-h"><h2 id="cdh">'+(id?esc(c.name):"Add client")+'</h2><button type="button" class="btn sm" id="xBtn">Close</button></div><div class="drawer-b">'+
+  '<div class="field"><label for="c_name">Registered entity name</label><input type="text" id="c_name" value="'+esc(c.name)+'"'+dis+'></div>'+
+  '<div class="row2"><div class="field"><label for="c_ncr">NCR ID</label><input type="text" id="c_ncr" class="mono" value="'+esc(c.ncr)+'"'+dis+' placeholder="NCR00000"></div>'+
+  '<div class="field"><label for="c_reg">Regional Entity</label><select id="c_reg"'+dis+'><option value="">—</option>'+regions.map(r=>'<option'+(c.region===r?' selected':'')+'>'+r+'</option>').join("")+'</select></div></div>'+
+  '<div class="field"><label for="c_regdate">NERC Registration Date</label><input type="date" id="c_regdate" value="'+esc(c.regDate||"")+'"'+dis+' style="max-width:220px"></div>'+
+  '<div class="field"><span class="lbl">Registered functions</span><div class="checks">'+["GO","GOP","GO-2","GOP-2","TO"].map(f=>'<label><input type="checkbox" name="fn" value="'+f+'"'+((c.functions||[]).includes(f)?' checked':'')+dis+'> '+f+'</label>').join("")+'</div></div>'+
+  '<div class="field"><span class="lbl">Functionally mapped NERC entities</span><div id="entZone"></div></div>'+
+  '<div class="field"><label for="c_fac">Facilities</label><textarea id="c_fac"'+dis+' placeholder="Plant names, units, MW, IBR vs synchronous">'+esc(c.facilities)+'</textarea></div>'+
+  '<div class="row2"><div class="field"><label for="c_con">Primary compliance contact</label><input type="text" id="c_con" value="'+esc(c.contact)+'"'+dis+' placeholder="Name"></div>'+
+  '<div class="field"><label for="c_email">Contact email</label><input type="email" id="c_email" value="'+esc(c.contactEmail||"")+'"'+dis+' placeholder="name@company.com" autocomplete="off"></div></div>'+
+  '<div class="field"><div class="checks"><label><input type="checkbox" id="c_digest"'+(c.digest!==false?' checked':'')+dis+'> Email this contact a weekday digest of their overdue and coming-due tasks</label></div></div>'+
+  '<div class="row2"><div class="field"><label for="c_pm">Project Manager</label><input type="text" id="c_pm" value="'+esc(c.pmName||"")+'"'+dis+' placeholder="Name"></div>'+
+  '<div class="field"><label for="c_pmemail">Project Manager email</label><input type="email" id="c_pmemail" value="'+esc(c.pmEmail||"")+'"'+dis+' placeholder="name@company.com" autocomplete="off"></div></div>'+
+  '<div class="field"><div class="checks"><label><input type="checkbox" id="c_pmdigest"'+(c.pmDigest!==false?' checked':'')+dis+'> Email the Project Manager a weekday digest (one email covering every client they manage)</label></div></div>'+
+  '<div class="row2"><div class="field"><label for="c_plm">Plant Manager</label><input type="text" id="c_plm" value="'+esc(c.plantMgrName||"")+'"'+dis+' placeholder="Name"></div>'+
+  '<div class="field"><label for="c_plmemail">Plant Manager email</label><input type="email" id="c_plmemail" value="'+esc(c.plantMgrEmail||"")+'"'+dis+' placeholder="name@company.com" autocomplete="off"></div></div>'+
+  '<div class="field"><div class="checks"><label><input type="checkbox" id="c_plmdigest"'+(c.plantMgrDigest===true?' checked':'')+dis+'> Email the Plant Manager the weekday client digest of this client\'s overdue and coming-due tasks</label></div></div>'+
+  '<div class="field"><label for="c_sp">SharePoint folder</label><input type="url" id="c_sp" value="'+esc(c.sharepoint||"")+'"'+dis+' placeholder="https://yourtenant.sharepoint.com/sites/…" autocomplete="off">'+
+    (c.sharepoint&&/^https:\/\//i.test(c.sharepoint)?'<a href="'+esc(c.sharepoint)+'" target="_blank" rel="noopener" style="font-size:12px">Open SharePoint folder ↗</a>':'')+'</div>'+
+  '<div class="field"><label for="c_notes">Notes</label><textarea id="c_notes"'+dis+'>'+esc(c.notes)+'</textarea></div>'+
+  (ro?'':(()=>{const miss=missingTasksFor(id);if(!miss.length)return id?'<div class="callout"><b>Task set</b><span>This client has every task in the tracker.</span></div>':'';
+    return id?'<div class="callout"><b>Missing tasks</b><span>'+miss.length+' task'+(miss.length===1?' is':'s are')+' assigned to other clients but not to this one.</span><div><button type="button" class="btn sm" id="fillBtn">Add '+miss.length+' missing task'+(miss.length===1?'':'s')+'</button></div></div>'
+      :'<div class="callout"><div class="checks"><label><input type="checkbox" id="c_assignAll" checked> Assign all '+miss.length+' tracker tasks to this client</label></div><span>Copies every distinct task already in the tracker. Copies are added without due dates; set each one so reminders and digests can track it.</span></div>'})())+
+  '<div id="delZone"></div></div>'+
+  (ro?'':'<div class="drawer-f"><button type="submit" class="btn primary">'+(id?"Save":"Add client")+'</button><span style="flex:1"></span>'+(id?'<button type="button" class="btn danger" id="delBtn">Delete</button>':'')+'</div>')+'</form></div>';
+  const close=closeModal; $("#xBtn").onclick=close; $("#scrim").addEventListener("click",e=>{if(e.target.id==="scrim")close()});
+  const entVals=Object.assign({},c.entities||{});
+  const drawEnt=()=>{document.querySelectorAll("[data-ent]").forEach(i=>{entVals[i.dataset.ent]=i.value.trim()});
+    const fns=[...document.querySelectorAll('input[name=fn]:checked')].map(i=>i.value); const list=entFor(fns);
+    $("#entZone").innerHTML=list.length?'<div style="display:flex;flex-direction:column;gap:8px">'+list.map(e=>'<div class="row2" style="align-items:center"><label for="ent_'+e.k+'" style="font-weight:500;color:var(--fg);font-size:13px">'+esc(e.label)+' <span class="chip">'+e.ab+'</span><div class="muted mono" style="font-size:11px;font-weight:400">'+esc(e.why)+'</div></label><input type="text" id="ent_'+e.k+'" data-ent="'+e.k+'" value="'+esc(entVals[e.k]||"")+'"'+dis+' placeholder="Entity name / NCR ID" autocomplete="off"></div>').join("")+
+      '<span class="muted" style="font-size:12px">The entities this client coordinates with under its registered functions. The list follows the functions checked above; the Regional Entity is set above.</span></div>'
+      :'<span class="muted" style="font-size:12px">Check a registered function to see the entities it maps to.</span>'};
+  drawEnt(); document.querySelectorAll('input[name=fn]').forEach(i=>i.addEventListener("change",drawEnt));
+  $("#c_name").focus(); if(ro)return;
+  $("#cForm").addEventListener("submit",async e=>{e.preventDefault();
+    const v={name:$("#c_name").value.trim(),ncr:$("#c_ncr").value.trim(),region:$("#c_reg").value,regDate:$("#c_regdate").value,functions:[...document.querySelectorAll('input[name=fn]:checked')].map(i=>i.value),facilities:$("#c_fac").value.trim(),contact:$("#c_con").value.trim(),contactEmail:$("#c_email").value.trim(),digest:$("#c_digest").checked,pmName:$("#c_pm").value.trim(),pmEmail:$("#c_pmemail").value.trim(),pmDigest:$("#c_pmdigest").checked,sharepoint:$("#c_sp").value.trim(),plantMgrName:$("#c_plm").value.trim(),plantMgrEmail:$("#c_plmemail").value.trim(),plantMgrDigest:$("#c_plmdigest").checked,notes:$("#c_notes").value.trim()};
+    document.querySelectorAll("[data-ent]").forEach(i=>{entVals[i.dataset.ent]=i.value.trim()});
+    v.entities={}; for(const e of ENTITIES) v.entities[e.k]=entVals[e.k]||"";
+    if(!v.name){toast("Enter the entity name.");return}
+    if(v.contactEmail&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.contactEmail)){toast("Enter a valid contact email, or leave it blank.");$("#c_email").focus();return}
+    if(v.pmEmail&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.pmEmail)){toast("Enter a valid Project Manager email, or leave it blank.");$("#c_pmemail").focus();return}
+    if(v.plantMgrEmail&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.plantMgrEmail)){toast("Enter a valid Plant Manager email, or leave it blank.");$("#c_plmemail").focus();return}
+    if(v.sharepoint&&!/^https:\/\/\S+$/i.test(v.sharepoint)){toast("Paste the full SharePoint folder link, starting with https://");$("#c_sp").focus();return}
+    const assignAll=!id&&$("#c_assignAll")&&$("#c_assignAll").checked;
+    try{ if(id){await db.doc("clients/"+id).update(v);const ch=diffs(c,v,CLIENT_F);if(ch.length)logAct({action:"updated",kind:"client",target:id,label:v.name,client:id,changes:ch});toast("Client saved.");close();return}
+      const nid=uid(); await db.doc("clients/"+nid).set(v); logAct({action:"created",kind:"client",target:nid,label:v.name,client:nid,changes:diffs(null,v,CLIENT_F)}); close();
+      if(assignAll){toast("Client added. Assigning tasks…");const n=await assignTasks(nid,v.contact);logAct({action:"created",kind:"task",target:nid,label:"Tracker task set",client:nid,note:n+" task"+(n===1?"":"s")+" assigned to the new client without due dates"});toast("Client added with "+n+" task"+(n===1?"":"s")+". Set their due dates.");S.f={q:"",client:nid,std:"",status:"nodate",fn:""};S.view="tasks";render()}
+      else toast("Client added.");
+    }catch(err){writeErr(err)}});
+  const fb=$("#fillBtn"); if(fb)fb.onclick=async()=>{fb.disabled=true;fb.textContent="Adding…";try{const n=await assignTasks(id,c.contact);logAct({action:"created",kind:"task",target:id,label:"Missing tasks",client:id,note:n+" missing task"+(n===1?"":"s")+" added without due dates"});toast(n+" task"+(n===1?"":"s")+" added to "+c.name+". Set their due dates.");close();S.f={q:"",client:id,std:"",status:"nodate",fn:""};S.view="tasks";render()}catch(err){writeErr(err);fb.disabled=false}};
+  const del=$("#delBtn"); if(del)del.onclick=()=>{const n=S.tasks.filter(t=>t.clientId===id).length;
+    $("#delZone").innerHTML='<div class="confirm"><span>Delete this client'+(n?' and its '+n+' task'+(n===1?'':'s'):'')+'?</span><button type="button" class="btn sm danger" id="delYes">Delete</button><button type="button" class="btn sm" id="delNo">Keep</button></div>';
+    $("#delNo").onclick=()=>$("#delZone").innerHTML="";
+    $("#delYes").onclick=async()=>{const delTasks=S.tasks.filter(t=>t.clientId===id).map(t=>Object.assign({},t));try{for(const t of S.tasks.filter(t=>t.clientId===id))await db.doc("tasks/"+t.id).delete();await db.doc("clients/"+id).delete();logAct({action:"deleted",kind:"client",target:id,label:c.name,client:id,clientName:c.name,snap:{data:c,tasks:delTasks},note:"Client deleted"+(n?" with its "+n+" task"+(n===1?"":"s"):"")});toast("Client deleted.");close()}catch(err){writeErr(err)}}};
+}
+/* every distinct open task in the tracker, one representative per title+standard+requirement */
+const taskKey=t=>[t.title,t.standard,t.requirement].map(x=>String(x||"").trim().toLowerCase()).join("|");
+function taskSet(){
+  const m=new Map();
+  for(const t of S.tasks){ if(t.sample||t.status==="done")continue; const c=clientById(t.clientId); if(c&&c.sample)continue;
+    const k=taskKey(t), cur=m.get(k);
+    if(!cur||(cur.copiedFrom&&!t.copiedFrom)||(!!cur.copiedFrom===!!t.copiedFrom&&(t.dueDate||"")<(cur.dueDate||"")))m.set(k,t); }
+  return m;
+}
+function missingTasksFor(clientId){
+  const have=new Set(S.tasks.filter(t=>clientId&&t.clientId===clientId).map(taskKey));
+  return [...taskSet().entries()].filter(([k])=>!have.has(k)).map(([,t])=>t);
+}
+async function assignTasks(clientId,contactName){
+  const list=missingTasksFor(clientId); let n=0;
+  for(const t of list){
+    await db.doc("tasks/"+uid()).set({title:t.title,clientId,facility:"",standard:t.standard||"",requirement:t.requirement||"",dueDate:"",assignee:contactName||"",remindDays:t.remindDays||[30,7],recur:t.recur||{n:0,unit:"m"},status:"open",evidence:"",notes:"",createdAt:ymd(today()),completedAt:null,copiedFrom:t.id});
+    n++;
+  }
+  return n;
+}
+async function clearSample(btn){
+  if(btn.dataset.armed!=="1"){btn.dataset.armed="1";btn.textContent="Click again to remove sample data";btn.classList.add("danger");return}
+  try{for(const t of S.tasks.filter(t=>t.sample))await db.doc("tasks/"+t.id).delete();for(const c of S.clients.filter(c=>c.sample))await db.doc("clients/"+c.id).delete();logAct({action:"deleted",kind:"client",target:"sample",label:"Sample data",note:"Sample client and tasks removed"});toast("Sample data removed.")}catch(e){writeErr(e)}
+}
+
+/* ---------- full data export (Editors only) ----------
+   One JSON file with every document in every collection, exactly as stored, for moving the tracker into the CGM web app. */
+async function exportAll(btn){
+  if(!db||!downloads){toast("Export isn't available in this view.");return}
+  btn.disabled=true; btn.textContent="Exporting…";
+  try{
+    const cols=["clients","tasks","standards","teamTasks","activity","activitySnapshots"];
+    const out={format:"cgm-tracker-export",version:1,exportedAt:new Date().toISOString(),source:"NERC Compliance Tracker",counts:{},warnings:[],collections:{}};
+    for(const c of cols){const snap=await db.collection(c).get();out.collections[c]=snap.docs.map(d=>({id:d.id,data:d.data()}));out.counts[c]=snap.docs.length;
+      if(snap.docs.length>=1000)out.warnings.push(c+": 1000 or more documents, so this collection may be incomplete.")}
+    // Names of the CGM people the records refer to by id, so the web app can match them to new logins.
+    const ids=new Set();
+    for(const d of out.collections.teamTasks)[d.data.owner,d.data.createdBy,...(d.data.collaborators||[])].forEach(x=>x&&ids.add(x));
+    for(const d of out.collections.tasks)[d.data.performedBy,d.data.reviewedBy].forEach(x=>x&&ids.add(x));
+    for(const d of out.collections.activity)for(const e of Object.values(d.data.entries||{}))[e.by,e.restoredBy].forEach(x=>x&&ids.add(x));
+    if(meId)ids.add(meId);
+    out.people={};
+    if(userNS&&ids.size){const list=[...ids];for(let i=0;i<list.length;i+=50){try{const ps=await userNS.profiles(list.slice(i,i+50));for(const id of list.slice(i,i+50))out.people[id]={name:(ps[id]&&ps[id].name)||""}}catch(_){for(const id of list.slice(i,i+50))out.people[id]={name:""}}}}
+    out.exportedBy=meId||null;
+    const live={clients:S.loaded.clients&&S.clients.length,tasks:S.loaded.tasks&&S.tasks.length,standards:S.loaded.standards&&S.standards.length,teamTasks:S.teamLoaded&&S.team.length};
+    for(const [k,n] of Object.entries(live))if(n!==false&&out.counts[k]!==n)out.warnings.push(k+": the export has "+out.counts[k]+" but the page shows "+n+".");
+    await downloads.save({filename:"cgm-tracker-full-export-"+ymd(today())+".json",data:JSON.stringify(out,null,1)});
+    logAct({action:"exported",kind:"export",label:"Full data export",note:Object.entries(out.counts).map(([k,n])=>n+" "+k).join(", ")});
+    toast(out.warnings.length?"Exported, with a warning: "+out.warnings[0]:"Full export saved: "+out.counts.clients+" clients, "+out.counts.tasks+" tasks, "+out.counts.teamTasks+" team tasks.");
+  }catch(e){toast(e&&e.code==="declined"?"Export cancelled.":"Couldn't export: "+((e&&e.message)||(e&&e.code)||"unknown error"))}
+  btn.disabled=false; btn.textContent="Export all data";
+}
+$("#exportAllBtn").addEventListener("click",e=>exportAll(e.currentTarget));
+
+/* ---------- CSV ---------- */
+async function exportCSV(){
+  if(!downloads)return;
+  const rows=filteredTasks(); const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+  const head=["Client","NCR ID","Standard","Version","Requirement","Task","Facility","Assignee","Assignee email","Due date","Status","Repeats","Completed","Evidence","Notes"];
+  const lines=[head.map(q).join(",")].concat(rows.map(t=>{const c=clientById(t.clientId)||{},s=stdByCode(t.standard)||{};return [c.name,c.ncr,t.standard,s.version,t.requirement,t.title,t.facility,t.assignee,t.assigneeEmail,t.dueDate,STATE_LABEL[state(t)],recurText(t.recur),t.completedAt,t.evidence,t.notes].map(q).join(",")}));
+  try{const r=await downloads.save({filename:"nerc-compliance-tasks-"+ymd(today())+".csv",data:lines.join("\r\n")});if(r!==false)logAct({action:"exported",kind:"export",label:"Tasks CSV",note:rows.length+" task"+(rows.length===1?"":"s")+" exported"});}catch(e){if(e&&e.code!=="declined")toast("Couldn't export: "+(e.message||e.code))}
+}
+
+async function exportActCSV(){
+  if(!downloads)return; const rows=actRows(); const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+  const head=["Date","Time","User","Action","Record type","Record","Client","Field","From","To","Note"]; const out=[head.map(q).join(",")];
+  for(const e of rows){const d=new Date(e.ts);const c=clientById(e.client);const base=[ymd(d),d.toLocaleTimeString(),whoName(e.by),e.action,ACT_KIND[e.kind]||e.kind,e.label,c?c.name:(e.clientName||"")];
+    const ch=e.changes&&e.changes.length?e.changes:[{f:"",from:"",to:""}];
+    ch.forEach((x,i)=>out.push(base.concat([x.f,x.from,x.to,i===0?e.note:""]).map(q).join(",")))}
+  try{await downloads.save({filename:"nerc-tracker-activity-"+ymd(today())+".csv",data:out.join("\r\n")})}catch(e){if(e&&e.code!=="declined")toast("Couldn't export: "+(e.message||e.code))}
+}
+
+/* ---------- boot ---------- */
+try{const v=localStorage.getItem("nct_view");if(v&&["dash","tasks","team","standards","clients","forms","rsaw","activity"].includes(v))S.view=v}catch(_){}
+render();
+(async function boot(){
+  const C=window.claude;
+  if(!C||!C.use){S.offline=true;render();return}
+  db=await C.use("db");
+  if(!db){S.offline=true;render();return}
+  C.use("user").then(async u=>{if(!u)return;userNS=u;meId=await u.id();u.canEdit().then(ok=>{if(ok)$("#exportAllBtn").hidden=false}).catch(()=>{});const w=await u.can("data.write");if(w===false){S.readOnly=true;render()}else if(S.view==="activity"||S.view==="team")render()}).catch(()=>{});
+  C.use("downloads").then(d=>{downloads=d;render()}).catch(()=>{});
+  C.use("mcp").then(m=>{mcp=m}).catch(()=>{});
+  const sub=(col,key,map)=>db.collection(col).onSnapshot(s=>{S[key]=s.docs.map(d=>Object.assign({id:d.id},d.data()));S.loaded[key]=true;render()},e=>{S.loaded[key]=true;if(e&&e.code==="revoked"){S.offline=true}render()});
+  sub("standards","standards");sub("clients","clients");sub("tasks","tasks");
+  db.collection("teamTasks").onSnapshot(sn=>{S.team=sn.docs.map(d=>Object.assign({id:d.id},d.data()));S.teamLoaded=true;if(S.view==="team"||S.view==="activity")render()},()=>{S.teamLoaded=true;if(S.view==="team")render()});
+  db.collection("activity").orderBy("day","desc").limit(400).onSnapshot(snap=>{const all=[];for(const d of snap.docs){const x=d.data();for(const [k,e] of Object.entries(x.entries||{}))all.push(Object.assign({id:k},e))}
+    all.sort((a,b)=>(b.ts||"").localeCompare(a.ts||""));S.activity=all;S.actLoaded=true;if(S.view==="activity")render()},()=>{S.actLoaded=true;if(S.view==="activity")render()});
+  // re-evaluate due states once the day changes
+  setInterval(()=>{const d=ymd(today());if(d!==boot._d){boot._d=d;render()}},60000); boot._d=ymd(today());
+})();
+})();
+</script>
+
+
+</body></html>
