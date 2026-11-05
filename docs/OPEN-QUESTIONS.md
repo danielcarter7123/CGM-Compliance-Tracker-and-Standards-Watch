@@ -44,7 +44,7 @@ Running `npm install`, `npm run typecheck`, `npm test` and `npm run build`, and 
 
 ### Nov 5, 2026 (first Claude Code session)
 
-1. **Reminder emails.** Dan wants reminders to land in Outlook. Nobody has confirmed what sends the live tracker's emails today, so check before cutover (T9) that the old sender is off. Plan: the app sends the reminders itself (T8). They arrive in people's Outlook inboxes like any email.
+1. **Reminder emails.** *Update (Nov 5):* build the reminder and notification emails, but ship them **off**. One clear admin toggle (and an env kill switch) turns them on after deployment. Dan wants reminders to land in Outlook. Nobody has confirmed what sends the live tracker's emails today, so check before cutover (T9) that the old sender is off. Plan: the app sends the reminders itself (T8). They arrive in people's Outlook inboxes like any email.
 2. **Evidence retention.** Old data can cycle out after about one to two years. But some NERC tasks recur every 6, 10 or 12 years, so evidence for those must stay at least one full cycle. Proposed rule, which Dan still needs to confirm: evidence can be purged once *both* of these are true:
    - 2 years have passed since removal or task close;
    - the task's next occurrence has been completed (evidence covers at least one full interval).
@@ -56,7 +56,10 @@ Running `npm install`, `npm run typecheck`, `npm test` and `npm run build`, and 
 7. **Outlook calendar.** Dan has no preference. Decision: per-user calendar feeds (iCal), which Outlook can subscribe to. No Microsoft Graph calendar writes.
 8. **Domain and launch.** CGM has a simple main site. Recommendation: host the app on a subdomain of the existing domain (for example `app.` or `watch.`), so the main site is untouched. The turnaround promise, second reviewer, legal review and security controls are still open (block P1 only).
 9. **How Watch updates.** Keep costs low but make it reliable as a standalone app. Decision pending the hosting walkthrough (see question 10). Recommendation: an in-app weekly job reads NERC's site and drafts changes with the Claude API (pennies per run). The existing Monday task keeps posting to `/api/drafts` as a backup during the pilot.
-10. **Hosting and database.** Dan asked for a walkthrough of the options before choosing. *Pending.*
+10. **Hosting and database.** Dan approved Q2–9 as proposed. Hosting is a hybrid:
+   - **build locally**: Supabase in Docker Desktop on Dan's PC, holding fake data and the T2a dry-run of real data;
+   - **go live on the cloud**: Supabase Pro + Vercel + Resend, roughly $45–50/month;
+   - deploy from GitHub.
 11. **Git.** Yes. Dan has an empty GitHub repository ready.
 
 **Client data:** the live tracker's data is essential to how the internal tracker runs. It must be carried over completely and handled under CLAUDE.md rule 7.
