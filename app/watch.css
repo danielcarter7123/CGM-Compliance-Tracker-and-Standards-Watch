@@ -200,12 +200,12 @@ h1,h2,h3{text-wrap:balance;margin:0}
 .nbtn.locked svg{flex:none}
 .nbtn.locked:hover{filter:saturate(.7)}
 
-/* Review queue (editors only). Its own dark navy console with a striped "Editor only" band, the same in light and dark themes, so it never reads as client-facing. */
-:root{--adm-bg:#0B1A30;--adm-panel:#13264A;--adm-line:#29406A;--adm-ink:#EAF0FA;--adm-muted:#A3B3CC;--adm-accent:#7FA6FF;--adm-accent-ink:#0B1220;--adm-add:#5EEAD4;--adm-del:#FCA5A5;--adm-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+/* Review queue (editors only). Its own dark navy console with a red striped "Editor only" band (only Dan and CGM editors ever see it), the same in light and dark themes, so it never reads as client-facing. */
+:root{--adm-flag:#E5484D;--adm-flag-ink:#FFFFFF;--adm-bg:#0B1A30;--adm-panel:#13264A;--adm-line:#29406A;--adm-ink:#EAF0FA;--adm-muted:#A3B3CC;--adm-accent:#7FA6FF;--adm-accent-ink:#0B1220;--adm-add:#5EEAD4;--adm-del:#FCA5A5;--adm-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
 .review{background:var(--adm-bg);color:var(--adm-ink);border-radius:8px;margin-bottom:28px;overflow:hidden;box-shadow:0 0 0 1px var(--adm-line)}
-.review::before{content:"";display:block;height:8px;background:repeating-linear-gradient(-45deg,var(--adm-accent) 0 10px,var(--adm-bg) 10px 20px)}
+.review::before{content:"";display:block;height:10px;background:repeating-linear-gradient(-45deg,var(--adm-flag) 0 12px,#1A0B0E 12px 24px)}
 .review .rhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 20px;border-bottom:1px solid var(--adm-line)}
-.review .rtag{font:600 11px var(--adm-mono);letter-spacing:.12em;text-transform:uppercase;background:var(--adm-accent);color:var(--adm-accent-ink);padding:4px 8px;border-radius:3px}
+.review .rtag{font:600 11px var(--adm-mono);letter-spacing:.12em;text-transform:uppercase;background:var(--adm-flag);color:var(--adm-flag-ink);padding:4px 8px;border-radius:3px}
 .review .rhead h2{font:600 18px var(--adm-mono);color:var(--adm-ink);letter-spacing:-.01em}
 .review .rhead .rc{font-family:var(--adm-mono);font-size:12.5px;color:var(--adm-muted)}
 .review .rhead .only{font-size:12.5px;color:var(--adm-muted);margin-left:auto}

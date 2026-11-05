@@ -34,7 +34,7 @@ html,body{margin:0}
 .fade::after{content:"";position:absolute;inset:auto 0 0 0;height:120px;background:linear-gradient(to bottom,transparent,var(--bg))}
 
 /* Editor console pages share the review panel's navy look */
-.console{background:var(--adm-bg);color:var(--adm-ink);min-height:100vh}
+.console{background:var(--adm-bg);color:var(--adm-ink);min-height:100vh;border-top:10px solid transparent;border-image:repeating-linear-gradient(-45deg,var(--adm-flag) 0 12px,#1A0B0E 12px 24px) 10}
 .console .wrap{padding-block:28px 64px}
 .console h1{font:600 22px var(--adm-mono);margin:0 0 6px;color:var(--adm-ink)}
 .console p{color:var(--adm-muted)}
