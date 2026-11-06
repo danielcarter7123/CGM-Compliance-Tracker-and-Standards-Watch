@@ -378,3 +378,34 @@ test("weekly drafting job runs: editors read them; nobody else, and nobody write
   for (const u of [ADMIN, PM, W_USER]) assert.ok(await fails(u, `insert into watch_job_runs(trigger) values ('manual')`), u);
   assert.equal((await as(ADMIN, `update watch_job_runs set status = 'ok' returning id`)).length, 0);
 });
+
+// ---------- T1: standards library and clients screens ----------
+test("library: PMs and admins edit standards and confirm recurrence; staff and clients can't", async () => {
+  await db.exec(`insert into obligation_templates(standard_code, req, title, recur_n, recur_unit, recur_basis) values ('PRC-005','R3','Fake battery check',6,'m','due')`);
+  const [r] = await as(PM, `update library_standards set version = '7' where code = 'PRC-005' returning version`);
+  assert.equal(r.version, "7");
+  assert.equal((await as(STAFF, `update library_standards set version = '9' where code = 'PRC-005' returning code`)).length, 0, "staff can't");
+  assert.equal((await as(T_ADMIN, `update library_standards set version = '9' where code = 'PRC-005' returning code`)).length, 0, "clients can't");
+  assert.equal((await as(PM, `update obligation_templates set recur_basis = 'done', basis_confirmed = true where title = 'Fake battery check' returning id`)).length, 1);
+  assert.equal((await as(STAFF, `update obligation_templates set basis_confirmed = false where title = 'Fake battery check' returning id`)).length, 0);
+  assert.ok(await fails(STAFF, `insert into library_standards(code, version, title, family) values ('FAK-001','1','Fake','FAK')`));
+  assert.equal((await as(ADMIN, `insert into library_standards(code, version, title, family, custom) values ('FAK-001','1','Fake','FAK',true) returning code`)).length, 1);
+  assert.ok(await fails(ADMIN, `insert into library_standards(code, version, title, family) values ('fake bad','1','x','x')`), "number format is enforced");
+  assert.equal((await as(ADMIN, `delete from library_standards where code = 'FAK-001' returning code`)).length, 1);
+  await db.exec(`update library_standards set version = '6' where code = 'PRC-005'; delete from obligation_templates where title = 'Fake battery check'`);
+});
+
+test("clients: PMs add and edit clients, staff only read; any staff keeps contacts; only admins change products or delete", async () => {
+  const [c] = await as(PM, `insert into companies(name, functions, entities) values ('Fake New Client', '{GO,GOP}', '{"rc":"Fake RC"}') returning id`);
+  assert.equal((await as(PM, `update companies set ncr_id = 'NCR99999' where id = '${c.id}' returning ncr_id`))[0].ncr_id, "NCR99999");
+  assert.equal((await as(STAFF, `update companies set ncr_id = 'X' where id = '${c.id}' returning id`)).length, 0, "staff can't edit clients");
+  assert.equal(await count(STAFF, `select count(*) from companies where id = '${c.id}'`), 1, "but can see them");
+  assert.equal((await as(T_ADMIN, `update companies set name = 'X' where id = '${A_CO}' returning id`)).length, 0, "clients can't edit their record");
+  assert.equal((await as(STAFF, `insert into contacts(company_id, kind, name, email) values ('${c.id}','pm','Fake PM','pm@fake.example') returning id`)).length, 1);
+  assert.ok(await fails(T_ADMIN, `insert into contacts(company_id, kind, name) values ('${A_CO}','compliance','Me')`), "clients can't add contacts");
+  assert.ok(await fails(PM, `insert into entitlements(company_id, product) values ('${c.id}','tracker')`), "PMs can't switch the Tracker on");
+  assert.equal((await as(ADMIN, `insert into entitlements(company_id, product) values ('${c.id}','tracker') returning product`)).length, 1);
+  assert.equal((await as(PM, `delete from companies where id = '${c.id}' returning id`)).length, 0, "PMs can't delete clients");
+  assert.equal((await as(ADMIN, `delete from companies where id = '${c.id}' returning id`)).length, 1);
+  assert.equal(Number((await db.query(`select count(*) from contacts where company_id = '${c.id}'`)).rows[0].count), 0, "contacts go with the client");
+});

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { requireViewer } from "@/lib/guards";
 import { createClient } from "@/lib/supabase/server";
+import { toWatchFunctions } from "@/lib/functions";
 import { ALL_FUNCTIONS, REGIONS } from "@/lib/types";
 import { finishWelcome } from "./actions";
 
@@ -19,7 +20,7 @@ export default async function WelcomePage({ searchParams }: { searchParams: { ne
   const { data: co } = v.company
     ? await createClient().from("companies").select("functions, region").eq("id", v.company.id).maybeSingle()
     : { data: null };
-  const fns = v.functions.length ? v.functions : ((co?.functions as string[]) || []);
+  const fns = v.functions.length ? v.functions : toWatchFunctions((co?.functions as string[]) || []);
   const region = v.region || (co?.region as string | null) || "";
   const companyName = searchParams.joined || v.company?.name;
 

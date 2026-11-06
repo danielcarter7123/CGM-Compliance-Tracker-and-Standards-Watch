@@ -57,6 +57,8 @@ Nobody can raise their own role. Only CGM admins set staff roles and products. C
 
 ## Rules worth knowing
 
+- **The Clients directory** (`/tracker/clients`, CGM staff) lists Tracker clients: companies that have or had the Tracker, plus new clients with no products yet. Watch-only subscribers aren't listed. A PM can add a client, but it shows "TRACKER OFF" until a CGM admin turns the Tracker on under Add-ons.
+
 - **Client isolation:** every tracker row carries `company_id`. A client user sees a row only when it's their company and the company holds the product. There's no way to query another company's rows.
 - **Client task edits are narrow:** a trigger (`guard_task_update`) lets client users change only `status` (open → in progress → performed), `evidence` and `notes`. It sets who performed it and when. Anything else is refused with a clear message.
 - **Approval needs a PM or admin**, also enforced by the trigger, including "mark complete" directly.

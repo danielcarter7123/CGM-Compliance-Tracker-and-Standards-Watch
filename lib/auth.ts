@@ -1,5 +1,6 @@
 import { createClient } from "./supabase/server";
 import { productsFrom, type Entitlement, type Products } from "./entitlements";
+import { toWatchFunctions } from "./functions";
 
 export type StaffRole = "admin" | "pm" | "staff";
 
@@ -51,7 +52,7 @@ export async function getViewer(): Promise<Viewer | null> {
     userId: auth.user.id,
     email: auth.user.email ?? null,
     fullName: (p.full_name as string | null) || "",
-    functions: (p.functions as string[]) || [],
+    functions: toWatchFunctions(p.functions as string[]), // Watch groups: GO-2 counts as GO, GOP-2 as GOP
     region: (p.region as string | null) ?? null,
     onboarded: isStaff || !!p.onboarded_at,
     digestOptIn: p.digest_opt_in !== false,

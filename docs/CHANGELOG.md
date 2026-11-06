@@ -2,6 +2,48 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 5, 2026: T1 standards library and clients (Claude Code)
+
+**Function list** (Dan's decision 5): `lib/functions.ts` holds the one registered-function list: GO, GOP, GO-2, GOP-2, TO, TOP, TP, PC.
+- Watch folds GO-2 into GO and GOP-2 into GOP. This is applied to people's functions and to the welcome screen's company prefill.
+- The pilot's mapped-entity table, with the standards behind each relationship, is ported unchanged.
+
+**Standards library** (`/tracker/standards`, every Tracker user can read it):
+- table: Standard (number-version) · Title · Applies to · Recurring obligations · Open tasks;
+- search, family and function filters;
+- each row expands to notes, the standard link and its obligations (with interval, repeat-from and a SUGGESTED chip);
+- project managers and admins can:
+  - save the version inline (every link follows it);
+  - save a custom link, or reset it to the nerc.com PDF;
+  - edit details (number locked);
+  - add a standard (number format and uniqueness checked);
+  - delete a standard, which is refused while tasks use it.
+
+**Recurrence settings** (`/tracker/standards/recurrence`, PMs and admins):
+- every recurring obligation, with Repeat from, SUGGESTED for unconfirmed rows, open-task counts and a MIXED chip;
+- applying confirms the rows and, optionally, aligns open repeating tasks matched by title, standard and requirement. Due dates never change.
+
+**Clients** (`/tracker/clients`, CGM staff):
+- **Directory:** Entity (SAMPLE / TRACKER OFF / CLIENT TASKS chips, SharePoint, contact and DIGEST) · NCR ID · Registered · Region · Registered as (and mapped entities) · Project Manager · Plant Manager · Facilities.
+- **Drawer:**
+  - every pilot field;
+  - mapped NERC entities that follow the ticked functions;
+  - the compliance contact, Project Manager and Plant Manager, each with their digest box (stored in `contacts`).
+- **Who can do what:**
+  - PMs and admins add and edit clients; other staff only view;
+  - admins switch the Tracker and Client Tasks on or off, delete a client (with its tasks, after a confirm tick) and remove sample clients.
+- **Not here:** Watch-only subscribers aren't listed.
+
+**Tracker tabs:** Standards Library and Clients are live, and the current tab is underlined.
+
+**Tests:**
+- RLS: library and template writes are PM/admin only; clients are PM/admin edit and staff read; contacts are staff-only; products and deletes are admin-only (32 RLS tests);
+- e2e `tracker-t1.spec.ts`: a PM's version, link and new/delete flow; staff and clients read-only; client add with validation, entity rows, contacts, staff view, admin product switch and delete.
+
+**Acceptance:** the library shows the pilot's 48 standards and 72 obligation templates.
+
+**Left for T2:** "Create task", "Create all recurring tasks for client", "Assign all tracker tasks" and "Add missing tasks" (they need the tasks screens).
+
 ## Nov 5, 2026: weekly NERC drafting job (Claude Code)
 
 **Decision 9 built:** the app drafts Standards Watch changes itself each week, and your Monday task stays as the backup.

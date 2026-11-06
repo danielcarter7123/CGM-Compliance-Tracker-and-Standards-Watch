@@ -1,4 +1,5 @@
 import "../tracker.css";
+import TrackerTabs from "@/components/TrackerTabs";
 import { requireTracker } from "@/lib/guards";
 
 /** Everything under /tracker needs the Compliance Tracker product (CGM staff always have it).
@@ -10,8 +11,8 @@ export default async function TrackerLayout({ children }: { children: React.Reac
     { label: "Tasks", show: true },
     { label: "Client Tasks", show: !v.isStaff && v.products.client_tasks },
     { label: "Team Tasks", show: v.isStaff },
-    { label: "Standards Library", show: true },
-    { label: "Clients", show: v.isStaff },
+    { label: "Standards Library", href: "/tracker/standards", show: true },
+    { label: "Clients", href: "/tracker/clients", show: v.isStaff },
     { label: "Messages", show: true },
     { label: "Activity Log", show: true },
   ];
@@ -23,15 +24,7 @@ export default async function TrackerLayout({ children }: { children: React.Reac
             <b>Compliance Tracker</b>
             <span>{v.isStaff ? `CGM ${v.staffRole === "pm" ? "project manager" : v.staffRole}` : v.company?.name}</span>
           </div>
-          <nav className="trk-tabs" aria-label="Tracker">
-            {sections.filter((s) => s.show).map((s) =>
-              s.href ? (
-                <a key={s.label} href={s.href}>{s.label}</a>
-              ) : (
-                <span key={s.label} className="soon" title="Coming in a later milestone">{s.label}</span>
-              ),
-            )}
-          </nav>
+          <TrackerTabs sections={sections.filter((s) => s.show).map(({ label, href }) => ({ label, href }))} />
         </div>
       </div>
       {children}

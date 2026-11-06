@@ -55,6 +55,7 @@ Run `npm run typecheck && npm test && npm run build` before calling any mileston
 
 - Field names: the Watch content follows the pilot (`std`, `fn`, `todo`, `todoTx`); `lib/mapping.ts` converts it to columns. Tracker tables use snake_case versions of the pilot fields (see `docs/tracker/DATA-SHAPES.md` for the mapping).
 - Dates are `YYYY-MM-DD`, or `YYYY-MM` for month-only Watch dates. Use the helpers in `lib/watch.ts`. Tracker recurrence math lives in SQL (`next_due`, `spawn_next_occurrence`); don't duplicate it in TypeScript except for previews, and test that the two agree.
+- Registered functions: one vocabulary in `lib/functions.ts` (GO, GOP, GO-2, GOP-2, TO, TOP, TP, PC). Watch filters fold GO-2 into GO and GOP-2 into GOP (`toWatchFunctions`). Don't add another list.
 - Entitlement logic exists twice: `public.company_has()` in SQL and `productsFrom()` in `lib/entitlements.ts`. Change both together; the tests cover both.
 - Styling is plain CSS with tokens on `:root` and dark-mode overrides. Every screen shares one CGM white-and-blue palette defined on `:root` in `app/watch.css` (navy `--navy`, blue `--accent`); use those tokens, don't add new brand colors. Status colors keep their meaning (indigo new FERC approval, amber coming into effect, teal in effect, grey in development). Watch keeps the pilot's bulletin layout and fonts. The Tracker uses its console layout (IBM Plex; `app/tracker.css`) with the same blue accent. Editor-only screens use the dark navy `.console` styles.
 - Pin exact dependency versions.
