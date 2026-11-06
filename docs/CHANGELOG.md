@@ -2,6 +2,30 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 5, 2026: T3 dashboard and reminders (Claude Code)
+
+**Dashboard** (`/tracker`, TRACKER-SPEC §3.2): read as the signed-in person, so staff see every client and a client sees their own company.
+- **Five tiles,** each opening Tasks with the matching filter:
+  - Overdue;
+  - Due ≤ 30 days (leaves out Pending review);
+  - Pending review, with an "awaiting report" count;
+  - Open tasks across N clients;
+  - Closed this quarter (since the first day of the calendar quarter).
+- **Warnings:** a banner when tasks need a due date, linking to that list, and "Start by adding a client" when there are none.
+- **Panels:**
+  - Reminders (overdue or inside a reminder window, by due date);
+  - By client (Open, Reminders, Overdue, sorted by overdue then reminders; a row opens that client's tasks);
+  - Pending review (oldest performed first);
+  - Upcoming schedule (next 40 outside their windows, grouped by month).
+
+  Task rows carry the pilot's colored state bar and open the task.
+
+**Header tools:** on Tracker screens, a **Reminders** button with a count (overdue plus inside a reminder window) opens Tasks › Reminders active. **New task** is there for staff.
+
+**Rules:** `lib/dashboard.ts` holds the counts. Unit tests cover quarter boundaries, Due ≤ 30 days leaving out review, oldest-first review, the by-client order and month grouping.
+
+**Tests:** e2e `tracker-t3.spec.ts` checks that every tile, the Reminders count and the By client row match the Tasks list they open, and that a client's dashboard covers only their company, without New task.
+
 ## Nov 5, 2026: Standards Watch gets its own header button (Claude Code)
 
 **Decided by Dan** (OPEN-QUESTIONS 16):

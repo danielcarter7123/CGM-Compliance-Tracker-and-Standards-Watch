@@ -276,3 +276,43 @@ test("tasks: states, reminders, filters and CSV follow the pilot", async () => {
   assert.match(csv.split("\r\n")[1], /^"Fake Peaker LLC","NCR00000","PRC-005","6","R3","Fake battery check"/);
   assert.equal(t.taskKey({ title: " Fake Battery Check ", standard_code: "PRC-005", requirement: "R3" }), "fake battery check|PRC-005|r3");
 });
+
+test("dashboard: the pilot's tiles, reminders, by-client order and upcoming schedule (TRACKER-SPEC §3.2, §4)", async () => {
+  const { dashboard, quarterStart, reminderTasks } = await import("../lib/dashboard");
+  const today = parseDate("2026-11-05");
+  assert.equal(quarterStart(today), "2026-10-01");
+  assert.equal(quarterStart(parseDate("2026-01-01")), "2026-01-01");
+  assert.equal(quarterStart(parseDate("2026-06-30")), "2026-04-01");
+  const t = (o: any) => ({ id: o.id, company_id: o.c || "a", title: o.id, facility: null, standard_code: null, requirement: null, due_date: o.due ?? null,
+    assignee_text: null, remind_days: o.rem || [30, 7], recur_n: 0, recur_unit: "m", recur_basis: "due", status: o.st || "open", evidence: o.ev || null,
+    notes: null, completed_at: o.done || null, performed_by: null, reviewed_at: null, reviewed_by: null, prev_id: null, next_id: null, copied_from: null, sample: false }) as any;
+  const tasks = [
+    t({ id: "late", due: "2026-10-20" }),                                   // overdue
+    t({ id: "late-b", c: "b", due: "2026-11-01" }),                          // overdue (client b)
+    t({ id: "soon", due: "2026-11-20" }),                                    // in window, due ≤ 30
+    t({ id: "edge30", due: "2026-12-05", rem: [7] }),                        // due in 30 days, not in its 7-day window
+    t({ id: "far", due: "2027-03-01" }),                                     // upcoming
+    t({ id: "far2", c: "b", due: "2027-01-15" }),                            // upcoming
+    t({ id: "nodate" }),                                                     // needs a due date
+    t({ id: "rev-old", st: "review", due: "2026-11-10", done: "2026-10-01" }),// pending review, no report
+    t({ id: "rev-new", st: "review", due: "2026-11-10", done: "2026-11-02", ev: "https://sharepoint.example/fake" }),
+    t({ id: "closedQ", st: "done", done: "2026-10-01" }),                    // closed this quarter (first day counts)
+    t({ id: "closedOld", st: "done", done: "2026-09-30" }),                  // last quarter
+  ];
+  const d = dashboard(tasks, [{ id: "a", name: "Fake A" }, { id: "b", name: "Fake B" }, { id: "c", name: "Fake C" }], today);
+  assert.equal(d.overdue, 2);
+  assert.equal(d.due30, 2, "soon and edge30; pending review is left out");
+  assert.deepEqual(d.review.map((x: any) => x.id), ["rev-old", "rev-new"], "oldest performed first");
+  assert.equal(d.awaitingReport, 1);
+  assert.equal(d.open, 9);
+  assert.equal(d.closedThisQuarter, 1);
+  assert.equal(d.qStart, "2026-10-01");
+  assert.equal(d.noDueDate, 1);
+  assert.deepEqual(reminderTasks(tasks, today).map((x: any) => x.id), ["late", "late-b", "soon"]);
+  assert.deepEqual(d.byClient.map((r: any) => [r.client.name, r.open, r.reminders, r.overdue]), [
+    ["Fake A", 7, 1, 1], ["Fake B", 2, 0, 1], ["Fake C", 0, 0, 0],
+  ].sort((x: any, y: any) => y[3] - x[3] || y[2] - x[2]));
+  assert.deepEqual(d.upcoming.map((m: any) => [m.label, m.tasks.map((x: any) => x.id)]), [
+    ["December 2026", ["edge30"]], ["January 2027", ["far2"]], ["March 2027", ["far"]],
+  ]);
+});

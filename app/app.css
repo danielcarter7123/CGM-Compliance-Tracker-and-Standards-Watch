@@ -93,3 +93,12 @@ table.grid input.seats{width:72px;font:14px var(--body);padding:6px 8px;border:1
 .sitenav a.watchbtn:hover{background:var(--accent);color:var(--accent-ink)}
 .sitenav a.watchbtn.here{background:var(--accent);color:var(--accent-ink)}
 @media (max-width:520px){.sitenav a.watchbtn{padding:5px 10px;font-size:12.5px}}
+
+/* Tracker tools at the right of the tab row: Reminders (count) and New task */
+.mast.app .navrow{display:flex;align-items:center;gap:12px}
+.mast.app .navrow .appnav{flex:1;min-width:0}
+.navtools{display:flex;gap:8px;align-items:center;flex:none;padding-block:5px}
+.remindbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:4px;padding:6px 10px;font:600 13px var(--body);color:var(--ink);text-decoration:none;background:var(--surface)}
+.remindbtn .count{display:inline-block;min-width:20px;text-align:center;border-radius:999px;padding:0 6px;background:var(--sunk);font-variant-numeric:tabular-nums}
+.remindbtn.has .count{background:var(--upcoming);color:#fff}
+@media (max-width:640px){.mast.app .navrow{flex-wrap:wrap}.navtools{width:100%;justify-content:flex-end;padding-top:0}}

@@ -5,6 +5,9 @@ import AppNav from "@/components/AppNav";
 import WatchButton from "@/components/WatchButton";
 import SiteChrome from "@/components/SiteChrome";
 import { appSections, whoLine } from "@/lib/nav";
+import { reminderTasks } from "@/lib/dashboard";
+import { createClient } from "@/lib/supabase/server";
+import type { Task } from "@/lib/tasks";
 import { getViewer } from "@/lib/auth";
 
 export const metadata: Metadata = {
@@ -14,6 +17,12 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const viewer = await getViewer().catch(() => null);
+  // The Reminders button's count: overdue tasks plus tasks inside their reminder window (read with the person's own access).
+  let reminders = 0;
+  if (viewer?.products.tracker) {
+    const { data } = await createClient().from("tasks").select("status, due_date, remind_days").neq("status", "done").not("due_date", "is", null);
+    reminders = reminderTasks((data || []) as Task[]).length;
+  }
   return (
     <html lang="en">
       <head>
@@ -50,6 +59,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {viewer && (
             <div className="wrap navrow">
               <AppNav sections={appSections(viewer)} />
+              {viewer.products.tracker && (
+                <span className="navtools">
+                  <a className={`remindbtn${reminders ? " has" : ""}`} href="/tracker/tasks?status=window" title="Overdue tasks and tasks inside their reminder window">
+                    Reminders <span className="count">{reminders}</span>
+                  </a>
+                  {viewer.isStaff && <a className="btn-main sm" href="/tracker/tasks?t=new">New task</a>}
+                </span>
+              )}
             </div>
           )}
         </header>
