@@ -61,7 +61,7 @@ test("tasks: create, mark performed, next occurrence, staff can't approve, PM ap
   await signIn(page, "pm@cgm.example", "/tracker/tasks");
   drawer = await openTask(page, "review");
   await drawer.getByRole("button", { name: "Approve & close" }).click();
-  await expect(page.getByRole("region", { name: TITLE }).getByRole("alert")).toContainText("No report link is posted.");
+  await expect(page.getByRole("region", { name: TITLE }).getByRole("alert")).toContainText("No report or evidence is posted.");
   drawer = page.getByRole("region", { name: TITLE });
   await drawer.getByLabel("Approve without a report link").check();
   await drawer.getByRole("button", { name: "Approve & close" }).click();

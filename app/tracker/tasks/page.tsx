@@ -1,4 +1,7 @@
 import CloseOutForm from "@/components/CloseOutForm";
+import EvidencePanel from "@/components/EvidencePanel";
+import { isCip } from "@/lib/evidence";
+import { evidenceFor, markEvidence } from "@/lib/evidence-data";
 import { requireTracker } from "@/lib/guards";
 import { REGISTERED_FUNCTIONS, standardLink } from "@/lib/functions";
 import { createClient } from "@/lib/supabase/server";
@@ -29,7 +32,7 @@ export default async function Tasks({ searchParams: sp }: { searchParams: SP }) 
     db.from("companies").select("id, name, ncr_id").order("name"),
     db.from("library_standards").select("code, version, title, applies, url").order("code"),
   ]);
-  const all = (tasks || []) as Task[];
+  const all = await markEvidence(db, (tasks || []) as Task[]);
   const companies = (cos || []) as Co[];
   const standards = (stds || []) as Std[];
   const coName = (id: string) => companies.find((c) => c.id === id)?.name || "";
@@ -68,6 +71,7 @@ export default async function Tasks({ searchParams: sp }: { searchParams: SP }) 
   const who = (id: string | null) => (id ? names.get(id) || (id === v.userId ? "you" : "a team member") : "");
   const selStd = sel ? std(sel.standard_code) : undefined;
   const nr = sel && !isNew ? nextReminder(sel) : null;
+  const ev = sel && !isNew ? await evidenceFor(db, { task: sel.id }) : null;
 
   return (
     <main className="wrap trk-page">
@@ -265,6 +269,13 @@ export default async function Tasks({ searchParams: sp }: { searchParams: SP }) 
               {prevTask && nextTask && " · "}
               {nextTask && <a href={link(`t=${nextTask.id}`)} className="nextocc">Next occurrence, due {nextTask.due_date ? fmt(nextTask.due_date) : "no date"} →</a>}
             </p>
+          )}
+
+          {sel && !isNew && ev && (
+            <EvidencePanel
+              items={ev.items} names={ev.names} me={v.userId} staff={staff} company={sel.company_id} target={{ task: sel.id }}
+              back={link(`t=${sel.id}`)} cip={isCip(sel.standard_code)} legacyLink={sel.evidence}
+            />
           )}
 
           {!isNew && !staff && (

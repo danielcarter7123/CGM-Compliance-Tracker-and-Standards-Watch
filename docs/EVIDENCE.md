@@ -2,6 +2,8 @@
 
 Dan's requirement: SharePoint linked seamlessly, and the option to upload files.
 
+**Status (Nov 6, 2026):** uploads to app storage, pasted links, open and remove are built (see CHANGELOG). Everything SharePoint (Graph, browse, pick, upload to SharePoint, resolving links) waits for the Entra app registration below. Until then uploads go to app storage.
+
 The database side is built and tested: `supabase/migrations/0005_evidence.sql`, plus the evidence cases in `tests/rls.test.mjs`. The Microsoft Graph code and the screens are milestone **T5** in `HANDOFF.md`.
 
 ## What a user can do on a task

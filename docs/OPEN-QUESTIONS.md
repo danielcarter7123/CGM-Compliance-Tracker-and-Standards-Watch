@@ -40,6 +40,12 @@ Running `npm install`, `npm run typecheck`, `npm test` and `npm run build`, and 
    - legal review;
    - any client-required security controls.
 
+19. **CIP files in app storage** (added Nov 6, 2026; T5b is built with a safeguard meanwhile):
+   - Until CGM's Microsoft registration connects SharePoint, "Upload file" saves to the app's private storage.
+   - CIP evidence may include BES Cyber System Information, which `docs/EVIDENCE.md` keeps in SharePoint by default.
+   - Today, uploading on a CIP task asks the person to confirm "This file contains no BES Cyber System Information", and points them to paste a SharePoint link otherwise.
+   - Is that right, or should uploads on CIP tasks be blocked entirely until SharePoint is connected?
+
 ## Answered
 
 ### Nov 5, 2026 (first Claude Code session)

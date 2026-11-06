@@ -550,3 +550,18 @@ test("revert writes old values back as a logged change; asks first when edited s
   assert.deepEqual([row.title, row.notes], ["Fake revert me", "Fake later note"], "only that change's fields go back");
   assert.equal((await as(ADMIN, "update activity_log set action = 'x' returning id")).length, 0, "the log stays append-only");
 });
+
+// ---------- T5b: evidence on client tasks, stored under the client's folder ----------
+test("client-task evidence: the add-on company's users add it under their own folder; others can't", async () => {
+  await db.exec("select set_config('request.jwt.claim.sub', '', false)");
+  const path = `${A_CO}/ct-${ctaskA}/fake-uuid-permit.pdf`;
+  const [{ id }] = await as(T_USER, `insert into evidence(company_id, client_task_id, kind, storage_path, file_name, size_bytes) values ('${A_CO}','${ctaskA}','file','${path}','permit.pdf',2048) returning id`);
+  assert.ok(id);
+  assert.ok(await fails(T_USER, `insert into evidence(company_id, client_task_id, kind, storage_path, file_name) values ('${A_CO}','${ctaskA}','file','${B_CO}/ct-${ctaskA}/x.pdf','x.pdf')`), "not under another client's folder");
+  assert.ok(await fails(B_USER, `insert into evidence(company_id, client_task_id, kind, url) values ('${A_CO}','${ctaskA}','link','https://example.com/x')`), "not another company");
+  assert.equal(await count(B_USER, `select count(*) from evidence where id = '${id}'`), 0);
+  assert.equal(await count(STAFF, `select count(*) from evidence where id = '${id}'`), 1);
+  assert.ok(await fails(B_USER, `insert into storage.objects(bucket_id, name) values ('evidence','${A_CO}/ct-${ctaskA}/sneaky.pdf')`), "no writing into another client's folder");
+  const [{ kind }] = (await db.query(`select kind from activity_log where kind = 'evidence' and target_id = '${id}'`)).rows;
+  assert.equal(kind, "evidence");
+});

@@ -2,6 +2,21 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 6, 2026: T5b evidence: uploads and links (Claude Code)
+
+Built now; SharePoint browsing, picking and uploading to SharePoint wait for CGM's Microsoft (Entra) registration (`docs/EVIDENCE.md`).
+- **Evidence panel** on every task and client task drawer: the evidence items, the task's evidence link (the close-out link or the pilot's), and a "removed" list kept on record.
+- **Upload a file:**
+  - PDF, Office, images, email, text, ZIP and similar; up to 50 MB (the storage limit in `supabase/config.toml`).
+  - The browser puts it straight into the client's folder of the private `evidence` bucket (`<company>/<task>/<uuid>-<name>`, or `ct-<id>` for client tasks) with the person's own session; storage rules allow only their client's folder, and files are never overwritten.
+  - The server then checks the path, type, size and that the object is really there, and records it with its SHA-256.
+  - On CIP tasks the person must confirm the file contains no BES Cyber System Information (checked in the browser and on the server). Open question 19 asks Dan whether to block CIP uploads instead.
+- **Paste a link:** any https link, with an optional name. (Resolving SharePoint links to items comes with the Graph connection.)
+- **Open:** `/tracker/evidence/<id>` goes to a link's address, or downloads a file through a 60-second signed URL, as the signed-in person.
+- **Remove:** whoever added it, or CGM staff; it stays on record as removed (who and when). Files aren't deleted (no purge until Dan sets retention).
+- **Report posted** now means the task's evidence link, or any evidence item not removed: the Tasks list, dashboard ("awaiting report"), CSV filter and the approve check all follow it.
+- **Tests:** RLS (client-task evidence under the client's folder; other companies refused, including writing into the folder); `e2e/tracker-evidence.spec.ts` (refused type, upload, the downloaded file matches byte for byte, link add and remove, the upload counts as the report, the CIP confirmation, another company can't open, list or download the file).
+
 ## Nov 6, 2026: Client Tasks screen (Claude Code)
 
 `/tracker/client-tasks` (TRACKER-SPEC §3.7, "Client Tasks"): the add-on's own task list for a client's work outside NERC compliance.

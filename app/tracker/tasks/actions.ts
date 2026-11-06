@@ -111,8 +111,9 @@ export async function approveTask(formData: FormData) {
   const id = str(formData, "id");
   const db = createClient();
   const { data: t } = await db.from("tasks").select("evidence").eq("id", id).maybeSingle();
-  if (t && !isLink(t.evidence) && formData.get("no_report") !== "on") {
-    back(to(formData, id, `error=${encodeURIComponent("No report link is posted. Tick \"Approve without a report link\" to close it anyway.")}`));
+  const { count: items } = await db.from("evidence").select("id", { count: "exact", head: true }).eq("task_id", id).is("removed_at", null);
+  if (t && !isLink(t.evidence) && !items && formData.get("no_report") !== "on") {
+    back(to(formData, id, `error=${encodeURIComponent("No report or evidence is posted. Tick \"Approve without a report link\" to close it anyway.")}`));
   }
   const { error } = await db.from("tasks").update({ status: "done" }).eq("id", id);
   if (error) back(to(formData, id, `error=${encodeURIComponent(error.message)}`));

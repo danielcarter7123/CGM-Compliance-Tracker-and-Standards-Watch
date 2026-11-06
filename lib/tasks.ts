@@ -29,6 +29,8 @@ export type Task = {
   next_id: string | null;
   copied_from: string | null;
   sample: boolean;
+  /** Set by markEvidence: at least one evidence item (upload or link) that hasn't been removed. */
+  has_evidence?: boolean;
 };
 
 export type State = "done" | "review" | "nodate" | "overdue" | "window" | "inprogress" | "scheduled";
@@ -40,7 +42,8 @@ export const REMIND_OFFSETS = [90, 60, 30, 14, 7, 1] as const;
 
 export const isLink = (s: string | null | undefined) => !!s && /^https:\/\/\S+$/i.test(s.trim());
 /** An https link in evidence counts as the report being posted. */
-export const hasReport = (t: Pick<Task, "evidence">) => isLink(t.evidence);
+/** "Report posted": the task's evidence link (the pilot's rule), or any evidence item that hasn't been removed. */
+export const hasReport = (t: Pick<Task, "evidence" | "has_evidence">) => isLink(t.evidence) || !!t.has_evidence;
 
 export function taskState(t: Pick<Task, "status" | "due_date" | "remind_days">, today = startOfToday()): State {
   if (t.status === "done") return "done";

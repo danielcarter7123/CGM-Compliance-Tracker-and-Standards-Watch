@@ -1,4 +1,5 @@
 import { dashboard } from "@/lib/dashboard";
+import { markEvidence } from "@/lib/evidence-data";
 import { isLive } from "@/lib/entitlements";
 import { requireTracker } from "@/lib/guards";
 import { createClient } from "@/lib/supabase/server";
@@ -21,7 +22,7 @@ export default async function Dashboard() {
     db.from("entitlements").select("company_id, product, status").eq("product", "tracker"),
     db.from("library_standards").select("code, version"),
   ]);
-  const all = (tasks || []) as Task[];
+  const all = await markEvidence(db, (tasks || []) as Task[]);
   // Tracker clients: companies with a live Tracker, plus any company that still has tasks.
   const withTasks = new Set(all.map((t) => t.company_id));
   const clients = (cos || []).filter((c) => withTasks.has(c.id as string) || (ents || []).some((e) => e.company_id === c.id && isLive(e.status as string))) as { id: string; name: string }[];

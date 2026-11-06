@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { markEvidence } from "@/lib/evidence-data";
 import { getViewer } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { filterTasks, tasksCsv, todayIso, type Task } from "@/lib/tasks";
@@ -22,7 +23,7 @@ export async function GET(req: NextRequest) {
   const f = { q: p.get("q") || "", status: p.get("status") || "", client: p.get("client") || "", std: p.get("std") || "", fn: p.get("fn") || "" };
   const companies = cos || [];
   const standards = stds || [];
-  const rows = filterTasks((tasks || []) as Task[], f, {
+  const rows = filterTasks(await markEvidence(db, (tasks || []) as Task[]), f, {
     clientName: (id) => (companies.find((c) => c.id === id)?.name as string) || "",
     applies: (code) => (standards.find((s) => s.code === code)?.applies as string[]) || [],
   });

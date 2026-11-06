@@ -3,6 +3,8 @@ import {
   CT_CATS, CT_PARTY, CT_PRI, CT_STATUS, CT_STATUS_FILTERS, ctRecur, ctState, ctStats, ctStatusLabel, ctWhen, filterCTasks, partyLabel,
   priorityLabel, type CTask,
 } from "@/lib/clienttasks";
+import EvidencePanel from "@/components/EvidencePanel";
+import { evidenceFor } from "@/lib/evidence-data";
 import { isLive } from "@/lib/entitlements";
 import { requireTracker } from "@/lib/guards";
 import { createClient } from "@/lib/supabase/server";
@@ -56,6 +58,7 @@ export default async function ClientTasks({ searchParams: sp }: { searchParams: 
         prev_id: null, next_id: null }
     : (sp.t && all.find((t) => t.id === sp.t)) || null;
   const nextDue = sel && !isNew && sel.status !== "done" && sel.recur_n > 0 && sel.due_date ? nextDuePreview(sel.due_date, sel.recur_n, sel.recur_unit) : null;
+  const ev = sel && !isNew ? await evidenceFor(db, { ctask: sel.id }) : null;
   const forClient = f.client ? clientName(f.client) : staff ? "all add-on clients" : ws[0]?.name || "";
 
   const enable = staff && others.length > 0 && (
@@ -210,6 +213,12 @@ export default async function ClientTasks({ searchParams: sp }: { searchParams: 
             </div>
             <div className="trk-form-f"><button className="btn-main sm" type="submit">{isNew ? "Create task" : "Save"}</button></div>
           </form>
+          {sel && !isNew && ev && (
+            <EvidencePanel
+              items={ev.items} names={ev.names} me={v.userId} staff={staff} company={sel.company_id} target={{ ctask: sel.id }}
+              back={link(`t=${sel.id}`)} cip={false}
+            />
+          )}
           {!isNew && (
             <div className="toolbar">
               {sel.status !== "done" && (
