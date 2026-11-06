@@ -2,6 +2,12 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 5, 2026: sign-in is the front door (Claude Code)
+
+- **Dan's follow-up:** the split-screen sign-in page is the app's front door. `/` sends signed-out visitors to `/login` (no app header), and signed-in people to their home.
+- **Watch offer page:** the public NERC Standards Watch offer (teaser cards and plans) moved to `/standards-watch`. The "Standards Watch plans" links, the account page's "Choose a plan" and Stripe's cancel link point there.
+- **Superseded:** this replaces the Tracker-first public home page described in the entry below.
+
 ## Nov 5, 2026: one app, CGM Compliance Tracker (Claude Code)
 
 **Decided by Dan** (OPEN-QUESTIONS 15): the app is CGM Compliance Tracker, and NERC Standards Watch is one page in it. Before this, the app had been branded as Standards Watch, with the Tracker as a section.

@@ -77,9 +77,15 @@ const CASES: Record<string, Case> = {
 };
 
 test("signed out: only public pages; protected URLs go to sign-in", async ({ page }) => {
+  // The front door is the split-screen sign-in page, with no app header around it.
   await page.goto("/");
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
+  await expect(page.locator("header.mast")).toHaveCount(0);
+  // The Standards Watch offer page for prospective subscribers.
+  await page.goto("/standards-watch");
   await expect(page.locator(".mast .bname")).toContainText("CGM Compliance Tracker");
-  await expect(page.getByRole("heading", { name: "CGM Compliance Tracker", level: 1 })).toBeVisible();
+  await expect(page.locator(".watchname")).toHaveText("NERC Standards Watch");
   expect(await navLinks(page)).toEqual(["Sign in", "Standards Watch plans"]);
   expect(await sectionLinks(page)).toEqual([]);
   for (const path of ["/watch", "/tracker", "/admin", "/account"]) {

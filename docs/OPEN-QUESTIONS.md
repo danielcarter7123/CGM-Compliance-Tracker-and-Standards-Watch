@@ -67,7 +67,7 @@ Running `npm install`, `npm run typecheck`, `npm test` and `npm run build`, and 
 15. **Name and structure.** The app is **CGM Compliance Tracker**, and that name goes at the top of every screen. **NERC Standards Watch is one scrollable page** in it, and the only page titled with that name. The Tracker is everything else. Dan said this during the handoff, but it was lost: "build the Watch page first" meant launch order, not that Watch was the face of the app.
    - One header and one section menu for the whole app: Standards Watch · Dashboard · Tasks · … · Activity Log.
    - Watch-only subscribers see Standards Watch and a locked Compliance Tracker.
-   - The public home page is the Tracker's, with Standards Watch offered on it (option A).
+   - The front door is the split-screen sign-in page Dan approved: signed-out visitors to the app go straight to it, with no app header around it (option B, Dan's follow-up). The NERC Standards Watch offer for prospective subscribers is at `/standards-watch`, which the "Standards Watch plans" links and Stripe's cancel link point to.
    - Signed-in Tracker users open on the Dashboard. After signing in they see Watch first, with "Continue to the Dashboard", as in the pilot.
 
 **Client data:** the live tracker's data is essential to how the internal tracker runs. It must be carried over completely and handled under CLAUDE.md rule 7.

@@ -54,7 +54,7 @@ export default async function AccountPage({ searchParams }: { searchParams: { sa
         {stripeWatch && v.companyRole === "admin" ? (
           <form action="/api/stripe/portal" method="post"><button className="btn-line" type="submit">Manage billing</button></form>
         ) : !v.isStaff && !v.products.watch ? (
-          <a className="btn-main" href="/#plans">Choose a plan</a>
+          <a className="btn-main" href="/standards-watch#plans">Choose a plan</a>
         ) : null}
       </section>
 

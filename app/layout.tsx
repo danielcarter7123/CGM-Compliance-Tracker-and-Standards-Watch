@@ -42,7 +42,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               {viewer?.isEditor && <a className="admin" href="/admin/digest">Digest</a>}
               {viewer?.staffRole === "admin" && <a className="admin" href="/admin">Admin</a>}
               {viewer ? <a href="/account">Account</a> : <a href="/login">Sign in</a>}
-              {!viewer?.hasAccess && <a className="cta" href="/#plans">Standards Watch plans</a>}
+              {!viewer?.hasAccess && <a className="cta" href="/standards-watch#plans">Standards Watch plans</a>}
             </nav>
           </div>
           {viewer && (

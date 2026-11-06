@@ -60,7 +60,7 @@ export default function LoginPage({ searchParams }: { searchParams: { next?: str
             <span>
               Need access? <a href="mailto:dan@cgmconsultinggroup.com?subject=Access%20to%20the%20CGM%20Compliance%20Platform">Contact CGM</a>
             </span>
-            <a href="/#plans">See Standards Watch plans</a>
+            <a href="/standards-watch">See Standards Watch plans</a>
           </div>
         </div>
       </section>

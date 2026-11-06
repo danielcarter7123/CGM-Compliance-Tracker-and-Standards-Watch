@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     customer_update: { name: "auto", address: "auto" },
     subscription_data: { metadata: { company_id: companyId, plan } },
     success_url: `${siteUrl()}/account?checkout=success`,
-    cancel_url: `${siteUrl()}/?checkout=cancelled#plans`,
+    cancel_url: `${siteUrl()}/standards-watch?checkout=cancelled#plans`,
   });
   return NextResponse.redirect(session.url!, 303);
 }
