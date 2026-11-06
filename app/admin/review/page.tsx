@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import ReviewQueue, { type ReviewDraft } from "@/components/ReviewQueue";
 import { getViewer } from "@/lib/auth";
-import { itemToValue, rowToItem } from "@/lib/mapping";
+import { publishedValue } from "@/lib/published";
 import { createClient } from "@/lib/supabase/server";
 import type { Draft } from "@/lib/types";
 
@@ -22,23 +22,7 @@ export default async function ReviewPage() {
   // Current published version of each entry a draft touches, for the before/after view.
   const list: ReviewDraft[] = [];
   for (const d of (drafts || []) as Draft[]) {
-    let current: Record<string, unknown> | null = null;
-    if (d.section === "items") {
-      const { data } = await db.from("standards").select("*").eq("id", d.key).maybeSingle();
-      current = data ? itemToValue(rowToItem(data)) : null;
-    } else if (d.section === "deadlines") {
-      const { data } = await db.from("deadlines").select("*").eq("id", d.key).maybeSingle();
-      current = data ? { d: data.d, t: data.title, who: data.who, fn: data.functions } : null;
-    } else if (d.section === "activity") {
-      const { data } = await db.from("actions").select("*").eq("id", d.key).maybeSingle();
-      current = data ? { d: data.d, src: data.src, t: data.text } : null;
-    } else if (d.section === "sources") {
-      const { data } = await db.from("sources").select("*").eq("key", d.key).maybeSingle();
-      current = data ? { t: data.title, u: data.url } : null;
-    } else if (d.section === "week") {
-      const { data } = await db.from("weekly_summaries").select("*").order("published_at", { ascending: false }).limit(1);
-      current = data && data[0] ? { label: data[0].label, covers: data[0].covers, items: data[0].items } : null;
-    }
+    const current = await publishedValue(db, d.section, d.key);
     list.push({ ...d, current });
   }
 

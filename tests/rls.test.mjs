@@ -348,3 +348,21 @@ test("onboarding: users set their own functions, Regional Entity and onboarded t
   assert.ok(r.onboarded_at);
   assert.ok(await fails(NEW_X, `update profiles set region = 'Mars' where id = '${NEW_X}'`));
 });
+
+// ---------- Delivery (0008) ----------
+test("alert log: staff read it, nobody writes it through the API; alert and digest opt-outs are each user's own", async () => {
+  await db.exec(`insert into alert_log(key, kind, label) values ('deadline:x:2099-01-01','deadline','Fake deadline')`);
+  assert.equal(await count(STAFF, "select count(*) from alert_log"), 1);
+  for (const u of [W_USER, T_ADMIN, NOPLAN]) assert.equal(await count(u, "select count(*) from alert_log"), 0, u);
+  for (const u of [ADMIN, STAFF, T_ADMIN]) assert.ok(await fails(u, `insert into alert_log(key, kind, label) values ('k-${u}','ferc','x')`), u);
+  const [r] = await as(W_USER, `update profiles set alerts_opt_in = false, digest_opt_in = false where id = '${W_USER}' returning alerts_opt_in, digest_opt_in`);
+  assert.deepEqual([r.alerts_opt_in, r.digest_opt_in], [false, false]);
+  assert.equal((await as(W_USER, `update profiles set alerts_opt_in = false where id = '${T_USER}' returning id`)).length, 0, "not someone else's");
+  await db.exec(`update profiles set alerts_opt_in = true, digest_opt_in = true where id = '${W_USER}'`);
+});
+
+test("drafts keep the value they replaced, visible to editors only", async () => {
+  await db.exec(`insert into drafts(id, section, op, key, status, previous) values ('d-prev','items','upsert','eop-004-5','approved','{"effective":"2099-01-01"}')`);
+  assert.equal(await count(ADMIN, "select count(*) from drafts where previous is not null"), 1);
+  for (const u of [PM, STAFF, W_USER]) assert.equal(await count(u, "select count(*) from drafts where previous is not null"), 0, u);
+});

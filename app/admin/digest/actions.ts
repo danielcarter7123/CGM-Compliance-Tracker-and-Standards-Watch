@@ -1,26 +1,43 @@
 "use server";
 
-import { Resend } from "resend";
 import { getViewer } from "@/lib/auth";
 import { loadContent } from "@/lib/content";
-import { digestSubject, renderDigest } from "@/lib/digest";
+import { digestSubject, renderDigest, renderDigestText } from "@/lib/digest";
+import { unsubscribeHeaders, unsubscribePage } from "@/lib/email-links";
+import { companiesWith } from "@/lib/entitlements";
+import { mailTransport, sendBatch } from "@/lib/mail";
 import { siteUrl } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { companiesWith } from "@/lib/entitlements";
+import { createClient } from "@/lib/supabase/server";
+import { ALL_FUNCTIONS } from "@/lib/types";
 
 export type SendResult = { ok: boolean; sent?: number; error?: string };
 
-/** Sends this week's digest to every subscriber with access who wants it, each filtered to their functions. */
-export async function sendDigest(): Promise<SendResult> {
+const clean = (lines: string[]) => lines.map((l) => String(l).trim().slice(0, 500)).filter(Boolean).slice(0, 20);
+
+/** Re-renders the preview with the corrections the editor typed. */
+export async function previewDigest(functions: string[], corrections: string[]): Promise<{ html: string; text: string }> {
+  const v = await getViewer();
+  if (!v?.isEditor) throw new Error("Only CGM editors can preview the digest.");
+  const fns = functions.filter((f) => ALL_FUNCTIONS.includes(f));
+  const content = await loadContent(createClient());
+  const opts = { corrections: clean(corrections), unsubscribeUrl: `${siteUrl()}/unsubscribe` };
+  return { html: renderDigest(content, fns, siteUrl(), opts), text: renderDigestText(content, fns, siteUrl(), opts) };
+}
+
+/** Sends this week's digest to every subscriber with access who wants it, each filtered to their functions,
+ *  with the editor's corrections, a plain-text part and their own unsubscribe link. Sent by hand from this page,
+ *  so the automated-email switch doesn't apply (see the Admin page). */
+export async function sendDigest(corrections: string[] = []): Promise<SendResult> {
   const v = await getViewer();
   if (!v?.isEditor) return { ok: false, error: "Only CGM editors can send the digest." };
-  if (!process.env.RESEND_API_KEY || !process.env.DIGEST_FROM) return { ok: false, error: "RESEND_API_KEY and DIGEST_FROM must be set." };
+  if (!mailTransport()) return { ok: false, error: "Email isn't configured: set RESEND_API_KEY and DIGEST_FROM." };
 
   const admin = createAdminClient();
   const content = await loadContent(admin);
   const { data: people, error } = await admin
     .from("profiles")
-    .select("email, functions, role, staff_role, company_id, digest_opt_in")
+    .select("id, email, functions, role, staff_role, company_id")
     .eq("digest_opt_in", true);
   if (error) return { ok: false, error: error.message };
 
@@ -30,20 +47,26 @@ export async function sendDigest(): Promise<SendResult> {
   );
   if (!recipients.length) return { ok: true, sent: 0 };
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
   const subject = digestSubject(content);
-  let sent = 0;
-  for (let i = 0; i < recipients.length; i += 100) {
-    const batch = recipients.slice(i, i + 100).map((p) => ({
-      from: process.env.DIGEST_FROM!,
-      to: [String(p.email)],
-      subject,
-      html: renderDigest(content, (p.functions as string[]) || [], siteUrl()),
-    }));
-    const { error: e } = await resend.batch.send(batch);
-    if (e) return { ok: false, sent, error: e.message };
-    sent += batch.length;
+  const site = siteUrl();
+  const fixes = clean(corrections);
+  try {
+    const sent = await sendBatch(
+      recipients.map((p) => {
+        const fns = (p.functions as string[]) || [];
+        const opts = { corrections: fixes, unsubscribeUrl: unsubscribePage(p.id as string, "digest") };
+        return {
+          to: String(p.email),
+          subject,
+          html: renderDigest(content, fns, site, opts),
+          text: renderDigestText(content, fns, site, opts),
+          headers: unsubscribeHeaders(p.id as string, "digest"),
+        };
+      }),
+    );
+    await admin.from("weekly_summaries").update({ digest_sent_at: new Date().toISOString() }).is("digest_sent_at", null);
+    return { ok: true, sent };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
   }
-  await admin.from("weekly_summaries").update({ digest_sent_at: new Date().toISOString() }).is("digest_sent_at", null);
-  return { ok: true, sent };
 }

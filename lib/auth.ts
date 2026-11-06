@@ -13,6 +13,7 @@ export type Viewer = {
   /** Finished the first-login welcome screen. CGM staff never see it. */
   onboarded: boolean;
   digestOptIn: boolean;
+  alertsOptIn: boolean;
   calendarToken: string;
   company: { id: string; name: string } | null;
   companyRole: "member" | "admin";
@@ -54,6 +55,7 @@ export async function getViewer(): Promise<Viewer | null> {
     region: (p.region as string | null) ?? null,
     onboarded: isStaff || !!p.onboarded_at,
     digestOptIn: p.digest_opt_in !== false,
+    alertsOptIn: p.alerts_opt_in !== false,
     calendarToken: String(p.calendar_token),
     company,
     companyRole: p.company_role === "admin" ? "admin" : "member",

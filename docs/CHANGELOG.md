@@ -2,6 +2,39 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 5, 2026: W5 delivery: digest, alerts, calendar (Claude Code)
+
+**Migration `0008_delivery.sql`:**
+- `profiles.alerts_opt_in`;
+- `drafts.previous` (the published value an approved draft replaced);
+- `alert_log`, which staff can read and nobody writes through the API;
+- 2 RLS tests (29 in all).
+
+**Digest** (`lib/digest.ts`, `/admin/digest`):
+- Each email has a plain-text part, made from the same sections as the HTML.
+- A corrections box, pre-filled from dates changed and entries removed since the last digest (`lib/changes.ts`). The editor edits it, updates the preview, then sends. Corrections show at the top of both parts.
+- Each recipient gets their own signed unsubscribe link plus the one-click `List-Unsubscribe` header.
+- Sending works locally through Mailpit.
+
+**Alerts** (`lib/alerts.ts`, `/api/jobs/alerts`, `vercel.json` cron daily at 13:00 UTC):
+- They cover new FERC approvals, effective dates set or moved, and comment periods or events within 14 days.
+- Each person gets one email per run, filtered to their functions, and each alert goes out once.
+- Nothing is sent while automated emails are off.
+- The digest page lists the alerts that are due.
+
+**Unsubscribe:** `/unsubscribe` asks before acting, and `/api/unsubscribe` is the one-click POST. The digest and alerts can each be turned off on their own, and the account page has both checkboxes.
+
+**Calendar feed** (`lib/ical.ts`):
+- RFC 5545 line folding, which was missing;
+- UIDs that no longer depend on list order (the old ones would have duplicated events in Outlook);
+- a description with the disclaimer, a URL, and a 12-hour refresh hint.
+
+**New settings:** `EMAIL_LINK_SECRET` and `CRON_SECRET` (`.env.example`).
+
+**Tests:**
+- unit: digest text vs HTML, corrections and alerts from fake drafts, the calendar parsed with ical.js (folding, unique and stable UIDs, filtering);
+- `e2e/delivery.spec.ts`: digest send to Mailpit with the correction, text part and headers; unsubscribe page and a forged link; alerts held while emails are off, sent once when on; one-click unsubscribe; the real feed parses.
+
 ## Nov 5, 2026: W3 review queue parity (Claude Code)
 
 **Review queue** (`/admin/review`, editor only):

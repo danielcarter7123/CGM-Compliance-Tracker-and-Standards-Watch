@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getViewer } from "@/lib/auth";
 import { applyDraft } from "@/lib/apply-draft";
 import { draftProblems, tidyDraftValue } from "@/lib/draft-fields";
+import { publishedValue } from "@/lib/published";
 import { createClient } from "@/lib/supabase/server";
 import type { Draft } from "@/lib/types";
 
@@ -59,10 +60,11 @@ async function approveOne(db: ReturnType<typeof createClient>, userId: string, i
     const problems = draftProblems(d.section, editedValue, (src || []).map((r) => String(r.key)));
     if (problems.length) throw new Error(problems.join(" "));
   }
+  const previous = await publishedValue(db, d.section, d.key); // kept for corrections and alerts
   await applyDraft(db, d as Draft, editedValue ?? undefined);
   const { error: e2 } = await db
     .from("drafts")
-    .update({ status: "approved", edited: !!editedValue, value: editedValue ?? d.value, decided_at: new Date().toISOString(), decided_by: userId })
+    .update({ status: "approved", edited: !!editedValue, value: editedValue ?? d.value, previous, decided_at: new Date().toISOString(), decided_by: userId })
     .eq("id", id);
   if (e2) throw new Error(e2.message);
   return { ok: true };

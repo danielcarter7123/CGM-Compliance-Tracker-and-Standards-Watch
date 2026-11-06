@@ -61,3 +61,5 @@ table.grid select,.cardbox select{font:14px var(--body);padding:6px 8px;border:1
 .checks.tight label{padding:3px 10px}
 .selectbox,.field select{font:15px var(--body);padding:9px 11px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink);max-width:320px}
 table.grid input.seats{width:72px;font:14px var(--body);padding:6px 8px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink)}
+.plaintext{white-space:pre-wrap;font:12.5px/1.5 var(--adm-mono);background:var(--adm-bg);color:var(--adm-ink);border:1px solid var(--adm-line);border-radius:4px;padding:12px;max-height:480px;overflow:auto}
+.console .field label{font:600 11.5px var(--adm-mono);letter-spacing:.06em;text-transform:uppercase}

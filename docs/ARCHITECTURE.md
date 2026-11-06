@@ -76,6 +76,20 @@ Server code that must bypass the rules (Stripe webhook, drafts API, digest send,
 - New client users see `/welcome` once (name, functions, Regional Entity, digest) before Watch or the Tracker.
 - Invite emails go through `lib/mail.ts`: Resend when configured, the local mail catcher in development. If neither is available, the account page tells the admin to ask the person to sign in.
 
+## Email
+
+All Watch email goes through `lib/mail.ts`: Resend when `RESEND_API_KEY` and `DIGEST_FROM` are real values, otherwise (development only) the local Mailpit catcher.
+
+| Email | Sent by | Gated by the Admin email switch | Unsubscribe |
+|---|---|---|---|
+| Weekly digest | An editor, from `/admin/digest` | No (sent by hand) | `digest_opt_in`, signed link + one-click header |
+| Alerts (new FERC approvals, effective dates set or moved, deadlines within 14 days) | Vercel Cron → `/api/jobs/alerts` daily at 13:00 UTC (`vercel.json`, `CRON_SECRET`) | Yes | `alerts_opt_in`, signed link + one-click header |
+| Team invites | A company admin's action | No (a person's direct action) | n/a |
+
+- **Unsubscribe links** are HMAC-signed with `EMAIL_LINK_SECRET` (`lib/email-links.ts`). The page asks before acting, so link scanners can't unsubscribe anyone. The `List-Unsubscribe` header does one-click unsubscribe (RFC 8058).
+- **What changed:** approving a draft stores the value it replaced in `drafts.previous`. `lib/changes.ts` turns these into the digest's suggested corrections and into alerts. `alert_log` makes sure each alert goes out once.
+- **Calendar feed:** `lib/ical.ts` builds it. UIDs depend only on the entry, label and date, lines are folded at 75 octets, and the tests parse it with ical.js.
+
 ## Code map
 
 ```

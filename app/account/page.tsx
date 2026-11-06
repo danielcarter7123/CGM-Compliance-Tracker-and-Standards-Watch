@@ -79,6 +79,9 @@ export default async function AccountPage({ searchParams }: { searchParams: { sa
         <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <input type="checkbox" name="digest" defaultChecked={v.digestOptIn} /> Email me the weekly digest
         </label>
+        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <input type="checkbox" name="alerts" defaultChecked={v.alertsOptIn} /> Email me alerts between digests (new FERC approvals, effective dates, deadlines within 14 days)
+        </label>
         <div className="field">
           <label htmlFor="full_name">Your name</label>
           <input id="full_name" name="full_name" type="text" defaultValue={v.fullName} />
