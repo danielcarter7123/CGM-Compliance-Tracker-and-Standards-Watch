@@ -11,10 +11,10 @@ export const APP_NAME: Record<AppKey, string> = {
   tracker: "CGM Compliance Tracker",
 };
 
-export type Section = { label: string; href?: string };
+export type Section = { label: string; href?: string; badge?: number };
 
 /** CGM Compliance Tracker's section tabs. Sections not built yet show greyed out. */
-export function trackerSections(v: Viewer): Section[] {
+export function trackerSections(v: Viewer, unread = 0): Section[] {
   return [
     { label: "Dashboard", href: "/tracker" },
     { label: "Tasks", href: "/tracker/tasks" },
@@ -22,7 +22,7 @@ export function trackerSections(v: Viewer): Section[] {
     ...(v.isStaff ? [{ label: "Team Tasks" }] : []),
     { label: "Standards Library", href: "/tracker/standards" },
     ...(v.isStaff ? [{ label: "Clients", href: "/tracker/clients" }] : []),
-    { label: "Messages" },
+    { label: "Messages", href: "/tracker/messages", badge: unread },
     { label: "Activity Log" },
   ];
 }

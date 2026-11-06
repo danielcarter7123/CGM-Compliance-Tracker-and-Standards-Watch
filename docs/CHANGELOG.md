@@ -2,6 +2,22 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 6, 2026: T6 Messages (Claude Code)
+
+Built as decided (OPEN-QUESTIONS 6): in-app chat; client users use their company channel and can direct-message their CGM project manager. The daily "you have unread messages" email comes with T8 (opt-out per person); nothing emails today.
+- **Messages screen** (`/tracker/messages`):
+  - CGM staff see team channels (General, plus channels they add), direct messages (start one with anyone) and one channel per Tracker client;
+  - a client user sees their company's channel and "Message <PM> (your CGM project manager)";
+  - messages are grouped by day with names (rpc `people_names`), https links are clickable, and a linked task shows as a chip that opens the task;
+  - authors can delete their own messages, which then show as "Message deleted"; nobody can edit one;
+  - Enter sends, Shift+Enter adds a line, 4,000 characters, a draft kept per conversation on the device;
+  - new messages appear live (Supabase Realtime, which applies row level security).
+- **Unread:** a count on the Messages tab and a dot per conversation, from `chats.last_at`/`last_by` against your own `chat_reads`.
+- **Discuss** on a task opens the client's channel with that task linked.
+- **Migration `0013_messages.sql`:** DMs only with your own PM (clients); one DM per pair; conversation activity set by trigger only; messages can't be edited or moved, only soft-deleted by their author; `people_names()`; General channel; realtime publication.
+- **Tests:** RLS cases for all of the above; `e2e/tracker-t6.spec.ts` covers Discuss, the task chip, links, delete, the PM DM, the database refusing other DMs and another company's channel, another company seeing nothing, and the PM's unread count.
+- **Still to do in T6:** the Team Tasks screen (staff only).
+
 ## Nov 6, 2026: close-out with a verified performed date (Claude Code)
 
 **Decided by Dan** (OPEN-QUESTIONS 18): clients close tasks out when the report arrives, but the date recorded must be the date the work was performed.

@@ -4,7 +4,7 @@ import { APP_NAME, initials, trackerSections, whoLine, type AppKey } from "@/lib
 
 /** The header for one app in CGM Workspace. Each app has its own; inside an app, "← CGM Workspace" on the left
  *  goes back to the launcher. No links between apps (decision 17). */
-export default function AppHeader({ app, viewer, reminders = 0 }: { app: AppKey; viewer: Viewer | null; reminders?: number }) {
+export default function AppHeader({ app, viewer, reminders = 0, unread = 0 }: { app: AppKey; viewer: Viewer | null; reminders?: number; unread?: number }) {
   const back = app !== "workspace" && viewer;
   return (
     <header className={`mast app app-${app}`}>
@@ -40,7 +40,7 @@ export default function AppHeader({ app, viewer, reminders = 0 }: { app: AppKey;
       </div>
       {app === "tracker" && viewer && (
         <div className="wrap navrow">
-          <AppNav sections={trackerSections(viewer)} />
+          <AppNav sections={trackerSections(viewer, unread)} />
           <span className="navtools">
             <a className={`remindbtn${reminders ? " has" : ""}`} href="/tracker/tasks?status=window" title="Overdue tasks and tasks inside their reminder window">
               Reminders <span className="count">{reminders}</span>

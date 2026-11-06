@@ -449,3 +449,39 @@ test("close-out: a client backdates the performed date (report arrived later); a
   assert.ok(await fails(T_USER, `update tasks set completed_at = current_date - 50 where id = '${t.id}'`), "the client can't change it afterwards; the PM can");
   await db.exec(`delete from tasks where id in ('${t.id}', '${p.next_id}')`);
 });
+
+// ---------- T6: messages (0013) ----------
+test("messages: clients DM only their own PM; messages can't be edited or moved, only soft-deleted; activity set by the database; names", async () => {
+  await db.exec(`update companies set pm_id = '${PM}' where id = '${A_CO}'`);
+  assert.equal(Number((await db.query(`select count(*) from chats where type = 'channel' and name = 'General'`)).rows[0].count) >= 1, true, "General exists");
+
+  // Client user A may open a DM with their PM, not with other staff or other clients.
+  // No RETURNING: the read check looks the new conversation up by id, which it can't see mid-insert. The app creates, then reads.
+  await as(T_USER, `insert into chats(type, members) values ('dm','{${PM},${T_USER}}')`);
+  const [dm] = await as(T_USER, `select id, members from chats where type = 'dm' and '${T_USER}' = any(members)`);
+  assert.ok(dm.id);
+  assert.ok(await fails(T_USER, `insert into chats(type, members) values ('dm','{${T_USER},${ADMIN}}')`), "not another CGM person");
+  assert.ok(await fails(T_USER, `insert into chats(type, members) values ('dm','{${T_USER},${B_USER}}')`), "not another client");
+  assert.ok(await fails(B_USER, `insert into chats(type, members) values ('dm','{${B_USER},${PM}}')`), "B's company has no PM set");
+  assert.ok(await fails(PM, `insert into chats(type, members) values ('dm','{${T_USER},${PM}}')`), "one conversation per pair (order doesn't matter)");
+  assert.ok(await fails(T_USER, `insert into chats(type, name) values ('channel','Sneaky')`), "clients can't open team channels");
+
+  // Posting sets last activity; nobody updates a conversation directly.
+  const [m] = await as(T_USER, `insert into chat_messages(chat_id, body) values ('${dm.id}','Fake: is the relay report in?') returning id`);
+  const [c] = (await db.query(`select last_by from chats where id = '${dm.id}'`)).rows;
+  assert.equal(c.last_by, T_USER);
+  assert.equal((await as(T_USER, `update chats set members = '{${T_USER},${ADMIN}}' where id = '${dm.id}' returning id`)).length, 0, "can't change who's in a DM");
+
+  // Only soft delete, by the author; no edits, no moving into a chat they can't see.
+  const [{ id: chB }] = (await db.query(`insert into chats(type, company_id) values ('client','${B_CO}') returning id`)).rows;
+  assert.ok(await fails(T_USER, `update chat_messages set chat_id = '${chB}' where id = '${m.id}'`), "can't move a message");
+  assert.ok(await fails(T_USER, `update chat_messages set body = 'edited' where id = '${m.id}'`), "can't edit");
+  assert.equal((await as(PM, `update chat_messages set deleted_at = now() where id = '${m.id}' returning id`)).length, 0, "not someone else's");
+  assert.equal((await as(T_USER, `update chat_messages set deleted_at = now() where id = '${m.id}' returning id`)).length, 1);
+  assert.equal(await count(B_USER, `select count(*) from chat_messages where id = '${m.id}'`), 0);
+
+  // Names: a client sees CGM staff and their own colleagues, never another company's people.
+  const names = await as(T_USER, `select id, name, staff from public.people_names('{${PM},${T_ADMIN},${B_USER}}')`);
+  assert.deepEqual(names.map((n) => n.id).sort(), [PM, T_ADMIN].sort());
+  await db.exec(`update companies set pm_id = null where id = '${A_CO}'`);
+});

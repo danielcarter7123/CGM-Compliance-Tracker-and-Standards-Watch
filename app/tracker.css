@@ -154,3 +154,39 @@
 .closeout-check{border:1px solid var(--line);border-left:4px solid var(--trk-accent);border-radius:6px;padding:10px 12px;display:grid;gap:8px;background:var(--surface)}
 .closeout-check.backdated{border-left-color:var(--upcoming)}
 .closeout-check p{margin:0}
+
+/* Messages (T6) */
+.appnav .badge{display:inline-block;min-width:18px;margin-left:6px;padding:0 5px;border-radius:9px;background:var(--accent);color:var(--accent-ink);font:600 11px/18px var(--body);text-align:center}
+.msg-grid{display:grid;grid-template-columns:260px minmax(0,1fr);gap:16px;align-items:start}
+.convos{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px;display:grid;gap:2px}
+.convo-h{font:600 11px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:10px 8px 4px}
+.convo{display:flex;justify-content:space-between;gap:8px;padding:7px 8px;border-radius:4px;color:var(--ink);text-decoration:none;font-size:14px}
+.convo:hover{background:var(--sunk)}
+.convo.open{background:var(--sunk);box-shadow:inset 3px 0 0 var(--accent);font-weight:600}
+.convo.unread{font-weight:700}
+.convo .dot{color:var(--accent);font-size:10px}
+.convo-note{padding:4px 8px;margin:0}
+.convo-new{display:flex;gap:6px;padding:6px 8px}
+.convo-new input,.convo-new select{flex:1;min-width:0;font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink)}
+.thread{background:var(--surface);border:1px solid var(--line);border-radius:6px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;min-height:480px}
+.thread-h{padding:12px 16px;border-bottom:1px solid var(--line)}
+.thread-h h2{margin:0;font:700 18px var(--trk-cond)}
+.thread-b{padding:12px 16px;max-height:62vh;overflow-y:auto;display:flex;flex-direction:column}
+.dayline{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;margin:14px 0 6px}
+.dayline::before,.dayline::after{content:"";flex:1;border-top:1px solid var(--line)}
+.msg{padding:6px 0 2px;position:relative}
+.msg.cont{padding-top:0}
+.msg-h{display:flex;align-items:center;gap:8px}
+.msg-b{margin:2px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg-b a{color:var(--accent)}
+.taskchip{display:inline-block;margin:2px 0 4px;padding:2px 8px;border:1px solid var(--line);border-radius:12px;font-size:12.5px;color:var(--ink);text-decoration:none;background:var(--sunk)}
+.taskchip:hover{border-color:var(--accent)}
+.msg-del{opacity:0;position:absolute;right:0;top:6px;transition:opacity .15s}
+.msg:hover .msg-del,.msg:focus-within .msg-del{opacity:1}
+.linkbtn{background:none;border:0;padding:0;color:var(--muted);font:inherit;font-size:12px;cursor:pointer;text-decoration:underline}
+.composer{border-top:1px solid var(--line);padding:12px 16px;display:grid;gap:8px}
+.composer textarea{width:100%;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink);resize:vertical}
+.composer-task{display:flex;gap:8px;align-items:center;font-size:13px}
+.composer-task select{max-width:100%;font:inherit;font-size:13px;padding:3px 6px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink)}
+.composer-f{display:flex;justify-content:space-between;align-items:center}
+@media (max-width:760px){.msg-grid{grid-template-columns:1fr}.thread{min-height:360px}.msg-del{opacity:1}}

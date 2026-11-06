@@ -88,6 +88,7 @@ export default async function Tasks({ searchParams: sp }: { searchParams: SP }) 
           <div className="trk-panel-h">
             <h2>{isNew ? "New task" : sel.title}</h2>
             {!isNew && <span className={`pill ${pill(sel).cls}`}>{pill(sel).label}</span>}
+            {!isNew && <a className="btn-line sm" href={`/tracker/messages?client=${sel.company_id}&task=${sel.id}`}>Discuss</a>}
             <a className="btn-line sm" href={link("")}>Close</a>
           </div>
           {sp.ok && <p className="notice ok" role="status">{sp.ok}</p>}

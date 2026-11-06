@@ -32,5 +32,5 @@ export async function navLinks(page: Page): Promise<string[]> {
 
 /** The section menu under the CGM Compliance Tracker header, including greyed-out sections. */
 export async function sectionLinks(page: Page): Promise<string[]> {
-  return (await page.locator("nav.appnav > a, nav.appnav > span").allInnerTexts()).map((t) => t.replace("🔒", "").trim());
+  return (await page.locator("nav.appnav > a, nav.appnav > span").allInnerTexts()).map((t) => t.replace("🔒", "").replace(/\s*\d+$/, "").trim());
 }

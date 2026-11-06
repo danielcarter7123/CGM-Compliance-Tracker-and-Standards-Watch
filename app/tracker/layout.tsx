@@ -12,10 +12,18 @@ export const metadata = { title: { default: "CGM Compliance Tracker", template: 
 export default async function TrackerLayout({ children }: { children: React.ReactNode }) {
   const v = await requireTracker();
   // The Reminders count: overdue tasks plus tasks inside their reminder window (read with the person's own access).
-  const { data } = await createClient().from("tasks").select("status, due_date, remind_days").neq("status", "done").not("due_date", "is", null);
+  const db = createClient();
+  const [{ data }, { data: chats }, { data: reads }] = await Promise.all([
+    db.from("tasks").select("status, due_date, remind_days").neq("status", "done").not("due_date", "is", null),
+    db.from("chats").select("id, last_at, last_by").not("last_at", "is", null),
+    db.from("chat_reads").select("chat_id, read_at").eq("user_id", v.userId),
+  ]);
+  // Unread conversations: activity by someone else since this person last opened it.
+  const readAt = new Map((reads || []).map((r) => [r.chat_id as string, r.read_at as string]));
+  const unread = (chats || []).filter((c) => c.last_by !== v.userId && (!readAt.has(c.id as string) || (c.last_at as string) > (readAt.get(c.id as string) as string))).length;
   return (
     <>
-      <AppHeader app="tracker" viewer={v} reminders={reminderTasks((data || []) as Task[]).length} />
+      <AppHeader app="tracker" viewer={v} reminders={reminderTasks((data || []) as Task[]).length} unread={unread} />
       <div className="trk">{children}</div>
       <AppFooter app="tracker" />
     </>

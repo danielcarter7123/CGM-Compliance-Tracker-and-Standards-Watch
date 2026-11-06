@@ -16,7 +16,10 @@ export default function AppNav({ sections }: { sections: Section[] }) {
         !s.href ? (
           <span key={s.label} className="soon" title="Coming in a later milestone">{s.label}</span>
         ) : (
-          <a key={s.label} href={s.href} aria-current={current(s.href) ? "page" : undefined}>{s.label}</a>
+          <a key={s.label} href={s.href} aria-current={current(s.href) ? "page" : undefined}>
+            {s.label}
+            {!!s.badge && <span className="badge" aria-label={`${s.badge} unread`}>{s.badge}</span>}
+          </a>
         ),
       )}
     </nav>
