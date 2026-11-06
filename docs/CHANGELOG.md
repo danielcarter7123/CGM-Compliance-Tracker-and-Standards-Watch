@@ -2,6 +2,30 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 5, 2026: W3 review queue parity (Claude Code)
+
+**Review queue** (`/admin/review`, editor only):
+- Before/after diffs use field names ("U.S. effective date", not `effective`). Lists show as readable lines, and topics by name.
+- New entries list every field.
+- **Approve all** shows when 2 or more drafts are waiting. It needs two clicks, publishes oldest first, and stops at the first problem, saying how many were published.
+- **Edit first** is now a form for each section, replacing the pilot's raw JSON box. The fields come from `lib/draft-fields.ts`:
+  - functions and topics as choices;
+  - dates as date pickers;
+  - milestones, news and this-week points as rows;
+  - source keys checked against the published sources.
+
+  Problems show as you type and block "Approve edited". The server checks the edited value again before publishing.
+- The draft shape is unchanged (CLAUDE.md rule 5). Empty optional fields are dropped so an edited draft looks like a Monday-task draft.
+
+**Decision log** (`/admin/review/log`):
+- every approved and rejected draft, newest first;
+- who decided, when, whether it was edited, the reason, the sources, and what was published;
+- filters by decision and section, 100 per page.
+
+**Tests:**
+- unit: every published pilot entry passes the checks unchanged, and bad edits (Feb 30, unknown function, unknown source, dev with an effective date, empty milestone text, http link) are caught;
+- `e2e/review.spec.ts`: fake drafts arrive through `/api/drafts` (the Monday task's route) and go through edit with checks, reject, Watch showing the edit, the log and its filters, and Approve all of remove drafts that take the fake entries back off; PMs can't reach the queue or the log.
+
 ## Nov 5, 2026: W2 accounts: welcome screen, invites, seats (Claude Code)
 
 **Decided by Dan:** editor-only screens get a red striped band so they stand out.

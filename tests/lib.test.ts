@@ -95,3 +95,22 @@ test("function filters: GO hides CIP-014-4 and TPL-008-1; TP shows TPL-008-1 and
   assert.ok(!tp.has("EOP-004-5"), "TP hides EOP-004-5");
   assert.equal(shown([]).size, new Set(items.map((i) => i.std)).size, "All shows everything");
 });
+
+test("review queue checks: every published pilot entry passes unchanged; bad edits are caught", async () => {
+  const { draftProblems, tidyDraftValue } = await import("../lib/draft-fields");
+  const keys = Object.keys(pilot.sources);
+  for (const [k, v] of Object.entries<any>(pilot.items)) assert.deepEqual(draftProblems("items", v, keys), [], `item ${k}`);
+  for (const [k, v] of Object.entries<any>(pilot.deadlines)) assert.deepEqual(draftProblems("deadlines", v), [], `deadline ${k}`);
+  for (const [k, v] of Object.entries<any>(pilot.activity)) assert.deepEqual(draftProblems("activity", v), [], `action ${k}`);
+  for (const [k, v] of Object.entries<any>(pilot.sources)) assert.deepEqual(draftProblems("sources", v), [], `source ${k}`);
+  if (pilot.week) assert.deepEqual(draftProblems("week", pilot.week), []);
+
+  const item = { ...(Object.values<any>(pilot.items).find((i) => i.effective)) };
+  assert.ok(draftProblems("items", { ...item, effective: "2027-02-30" }).some((p) => p.includes("real date")), "Feb 30 is refused");
+  assert.ok(draftProblems("items", { ...item, fn: ["GO", "XX"] }).length > 0, "unknown function");
+  assert.ok(draftProblems("items", { ...item, src: ["nope"] }, keys).some((p) => p.includes("Unknown source")));
+  assert.ok(draftProblems("items", { ...item, status: "dev" }).some((p) => p.includes("in development")));
+  assert.ok(draftProblems("items", { ...item, milestones: [{ d: "2027-01-01", l: "" }] }).some((p) => p.includes("row 1")));
+  assert.ok(draftProblems("sources", { t: "x", u: "http://insecure.example" }).length > 0);
+  assert.deepEqual(tidyDraftValue("deadlines", { d: "2027-01-01", t: "x", who: "", fn: [] }), { d: "2027-01-01", t: "x", fn: null });
+});

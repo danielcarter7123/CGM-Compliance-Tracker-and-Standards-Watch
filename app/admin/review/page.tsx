@@ -15,7 +15,9 @@ export default async function ReviewPage() {
 
   const db = createClient();
   const { data: drafts } = await db.from("drafts").select("*").eq("status", "pending").order("created_at");
-  const { data: decided } = await db.from("drafts").select("id,label,section,status,decided_at,edited").neq("status", "pending").order("decided_at", { ascending: false }).limit(15);
+  const { data: decided } = await db.from("drafts").select("id,label,section,status,decided_at,edited").neq("status", "pending").order("decided_at", { ascending: false }).limit(5);
+  const { data: srcRows } = await db.from("sources").select("key, title").order("key");
+  const sources = Object.fromEntries((srcRows || []).map((r) => [String(r.key), String(r.title)]));
 
   // Current published version of each entry a draft touches, for the before/after view.
   const list: ReviewDraft[] = [];
@@ -45,10 +47,10 @@ export default async function ReviewPage() {
       <div className="wrap">
         <h1>Review queue</h1>
         <p>Drafts from the Monday task wait here. Nothing reaches subscribers until you approve it. Every decision is recorded with who made it and when.</p>
-        <ReviewQueue drafts={list} />
+        <ReviewQueue drafts={list} sources={sources} />
         {decided && decided.length > 0 && (
           <section className="review" style={{ marginTop: 24 }}>
-            <div className="rhead"><span className="rtag">Log</span><h2>Recent decisions</h2></div>
+            <div className="rhead"><span className="rtag">Log</span><h2>Recent decisions</h2><a className="only" href="/admin/review/log">Full decision log →</a></div>
             <div className="rlist">
               {decided.map((x) => (
                 <div key={x.id} className="draft" style={{ borderLeftColor: x.status === "approved" ? "var(--adm-add)" : "var(--adm-del)" }}>

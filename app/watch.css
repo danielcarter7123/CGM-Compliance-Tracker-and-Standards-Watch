@@ -244,3 +244,25 @@ h1,h2,h3{text-wrap:balance;margin:0}
 .foot .srchead{font-family:var(--display);font-size:20px;font-weight:600;color:var(--ink);margin:8px 0 4px}
 a.nbtn.locked{cursor:pointer}
 @media (max-width:520px){.nextbar .wrap > span{display:none}.nextbar .nbtn{width:100%;text-align:center;justify-content:center}}
+
+/* Review queue: Edit first form and the decision log */
+.edform{display:grid;gap:10px;background:var(--adm-bg);border:1px solid var(--adm-line);border-radius:6px;padding:12px}
+.edform .field label,.edform .field .lbl{font:600 11.5px var(--adm-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--adm-muted)}
+.review .edform input[type=text],.review .edform input[type=url],.review .edform input[type=date],.review .edform select,.review .edform textarea{max-width:none;height:auto;line-height:1.4;background:var(--adm-panel);color:var(--adm-ink);border:1px solid var(--adm-line);border-radius:4px;padding:7px 9px;font:13px var(--body);width:100%;box-sizing:border-box;color-scheme:dark}
+.edform textarea{min-height:64px;resize:vertical}
+.review .edform input[type=checkbox]{width:16px;height:16px;padding:0;margin:0;accent-color:var(--adm-accent)}
+.edchecks{display:flex;flex-wrap:wrap;gap:6px}
+.edchecks label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--adm-line);border-radius:999px;padding:3px 10px;font:600 12.5px var(--adm-mono);color:var(--adm-ink);text-transform:none;letter-spacing:0}
+.edrows{display:grid;gap:6px}
+.edrow{display:grid;grid-template-columns:170px minmax(0,1fr) auto;gap:6px;align-items:center}
+.edrows > .btn{justify-self:start}
+.edhint{font-size:12px;color:var(--adm-muted)}
+.edproblems{margin:0;padding:10px 12px 10px 28px;border:1px solid var(--adm-flag);border-radius:4px;color:#FFB4B6;font-size:13px;display:grid;gap:2px}
+.dlist li > span:last-child,.dlist s{white-space:pre-line}
+.logfilters{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:12px 0}
+.logfilters label{color:var(--adm-muted);font-size:13px}
+.logfilters select{width:auto;font:13px var(--body)}
+.logrow details summary{cursor:pointer;color:var(--adm-accent)}
+.review .rhead a.only{color:var(--adm-accent)}
+@media (max-width:640px){.edrow{grid-template-columns:minmax(0,1fr)}.dlist li{grid-template-columns:minmax(0,1fr)}}
+.review .edform .field{align-content:start}
