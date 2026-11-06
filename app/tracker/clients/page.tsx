@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { fmt } from "@/lib/watch";
 import { addMissingTasks } from "../tasks/actions";
 import { taskKey } from "@/lib/tasks";
-import { deleteClient, removeSamples, saveClient, setClientProducts } from "./actions";
+import { deleteClient, inviteToClient, removeClientMember, removeSamples, revokeClientInvite, saveClient, setClientProducts } from "./actions";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Clients" };
@@ -45,6 +45,18 @@ export default async function Clients({ searchParams }: { searchParams: { c?: st
 
   const sel = searchParams.c === "new" ? (canEdit ? EMPTY : null) : clients.find((c) => c.id === searchParams.c) || null;
   const isNew = searchParams.c === "new";
+  // People at the selected client (logins) and open invites, read as CGM staff.
+  type Person = { id: string; full_name: string | null; email: string | null; company_role: string; onboarded_at: string | null };
+  type Inv = { id: string; email: string; company_role: string; expires_at: string };
+  let people: Person[] = [], invites: Inv[] = [];
+  if (sel && !isNew) {
+    const [{ data: pp }, { data: ii }] = await Promise.all([
+      db.from("profiles").select("id, full_name, email, company_role, onboarded_at").eq("company_id", sel.id).is("staff_role", null).order("email"),
+      db.from("invites").select("id, email, company_role, expires_at").eq("company_id", sel.id).is("accepted_at", null).is("revoked_at", null).gt("expires_at", new Date().toISOString()).order("created_at"),
+    ]);
+    people = (pp || []) as Person[];
+    invites = (ii || []) as Inv[];
+  }
   const person = (kind: string, label: string, digestText: string, defaultDigest: boolean) => {
     const c = sel && !isNew ? contactOf(sel.id, kind) : undefined;
     return (
@@ -177,6 +189,60 @@ export default async function Clients({ searchParams }: { searchParams: { c?: st
               </span>
               {isAdmin && <div><button className="btn-line sm" type="submit">Save products</button></div>}
             </form>
+          )}
+
+          {!isNew && (
+            <section className="trk-form people" id="people" aria-label="People">
+              <span className="lbl">People with a login</span>
+              {people.length || invites.length ? (
+                <ul className="peoplelist">
+                  {people.map((p) => (
+                    <li key={p.id}>
+                      <span>
+                        <b>{p.full_name || p.email}</b>
+                        <span className="muted small"> {p.email} · {p.company_role === "admin" ? "company admin" : "member"}{p.onboarded_at ? "" : " · hasn't finished setting up"}</span>
+                      </span>
+                      {canEdit && (
+                        <form action={removeClientMember}>
+                          <input type="hidden" name="id" value={sel.id} />
+                          <input type="hidden" name="member" value={p.id} />
+                          <button className="btn-line sm" type="submit" aria-label={`Remove ${p.email}`}>Remove</button>
+                        </form>
+                      )}
+                    </li>
+                  ))}
+                  {invites.map((i) => (
+                    <li key={i.id}>
+                      <span><b>{i.email}</b><span className="muted small"> invited as {i.company_role === "admin" ? "company admin" : "member"} · expires {fmt(i.expires_at.slice(0, 10))}</span></span>
+                      {canEdit && (
+                        <form action={revokeClientInvite}>
+                          <input type="hidden" name="id" value={sel.id} />
+                          <input type="hidden" name="invite_id" value={i.id} />
+                          <button className="btn-line sm" type="submit" aria-label={`Revoke invite for ${i.email}`}>Revoke</button>
+                        </form>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="muted small">No one at this client has a login yet.</p>
+              )}
+              {canEdit && (
+                <form action={inviteToClient} className="toolbar">
+                  <input type="hidden" name="id" value={sel.id} />
+                  <label className="sr" htmlFor="inv_email">Invite someone at this client</label>
+                  <input id="inv_email" name="email" type="email" required placeholder="name@client.com" className="grow" />
+                  <select name="company_role" defaultValue="member" aria-label="Role">
+                    <option value="member">Member</option>
+                    <option value="admin">Company admin</option>
+                  </select>
+                  <button className="btn-main sm" type="submit">Invite</button>
+                </form>
+              )}
+              <span className="muted small">
+                Client users see only this company: its Compliance Tracker tasks (mark performed, evidence, notes) and any other apps in its plan. A company admin can also invite colleagues from their account page, within the company&apos;s seats.
+              </span>
+            </section>
           )}
 
           {!isNew && isAdmin && (

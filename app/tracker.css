@@ -144,3 +144,8 @@
 .item .m{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12.5px;color:var(--muted)}
 .item .when{display:grid;justify-items:end;gap:3px;font-size:13px;text-align:right}
 @media (max-width:980px){.strip{grid-template-columns:repeat(2,minmax(0,1fr))}.cols{grid-template-columns:minmax(0,1fr)}}
+
+/* Clients: people with a login */
+.people{border-top:1px solid var(--line);padding-top:12px}
+.peoplelist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.peoplelist li{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:7px 10px}

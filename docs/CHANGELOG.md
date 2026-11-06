@@ -2,6 +2,30 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 6, 2026: T5 client view (Claude Code)
+
+**Isolation, proven end to end** (`e2e/tracker-t5.spec.ts`): a Demo Wind Farm (fake) user tries to reach Sample Peaker (fake).
+- **By address:** the other company's task link, the Tasks filter, the CSV export and its client record all come up empty or redirect.
+- **By calling the API directly** with their own token: reading the other company's tasks or companies returns nothing, editing them changes nothing, and inserting a task is refused.
+- **Their own due date:** changing it is refused with the database's message.
+- The other company's data is confirmed unchanged afterwards.
+
+**Client task view:**
+- clients see a note that CGM sets the due date, repeat schedule and assignee, and to ask their project manager;
+- clients can mark their own tasks performed with an evidence link (checked in the browser test);
+- there is no due-date field.
+
+**People** (Clients › client details): every CGM staff member sees who has a login at the client and the open invites. CGM admins and PMs can invite (member or company admin), revoke and remove, with seats enforced by the database. The invite email (`lib/invites.ts`, shared with company admins' invites) now mentions Sign in with Microsoft.
+
+**Tests:**
+- RLS: PMs invite into any client; client admins only their own; clients can't change due date, repeats or assignee directly, but can mark performed; another company can't see or touch the task (33 RLS tests).
+- e2e: the isolation journey above; CGM invites a user, who joins that company and sees only its apps; removal.
+
+**Already in place from earlier milestones:**
+- client Dashboard and Tasks limited to their company (T2, T3);
+- company admins invite colleagues (W2);
+- Client Tasks, Messages and the Activity Log are still to come (T6, T7).
+
 ## Nov 6, 2026: CGM Workspace: three separate apps (Claude Code)
 
 **Decided by Dan** (OPEN-QUESTIONS 17, contract in `docs/SUITE.md`): CGM Standards Watch, CGM Compliance Tracker and CGM Powerworks are separate apps on one CGM account. Clients get exactly the apps their plan includes. This supersedes decisions 15 and 16 where they differ.

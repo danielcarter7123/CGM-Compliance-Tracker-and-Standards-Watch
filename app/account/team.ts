@@ -3,8 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getViewer } from "@/lib/auth";
-import { sendMail } from "@/lib/mail";
-import { siteUrl } from "@/lib/stripe";
+import { sendInviteEmail } from "@/lib/invites";
 import { createClient } from "@/lib/supabase/server";
 
 // Team changes for company admins. Each one runs as the signed-in user; the database (0007_accounts.sql)
@@ -23,9 +22,6 @@ async function companyAdmin() {
   return v as typeof v & { company: { id: string; name: string } };
 }
 
-const ENT: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
-const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ENT[c]);
-
 export async function inviteColleague(formData: FormData) {
   const v = await companyAdmin();
   const email = String(formData.get("email") || "").trim().toLowerCase();
@@ -34,27 +30,7 @@ export async function inviteColleague(formData: FormData) {
   const { error } = await createClient().from("invites").insert({ company_id: v.company.id, email, company_role: role });
   if (error) fail(error);
 
-  const link = `${siteUrl()}/login?next=/workspace`; // the sign-in callback shows new joiners the welcome screen first
-  const who = v.fullName || v.email || "A colleague";
-  const company = v.company.name;
-  let sent = false;
-  try {
-    sent = await sendMail({
-      to: email,
-      subject: `${who} invited you to ${company} on CGM Workspace`,
-      text:
-        `${who} invited you to join ${company} on CGM Workspace from CGM Consulting Group.\n\n` +
-        `Sign in with this email address (${email}) at:\n${link}\n\n` +
-        `There's no password: we email you a one-time sign-in link. The invite expires in 14 days.`,
-      html: `<div style="font:15px/1.5 Arial,sans-serif;color:#0D1B2E;max-width:520px">
-  <p><b>${esc(who)}</b> invited you to join <b>${esc(company)}</b> on CGM Workspace from CGM Consulting Group.</p>
-  <p>Sign in with this email address (${esc(email)}). There's no password: we email you a one-time sign-in link.</p>
-  <p><a href="${esc(link)}" style="display:inline-block;background:#1747D1;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:600">Sign in to accept</a></p>
-  <p style="color:#55657A;font-size:13px">The invite expires in 14 days.</p></div>`,
-    });
-  } catch {
-    sent = false;
-  }
+  const sent = await sendInviteEmail(v.fullName || v.email || "A colleague", v.company.name, email);
   back(`team=${sent ? "invited" : "invited-nomail"}&who=${encodeURIComponent(email)}`);
 }
 

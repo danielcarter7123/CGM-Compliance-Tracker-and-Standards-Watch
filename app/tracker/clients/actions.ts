@@ -130,3 +130,39 @@ export async function removeSamples() {
   if (error) back(`error=${encodeURIComponent(error.message)}`);
   back(`ok=${encodeURIComponent(`Removed ${data?.length || 0} sample client${data?.length === 1 ? "" : "s"} and their tasks.`)}`);
 }
+
+// ---------- People: CGM invites and manages a client's users (T5) ----------
+// Row level security (0007) allows CGM admins and project managers to invite into any company and to revoke or
+// remove; seats are enforced by the database. Other staff can see the list but not change it.
+
+export async function inviteToClient(formData: FormData) {
+  const v = await requireStaff("/tracker/clients");
+  const id = str(formData, "id");
+  if (!v.canApprove) back(`c=${id}&error=${encodeURIComponent("Only CGM project managers and admins invite client users.")}#people`);
+  const email = str(formData, "email").toLowerCase();
+  const role = formData.get("company_role") === "admin" ? "admin" : "member";
+  if (!EMAIL.test(email)) back(`c=${id}&error=${encodeURIComponent("Enter a valid email address.")}#people`);
+  const db = createClient();
+  const { error } = await db.from("invites").insert({ company_id: id, email, company_role: role });
+  if (error) back(`c=${id}&error=${encodeURIComponent(error.message)}#people`);
+  const { data: co } = await db.from("companies").select("name").eq("id", id).single();
+  const { sendInviteEmail } = await import("@/lib/invites");
+  const sent = await sendInviteEmail(v.fullName || "CGM Consulting Group", (co?.name as string) || "your company", email);
+  back(`c=${id}&ok=${encodeURIComponent(sent ? `Invite sent to ${email}.` : `Invite created for ${email}, but the email couldn't be sent. Ask them to sign in with that address; they'll join automatically.`)}#people`);
+}
+
+export async function revokeClientInvite(formData: FormData) {
+  await requireStaff("/tracker/clients");
+  const id = str(formData, "id");
+  const { error } = await createClient().rpc("revoke_invite", { invite_id: str(formData, "invite_id") });
+  if (error) back(`c=${id}&error=${encodeURIComponent(error.message)}#people`);
+  back(`c=${id}&ok=${encodeURIComponent("Invite revoked.")}#people`);
+}
+
+export async function removeClientMember(formData: FormData) {
+  await requireStaff("/tracker/clients");
+  const id = str(formData, "id");
+  const { error } = await createClient().rpc("remove_member", { member: str(formData, "member") });
+  if (error) back(`c=${id}&error=${encodeURIComponent(error.message)}#people`);
+  back(`c=${id}&ok=${encodeURIComponent("Removed from this client. They can no longer see its information.")}#people`);
+}

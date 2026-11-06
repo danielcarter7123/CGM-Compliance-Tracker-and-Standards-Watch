@@ -199,6 +199,9 @@ export default async function Tasks({ searchParams: sp }: { searchParams: SP }) 
               <dt>Repeats</dt><dd>{recurText(sel)}</dd>
             </dl>
           )}
+          {!staff && !isNew && (
+            <p className="muted small clientnote">CGM sets the due date, repeat schedule and assignee. To change one, ask your CGM project manager. You can mark the task performed and post evidence and notes.</p>
+          )}
 
           {!isNew && (sel.status === "open" || sel.status === "inprogress") && (
             <details className="perform">

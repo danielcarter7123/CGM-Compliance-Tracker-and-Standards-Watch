@@ -53,7 +53,7 @@ Nobody can raise their own role. Only CGM admins set staff roles and products. C
 | Products and roles | | read own | read own | read own | read | read | ✓ |
 | Billing (Stripe portal) | | company admin | company admin | company admin | | | |
 | App switches (automated emails on/off) | | | | | read | read | ✓ |
-| Team: invite, revoke, change role, remove (own company) | | company admin | company admin | company admin | read | ✓ any company (screen comes with T5) | ✓ any company (screen comes with T5) |
+| Team: invite, revoke, change role, remove (own company) | | company admin | company admin | company admin | read | ✓ any company (Clients › People) | ✓ any company (Clients › People) |
 | Seats per company | | read own | read own | read own | read | read | ✓ |
 
 ## Rules worth knowing

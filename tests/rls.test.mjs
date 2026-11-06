@@ -419,3 +419,21 @@ test("clients: PMs add and edit clients, staff only read; any staff keeps contac
   assert.equal((await as(ADMIN, `delete from companies where id = '${c.id}' returning id`)).length, 1);
   assert.equal(Number((await db.query(`select count(*) from contacts where company_id = '${c.id}'`)).rows[0].count), 0, "contacts go with the client");
 });
+
+// ---------- T5: client view ----------
+test("T5: CGM PMs invite into any client; client admins only their own; clients can't change due dates even directly", async () => {
+  const [inv] = await as(PM, `insert into invites(company_id, email) values ('${B_CO}','fake-new@b.example') returning invited_by`);
+  assert.equal(inv.invited_by, PM);
+  assert.ok(await fails(T_ADMIN, `insert into invites(company_id, email) values ('${B_CO}','sneaky@b.example')`), "client admin of A can't invite into B");
+  await as(PM, `select public.revoke_invite(id) from invites where email = 'fake-new@b.example'`);
+
+  const [t] = (await db.query(`insert into tasks(company_id, title, due_date) values ('${A_CO}','Fake T5 task','2099-01-31') returning id`)).rows;
+  assert.ok(await fails(T_USER, `update tasks set due_date = '2099-12-31' where id = '${t.id}'`), "due date");
+  assert.ok(await fails(T_USER, `update tasks set recur_n = 1 where id = '${t.id}'`), "repeat schedule");
+  assert.ok(await fails(T_USER, `update tasks set assignee_text = 'Me' where id = '${t.id}'`), "assignee");
+  const [p] = await as(T_USER, `update tasks set status = 'review', completed_at = current_date, evidence = 'https://sharepoint.example/fake' where id = '${t.id}' returning status, performed_by`);
+  assert.deepEqual([p.status, p.performed_by], ["review", T_USER], "but can mark performed with evidence");
+  assert.equal((await as(B_USER, `update tasks set notes = 'x' where id = '${t.id}' returning id`)).length, 0, "another company can't touch it");
+  assert.equal(await count(B_USER, `select count(*) from tasks where id = '${t.id}'`), 0, "or see it");
+  await db.exec(`delete from tasks where id = '${t.id}'`);
+});
