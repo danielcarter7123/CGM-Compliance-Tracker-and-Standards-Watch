@@ -16,7 +16,7 @@ async function openTask(page: Page, status: string, nth: "first" | "last" = "fir
 
 test("tasks: create, mark performed, next occurrence, staff can't approve, PM approves", async ({ page, request }) => {
   await signIn(page, "staff@cgm.example", "/tracker/tasks");
-  await page.getByRole("link", { name: "New task" }).click();
+  await page.getByRole("main").getByRole("link", { name: "New task" }).click();
   const form = page.getByRole("region", { name: "New task" });
   await form.getByLabel("Task", { exact: true }).fill(TITLE);
   await form.getByLabel("Client").selectOption({ label: "Demo Wind Farm LLC (fake)" });
