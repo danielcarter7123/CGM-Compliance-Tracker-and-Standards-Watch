@@ -4,6 +4,8 @@ import { REGIONS } from "@/lib/functions";
 import { requireStaff } from "@/lib/guards";
 import { createClient } from "@/lib/supabase/server";
 import { fmt } from "@/lib/watch";
+import { addMissingTasks } from "../tasks/actions";
+import { taskKey } from "@/lib/tasks";
 import { deleteClient, removeSamples, saveClient, setClientProducts } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -28,7 +30,7 @@ export default async function Clients({ searchParams }: { searchParams: { c?: st
     db.from("companies").select("id, name, ncr_id, region, reg_date, functions, entities, facilities, sharepoint_url, notes, sample").order("name"),
     db.from("contacts").select("id, company_id, kind, name, email, digest"),
     db.from("entitlements").select("company_id, product, status"),
-    db.from("tasks").select("company_id").neq("status", "done"),
+    db.from("tasks").select("company_id, title, standard_code, requirement, sample").neq("status", "done"),
   ]);
   const entsOf = (id: string) => ((ents || []) as Ent[]).filter((e) => e.company_id === id);
   const has = (id: string, p: string) => entsOf(id).some((e) => e.product === p && isLive(e.status));
@@ -134,6 +136,30 @@ export default async function Clients({ searchParams }: { searchParams: { c?: st
               )}
             </fieldset>
           </form>
+
+          {!isNew && (
+            (() => {
+              const others = new Set((openTasks || []).filter((t) => t.company_id !== sel.id && !t.sample).map(taskKey));
+              const mine = new Set((openTasks || []).filter((t) => t.company_id === sel.id).map(taskKey));
+              const missing = [...others].filter((k) => !mine.has(k)).length;
+              return (
+                <div className="callout">
+                  <b>Task set</b>
+                  {missing ? (
+                    <>
+                      <span>{mine.size ? `Missing tasks: ${missing} task${missing === 1 ? " is" : "s are"} assigned to other clients but not to this one.` : `Assign all ${missing} tracker tasks to this client. Copies come without due dates; set each one so reminders and digests can track it.`}</span>
+                      <form action={addMissingTasks}>
+                        <input type="hidden" name="company_id" value={sel.id} />
+                        <button className="btn-line sm" type="submit">{mine.size ? `Add ${missing} missing task${missing === 1 ? "" : "s"}` : `Assign all ${missing} tracker tasks`}</button>
+                      </form>
+                    </>
+                  ) : (
+                    <span>This client has every task in the tracker.</span>
+                  )}
+                </div>
+              );
+            })()
+          )}
 
           {!isNew && (
             <form action={setClientProducts} className="trk-form addons">

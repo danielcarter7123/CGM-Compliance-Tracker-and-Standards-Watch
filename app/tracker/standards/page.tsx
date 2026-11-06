@@ -1,6 +1,7 @@
 import { requireTracker } from "@/lib/guards";
 import { REGISTERED_FUNCTIONS, standardLink } from "@/lib/functions";
 import { createClient } from "@/lib/supabase/server";
+import { createAllForClient } from "../tasks/actions";
 import { deleteStandard, saveLink, saveStandard, saveVersion } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -19,10 +20,12 @@ export default async function StandardsLibrary({ searchParams }: { searchParams:
   const v = await requireTracker("/tracker/standards");
   const canEdit = v.canApprove;
   const db = createClient();
-  const [{ data: stds, error }, { data: tpls }, { data: open }] = await Promise.all([
+  const staff = v.isStaff;
+  const [{ data: stds, error }, { data: tpls }, { data: open }, { data: clients }] = await Promise.all([
     db.from("library_standards").select("code, version, title, family, applies, url, notes, custom").order("code"),
     db.from("obligation_templates").select("*").order("pos"),
     db.from("tasks").select("standard_code").neq("status", "done").not("standard_code", "is", null),
+    v.isStaff ? db.from("companies").select("id, name").order("name") : Promise.resolve({ data: [] as { id: string; name: string }[] }),
   ]);
   const all = (stds || []) as Std[];
   const byStd = new Map<string, Tpl[]>();
@@ -193,17 +196,31 @@ export default async function StandardsLibrary({ searchParams }: { searchParams:
                         {list.length ? (
                           <ul className="tpls">
                             {list.map((t) => (
-                              <li key={t.id}>
-                                <b>{t.title}</b>
-                                <span className="muted mono small">
-                                  {t.req ? `${t.req} · ` : ""}{recurText(t)}
-                                  {t.recur_n > 0 && !t.basis_confirmed && <span className="chip warn" title="Repeat-from setting not yet confirmed by CGM">SUGGESTED</span>}
+                              <li key={t.id} className="tplrow">
+                                <span className="tpltext">
+                                  <b>{t.title}</b>
+                                  <span className="muted mono small">
+                                    {t.req ? `${t.req} · ` : ""}{recurText(t)}
+                                    {t.recur_n > 0 && !t.basis_confirmed && <span className="chip warn" title="Repeat-from setting not yet confirmed by CGM">SUGGESTED</span>}
+                                  </span>
                                 </span>
+                                {staff && <a className="btn-line sm" href={`/tracker/tasks?t=new&tpl=${t.id}`}>Create task</a>}
                               </li>
                             ))}
                           </ul>
                         ) : (
                           <p className="muted">No obligation templates for this standard yet.</p>
+                        )}
+                        {staff && list.some((t) => t.recur_n > 0) && (
+                          <form action={createAllForClient} className="toolbar bulkcreate">
+                            <input type="hidden" name="standard_code" value={s.code} />
+                            <select name="company_id" defaultValue="" aria-label={`Client for all ${s.code} tasks`}>
+                              <option value="">Choose client…</option>
+                              {(clients || []).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                            </select>
+                            <button className="btn-main sm" type="submit">Create all recurring tasks for client</button>
+                            <span className="muted small">Due one interval from today. Adjust each to the last completed date.</span>
+                          </form>
                         )}
                       </div>
                     </div>

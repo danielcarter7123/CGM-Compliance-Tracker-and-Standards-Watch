@@ -2,6 +2,39 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 5, 2026: T2 tasks core (Claude Code)
+
+**Tasks screen** (`/tracker/tasks`, every Tracker user; RLS limits clients to their own company):
+- the pilot's toolbar: search over title, standard, requirement, facility, assignee, notes and client;
+- status filters: All open · Reminders active · Needs due date · Pending review · Report not posted · Overdue · Due ≤ 30 days · Completed · All tasks;
+- client, standard and function filters;
+- the pilot's columns and status pills, including the red dashed "report pending" pill;
+- sorted by due date with no date last; Completed sorts newest first.
+
+**Export CSV** (`/tracker/tasks/export`): the pilot's 14 columns, following the current filters, read with the person's own access.
+
+**Task details:**
+- **Staff edit every field:** client, facility, standard (with its link), requirement, due date, assignee, reminders (90/60/30/14/7/1, with the next reminder date), repeats every N months, years or days, repeat from, status, evidence and notes.
+- **Checks:** a task needs a title, a client and a due date. Evidence links must be https. The performed date can't be in the future.
+- **Mark performed** takes two steps, as in the pilot. It shows the next due date beforehand, and the database creates the next occurrence once.
+- **Approve & close** (project managers and admins; the database refuses anyone else, and its message is shown) asks for confirmation when no report link is posted. **Send back** is there too.
+- **Links:** previous and next occurrence.
+- **Delete** asks for confirmation.
+- **Client users** see the facts read-only. They can mark performed and save evidence and notes.
+
+**Library and clients:**
+- **Create task** on each library obligation opens a prefilled new task: due one interval from today, reminders [30, 7] or [7, 1] for day intervals.
+- **Create all recurring tasks for client** works per standard.
+- **Client details:** "Assign all N tracker tasks" (new client) or "Add N missing tasks" copies one task for each distinct open title, standard and requirement, without due dates. It then opens Tasks filtered to "Needs due date".
+
+**Rules:** `lib/tasks.ts` holds the pilot's states, reminders, filters, CSV and task-set key. `nextDuePreview` mirrors SQL `next_due`, and a test checks them against each other on month ends, leap years and calendar years.
+
+**Tests:**
+- unit: next-due agreement with SQL; states, reminders, filters and CSV;
+- e2e `tracker-t2.spec.ts`: staff create → mark performed → next occurrence due Feb 28, 2027 for a Jan 31 monthly task → staff approve refused with the database message → client can only post evidence and notes → PM approves; the CSV follows the filters; library Create task prefills.
+
+**Left for later:** task plans (T4), Discuss and Outlook reminders (T6 and T8), and the completion-date "move next occurrence" prompt.
+
 ## Nov 5, 2026: sign-in is the front door (Claude Code)
 
 - **Dan's follow-up:** the split-screen sign-in page is the app's front door. `/` sends signed-out visitors to `/login` (no app header), and signed-in people to their home.

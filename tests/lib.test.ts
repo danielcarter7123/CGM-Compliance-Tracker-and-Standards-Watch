@@ -220,3 +220,59 @@ test("drafting job: a submission becomes drafts in the Monday task's shape, chec
   assert.ok(Object.keys(rows[0]).sort().join() === ["created_by", "id", "key", "label", "op", "reason", "refs", "section", "status", "value"].join(), "draft row columns");
   assert.equal(estimateCost({ input: 100000, output: 10000, cacheRead: 200000, cacheWrite: 0, searches: 10 }), 0.74);
 });
+
+test("tasks: next-due preview agrees with SQL next_due, including month ends, leap years and calendar years", async () => {
+  const { nextDuePreview } = await import("../lib/tasks");
+  const { freshDb } = await import("./helpers/pg.mjs");
+  const db = await freshDb();
+  const cases: [string, number, "d" | "m" | "y"][] = [
+    ["2026-01-31", 1, "m"], ["2028-01-31", 1, "m"], ["2026-03-31", 3, "m"], ["2026-08-31", 6, "m"], ["2026-11-30", 15, "m"],
+    ["2026-12-15", 12, "m"], ["2026-05-10", 84, "m"], ["2026-02-28", 35, "d"], ["2028-02-28", 1, "d"], ["2026-12-31", 90, "d"],
+    ["2026-06-15", 1, "y"], ["2026-01-01", 3, "y"], ["2026-12-31", 6, "y"],
+  ];
+  for (const [base, n, unit] of cases) {
+    const { rows } = await db.query<{ d: string }>(`select public.next_due($1::date, $2, $3)::text as d`, [base, n, unit]);
+    assert.equal(nextDuePreview(base, n, unit), rows[0].d, `${base} + ${n}${unit}`);
+  }
+});
+
+test("tasks: states, reminders, filters and CSV follow the pilot", async () => {
+  const t = await import("../lib/tasks");
+  const today = parseDate("2026-11-05");
+  const base = { id: "x", company_id: "c1", title: "Fake battery check", facility: "Unit 1", standard_code: "PRC-005", requirement: "R3", due_date: "2026-11-20",
+    assignee_text: "Fake Tech", remind_days: [30, 7], recur_n: 6, recur_unit: "m", recur_basis: "due", status: "open", evidence: null, notes: null,
+    completed_at: null, performed_by: null, reviewed_at: null, reviewed_by: null, prev_id: null, next_id: null, copied_from: null, sample: false } as any;
+  assert.equal(t.taskState(base, today), "window");
+  assert.equal(t.taskState({ ...base, due_date: "2027-03-01" }, today), "scheduled");
+  assert.equal(t.taskState({ ...base, due_date: "2027-03-01", status: "inprogress" }, today), "inprogress");
+  assert.equal(t.taskState({ ...base, due_date: "2026-11-01" }, today), "overdue");
+  assert.equal(t.taskState({ ...base, due_date: null }, today), "nodate");
+  assert.equal(t.pill({ ...base, status: "review", completed_at: "2026-11-03" }, today).cls, "reportdue");
+  assert.equal(t.pill({ ...base, status: "review", evidence: "https://sharepoint.example/fake" }, today).cls, "review");
+  assert.equal(t.whenText({ ...base, status: "review", completed_at: "2026-11-03" }, today), "Performed Nov 3, 2026 · report pending 2 days");
+  assert.deepEqual(t.nextReminder({ ...base, due_date: "2026-12-20" }, today), { date: "2026-11-20", offset: 30 });
+  assert.deepEqual(t.nextReminder({ ...base, due_date: "2026-11-30" }, today), { date: "2026-11-23", offset: 7 });
+  assert.equal(t.nextReminder({ ...base, due_date: "2026-11-06" }, today), null);
+  assert.deepEqual(t.defaultReminders("d"), [7, 1]);
+
+  const rows = [
+    { ...base, id: "a", due_date: "2026-12-01" },
+    { ...base, id: "b", due_date: null },
+    { ...base, id: "c", status: "done", completed_at: "2026-10-01" },
+    { ...base, id: "d", status: "review", completed_at: "2026-11-01" },
+    { ...base, id: "e", due_date: "2026-10-01", company_id: "c2", standard_code: "CIP-004" },
+  ];
+  const lookup = { clientName: (id: string) => (id === "c2" ? "Fake Other LLC" : "Fake Peaker LLC"), applies: (c: string | null) => (c === "CIP-004" ? ["GO"] : ["GO", "TO"]) };
+  const ids = (f: any) => t.filterTasks(rows, f, lookup, today).map((r) => r.id);
+  assert.deepEqual(ids({}), ["e", "d", "a", "b"], "open, by due date, no date last");
+  assert.deepEqual(ids({ status: "done" }), ["c"]);
+  assert.deepEqual(ids({ status: "nodate" }), ["b"]);
+  assert.deepEqual(ids({ status: "noreport" }), ["d"]);
+  assert.deepEqual(ids({ status: "overdue" }), ["e"]);
+  assert.deepEqual(ids({ status: "all", fn: "TO" }), ["c", "d", "a", "b"], "function filter uses the standard's Applies to");
+  assert.deepEqual(ids({ q: "other llc" }), ["e"], "search includes the client name");
+  const csv = t.tasksCsv([rows[0]], { client: () => ({ name: "Fake Peaker LLC", ncr_id: "NCR00000" }), version: () => "6" }, today);
+  assert.equal(csv.split("\r\n")[0], '"Client","NCR ID","Standard","Version","Requirement","Task","Facility","Assignee","Due date","Status","Repeats","Completed","Evidence","Notes"');
+  assert.match(csv.split("\r\n")[1], /^"Fake Peaker LLC","NCR00000","PRC-005","6","R3","Fake battery check"/);
+  assert.equal(t.taskKey({ title: " Fake Battery Check ", standard_code: "PRC-005", requirement: "R3" }), "fake battery check|PRC-005|r3");
+});

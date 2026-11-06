@@ -13,7 +13,7 @@ export function appSections(v: Viewer | null): Section[] {
   if (v.products.tracker) {
     out.push(
       { label: "Dashboard", href: "/tracker" },
-      { label: "Tasks" },
+      { label: "Tasks", href: "/tracker/tasks" },
       ...(!v.isStaff && v.products.client_tasks ? [{ label: "Client Tasks" }] : []),
       ...(v.isStaff ? [{ label: "Team Tasks" }] : []),
       { label: "Standards Library", href: "/tracker/standards" },
