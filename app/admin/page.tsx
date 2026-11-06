@@ -1,7 +1,9 @@
 import { requireAdmin } from "@/lib/guards";
 import { isLive } from "@/lib/entitlements";
 import { emailsEnabled, emailsKilledByEnv } from "@/lib/settings";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { runTrackerEmails } from "@/lib/tracker-job";
 import { addCompany, setEmails, setPerson, setProducts } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -20,8 +22,10 @@ type Ent = { company_id: string; product: string; status: string; source: string
 type Person = { id: string; email: string | null; full_name: string | null; staff_role: string | null; company_id: string | null; company_role: string };
 
 /** CGM admin only: which products each company holds, who is CGM staff, who belongs to which company, and app switches. */
-export default async function AdminPage({ searchParams }: { searchParams: { ok?: string; error?: string } }) {
+export default async function AdminPage({ searchParams }: { searchParams: { ok?: string; error?: string; preview?: string } }) {
   await requireAdmin();
+  // Checked as a CGM admin above; the dry run reads with the service role and sends nothing.
+  const preview = searchParams.preview ? await runTrackerEmails(createAdminClient(), { dryRun: true }) : null;
   const db = createClient();
   const [{ data: companies }, { data: ents }, { data: people }, emailsOn] = await Promise.all([
     db.from("companies").select("id, name, sample, seats").order("name"),
@@ -56,6 +60,31 @@ export default async function AdminPage({ searchParams }: { searchParams: { ok?:
           <input type="hidden" name="on" value={emailsOn ? "false" : "true"} />
           <button className={emailsOn ? "btn-line" : "btn-main"} type="submit">{emailsOn ? "Turn emails off" : "Turn emails on"}</button>
         </form>
+      </section>
+
+      <section className="cardbox wide" id="tracker-emails">
+        <h2>CGM Compliance Tracker emails</h2>
+        <p style={{ margin: 0 }}>
+          Weekdays at 14:00 UTC (7 a.m. Mountain, 8 a.m. in summer): client digests to each client&apos;s contacts, one digest per
+          project manager across their clients, task reminders to assignees and team-task owners, and a daily unread-messages
+          notice. Each email has an unsubscribe link; nothing goes out twice in a day.
+        </p>
+        {preview ? (
+          preview.skipped ? <p className="muted" style={{ margin: 0 }}>{preview.skipped}</p> : (
+            <div className="tablewrap">
+              <table className="grid">
+                <caption className="muted" style={{ textAlign: "left" }}>What would go out today ({preview.today}), whether or not emails are on: {preview.planned.length} email{preview.planned.length === 1 ? "" : "s"}.</caption>
+                <thead><tr><th>Kind</th><th>To</th><th className="num">Items</th><th>Subject</th></tr></thead>
+                <tbody>
+                  {preview.planned.map((p, i) => (
+                    <tr key={i}><td>{({ client_digest: "Client digest", pm_digest: "PM digest", reminders: "Reminders", messages: "Unread messages" } as Record<string, string>)[p.kind]}</td><td>{p.to}</td><td className="num">{p.items}</td><td>{p.subject}</td></tr>
+                  ))}
+                  {!preview.planned.length && <tr><td colSpan={4} className="muted">Nothing to send today.</td></tr>}
+                </tbody>
+              </table>
+            </div>
+          )
+        ) : <p style={{ margin: 0 }}><a className="btn-line" href="/admin?preview=1#tracker-emails">Preview today&apos;s Tracker emails</a></p>}
       </section>
 
       <section className="cardbox wide">

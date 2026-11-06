@@ -1,6 +1,16 @@
 {
   "crons": [
-    { "path": "/api/jobs/alerts", "schedule": "0 13 * * *" },
-    { "path": "/api/jobs/watch-drafts", "schedule": "0 17 * * 1" }
+    {
+      "path": "/api/jobs/alerts",
+      "schedule": "0 13 * * *"
+    },
+    {
+      "path": "/api/jobs/watch-drafts",
+      "schedule": "0 17 * * 1"
+    },
+    {
+      "path": "/api/jobs/tracker-emails",
+      "schedule": "0 14 * * 1-5"
+    }
   ]
 }

@@ -2,6 +2,22 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 6, 2026: T8 Tracker emails and task calendar (Claude Code)
+
+All built and tested, and **off** until a CGM admin turns automated emails on (Admin page; `EMAILS_DISABLED` still overrides). Turn them on only after the live tracker's sender is off (OPEN-QUESTIONS 1), so nobody gets both.
+- **One weekday job** (`/api/jobs/tracker-emails`, `vercel.json` cron `0 14 * * 1-5`: 7 a.m. Mountain, 8 a.m. in summer; change the schedule there). Logged per email per day (`tracker_email_log`), so a retried run never sends twice. Monday's run also covers windows that started on the weekend.
+  - **Client digest** to each Tracker client's compliance contact and plant manager whose digest tick is on: overdue, due in the next 30 days, performed but missing the report, and waiting for CGM's review. Skipped when there's nothing to say.
+  - **PM digest:** one email per PM across all their clients (the client record's PM contact and the assigned CGM PM).
+  - **Reminders** (the live tracker's per-person emails): a task's assignee (`assignee_email`, or the assigned login) when a reminder window starts, on the due date and every weekday while overdue; a team task's owner 7 days before the anticipated date, on it and every weekday while late. One email per person listing everything.
+  - **Unread messages** (decision 6): at most one notice a day, only when something new arrived since the last one.
+  - Tasks without a due date, done tasks, sample clients and client tasks are never included. Links open the task, never a file.
+- **Unsubscribe:** every email has a link and one-click headers. Tracker links carry the address and kind encrypted (no email address in any URL) and work without a login (`email_optouts`). Signed-in people manage the three kinds on their account page.
+- **Task calendar** (decision 7): a personal feed on the account page (`/api/calendar/tracker/<token>`): a client user's own company's open tasks; for CGM staff, their clients' tasks (all clients if they manage none) and their team tasks.
+- **Admin preview:** "Preview today's Tracker emails" on the Admin page lists what would go out today, sending nothing.
+- **Fix:** the service-role client no longer lets Next.js cache database reads, which could have served stale data to the Watch calendar feed and the alert job too.
+- **Migration `0015_tracker_emails.sql`:** `email_optouts` (each person only their own address), `tracker_email_log` (staff read; job writes).
+- **Tests:** RLS (opt-outs own-only, log job-only); lib (sections, reminder timing including Monday catch-up and team tasks, rendering and escaping); `e2e/tracker-emails.spec.ts` (job sends the digest and reminder to Mailpit once, the unsubscribe page and one-click link, account settings, calendar scope, admin preview).
+
 ## Nov 6, 2026: T5b evidence: uploads and links (Claude Code)
 
 Built now; SharePoint browsing, picking and uploading to SharePoint wait for CGM's Microsoft (Entra) registration (`docs/EVIDENCE.md`).
@@ -10,7 +26,7 @@ Built now; SharePoint browsing, picking and uploading to SharePoint wait for CGM
   - PDF, Office, images, email, text, ZIP and similar; up to 50 MB (the storage limit in `supabase/config.toml`).
   - The browser puts it straight into the client's folder of the private `evidence` bucket (`<company>/<task>/<uuid>-<name>`, or `ct-<id>` for client tasks) with the person's own session; storage rules allow only their client's folder, and files are never overwritten.
   - The server then checks the path, type, size and that the object is really there, and records it with its SHA-256.
-  - On CIP tasks the person must confirm the file contains no BES Cyber System Information (checked in the browser and on the server). Open question 19 asks Dan whether to block CIP uploads instead.
+  - On CIP tasks the person must confirm the file contains no BES Cyber System Information (checked in the browser and on the server). Dan kept this confirmation rather than blocking CIP uploads (decision 19, Nov 6, 2026).
 - **Paste a link:** any https link, with an optional name. (Resolving SharePoint links to items comes with the Graph connection.)
 - **Open:** `/tracker/evidence/<id>` goes to a link's address, or downloads a file through a 60-second signed URL, as the signed-in person.
 - **Remove:** whoever added it, or CGM staff; it stays on record as removed (who and when). Files aren't deleted (no purge until Dan sets retention).

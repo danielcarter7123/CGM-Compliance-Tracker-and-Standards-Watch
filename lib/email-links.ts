@@ -1,5 +1,5 @@
 import "server-only";
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { siteUrl } from "./stripe";
 
 /* Signed unsubscribe links. The weekly digest is on by default; alerts are an opt-in extra. Each kind has its own
@@ -37,5 +37,45 @@ export const unsubscribePage = (uid: string, kind: ListKind) => `${siteUrl()}/un
 /** Headers for one-click unsubscribe in Gmail, Outlook and Apple Mail (RFC 8058). */
 export const unsubscribeHeaders = (uid: string, kind: ListKind) => ({
   "List-Unsubscribe": `<${siteUrl()}/api/unsubscribe?${query(uid, kind)}>`,
+  "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+});
+
+/* Tracker emails go to addresses that may have no login (client contacts, imported assignees), so their unsubscribe
+   links carry the address and kind encrypted (AES-256-GCM with a key derived from EMAIL_LINK_SECRET): no email
+   address appears in a URL, and a link can't be forged or altered. Opt-outs are kept by address (email_optouts). */
+
+export type TrackerKind = "tracker_digest" | "tracker_reminders" | "messages";
+export const TRACKER_LIST_NAME: Record<TrackerKind, string> = {
+  tracker_digest: "the weekday CGM Compliance Tracker digest",
+  tracker_reminders: "CGM Compliance Tracker task reminders",
+  messages: "the daily unread-messages notice",
+};
+export const isTrackerKind = (k: unknown): k is TrackerKind => k === "tracker_digest" || k === "tracker_reminders" || k === "messages";
+
+const key = () => createHash("sha256").update(`tracker-unsub:${secret()}`).digest();
+
+export function sealOptOut(email: string, kind: TrackerKind): string {
+  const iv = randomBytes(12);
+  const c = createCipheriv("aes-256-gcm", key(), iv);
+  const body = Buffer.concat([c.update(`${kind}\n${email.toLowerCase()}`, "utf8"), c.final()]);
+  return Buffer.concat([iv, c.getAuthTag(), body]).toString("base64url");
+}
+
+export function openOptOut(token: string): { email: string; kind: TrackerKind } | null {
+  try {
+    const raw = Buffer.from(token, "base64url");
+    if (raw.length < 30 || raw.length > 600) return null;
+    const d = createDecipheriv("aes-256-gcm", key(), raw.subarray(0, 12));
+    d.setAuthTag(raw.subarray(12, 28));
+    const [kind, email] = Buffer.concat([d.update(raw.subarray(28)), d.final()]).toString("utf8").split("\n");
+    return isTrackerKind(kind) && /^[^@\s]+@[^@\s]+$/.test(email || "") ? { email, kind } : null;
+  } catch {
+    return null;
+  }
+}
+
+export const optOutPage = (email: string, kind: TrackerKind) => `${siteUrl()}/unsubscribe?x=${sealOptOut(email, kind)}`;
+export const optOutHeaders = (email: string, kind: TrackerKind) => ({
+  "List-Unsubscribe": `<${siteUrl()}/api/unsubscribe?x=${sealOptOut(email, kind)}>`,
   "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
 });

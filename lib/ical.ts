@@ -60,3 +60,27 @@ export function buildCalendar({ items, deadlines, functions, site, now = new Dat
   lines.push("END:VCALENDAR");
   return lines.map(fold).join("\r\n") + "\r\n";
 }
+
+export type TaskEvent = { id: string; kind: "task" | "team"; date: string; title: string; client: string; code: string };
+
+/** The CGM Compliance Tracker task calendar (OPEN-QUESTIONS 7: calendar feeds instead of Outlook writes). One all-day
+ *  event per open task on its due date (team tasks on their anticipated date). UIDs depend only on the task, so a
+ *  moved due date updates the event in place. */
+export function buildTaskCalendar(events: TaskEvent[], site: string, now = new Date()): string {
+  const stamp = now.toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
+  const lines: string[] = [
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//CGM Consulting Group//Compliance Tracker//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+    "X-WR-CALNAME:CGM Compliance Tracker", "NAME:CGM Compliance Tracker",
+    "REFRESH-INTERVAL;VALUE=DURATION:PT6H", "X-PUBLISHED-TTL:PT6H",
+  ];
+  for (const e of events.filter((x) => isDay(x.date))) {
+    const url = e.kind === "team" ? `${site}/tracker/team?scope=everyone&status=all&t=${e.id}` : `${site}/tracker/tasks?status=all&t=${e.id}`;
+    const summary = `${e.kind === "team" ? "Team: " : "Due: "}${e.code ? `${e.code} ` : ""}${e.title}${e.client ? ` (${e.client})` : ""}`;
+    lines.push("BEGIN:VEVENT", `UID:${e.kind}-${e.id}@cgm-compliance-tracker`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${day(e.date)}`,
+      `DTEND;VALUE=DATE:${nextDay(e.date)}`, `SUMMARY:${ESCAPE(summary)}`,
+      `DESCRIPTION:${ESCAPE(`${e.kind === "team" ? "Anticipated completion" : "Due date"} in CGM Compliance Tracker.\n${url}`)}`, `URL:${url}`,
+      "TRANSP:TRANSPARENT", "END:VEVENT");
+  }
+  lines.push("END:VCALENDAR");
+  return lines.map(fold).join("\r\n") + "\r\n";
+}

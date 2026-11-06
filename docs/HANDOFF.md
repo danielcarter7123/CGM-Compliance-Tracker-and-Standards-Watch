@@ -47,7 +47,7 @@ Watch pilot results: first Monday run Nov 2, 2026. Ten drafts were queued and al
 | **Live-data import** (`0004_legacy_import.sql`, `scripts/import-tracker.ts`): the live tracker's export becomes one SQL transaction (clients, contacts, Tracker entitlements, library, tasks with recurrence chains, team tasks, people, full history, deleted-record snapshots), keeping every original document in `legacy` | 8 import tests on a fake export shaped like the real one |
 | Seed data: `data/pilot-content.json` (live Watch content, Nov 2 review) and `data/tracker-standards-library.json` (CGM's 48 standards and 72 obligation templates; **no client data**) | load tests |
 
-Not built yet (T1, T2, T2a, T3, T5, T6, T7, the Client Tasks screen and evidence uploads are done, see CHANGELOG): the Microsoft Graph (SharePoint) code for evidence, task plans, tracker digests and reminders, and anything run against live Supabase, Stripe, Resend or Microsoft 365 (no accounts yet).
+Not built yet (T1, T2, T2a, T3, T5, T6, T7, T8, the Client Tasks screen and evidence uploads are done, see CHANGELOG): the Microsoft Graph (SharePoint) code for evidence, task plans (waiting on Dan's file), billing (waiting on prices), and anything run against live Supabase, Stripe, Resend or Microsoft 365 (no accounts yet).
 
 ### Client data: carried over, not re-entered
 
@@ -181,6 +181,7 @@ Each milestone ends with `npm run typecheck && npm test && npm run build` green 
   - On cutover day: pause edits, export, import to production, reconcile, then switch the team over.
   - Export the Sandbox Copy's task plans too (add the same button there).
   - Retire the Watch sync task and the tracker's email sender, then make both pilot trackers read-only.
+  - Only then turn on automated emails (Admin page), after checking "Preview today's Tracker emails".
 
 ### Production hardening (shared)
 - **P1.**

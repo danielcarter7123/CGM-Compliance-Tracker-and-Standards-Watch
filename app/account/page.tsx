@@ -4,7 +4,8 @@ import { siteUrl } from "@/lib/stripe";
 import TeamCard from "@/components/TeamCard";
 import { ALL_FUNCTIONS, REGIONS } from "@/lib/types";
 import { fmt } from "@/lib/watch";
-import { savePreferences, signOut } from "./actions";
+import { createClient } from "@/lib/supabase/server";
+import { savePreferences, saveTrackerEmails, signOut } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,10 @@ export default async function AccountPage({ searchParams }: { searchParams: { sa
   if (!v) redirect("/login?next=/account");
   const stripeWatch = v.entitlements.find((e) => e.product === "watch" && e.source === "stripe");
   const calUrl = `${siteUrl()}/api/calendar/${v.calendarToken}`;
+  const trackerCal = `${siteUrl()}/api/calendar/tracker/${v.calendarToken}`;
+  const tracker = v.isStaff || v.products.tracker;
+  const { data: outs } = tracker ? await createClient().from("email_optouts").select("kind") : { data: [] };
+  const off = new Set((outs || []).map((o) => o.kind as string));
 
   return (
     <main className="wrap page" style={{ display: "grid", gap: 18 }}>
@@ -102,6 +107,32 @@ export default async function AccountPage({ searchParams }: { searchParams: { sa
           <p style={{ margin: 0 }}>Add this address as a subscribed calendar in Outlook or Google Calendar. Effective dates, phased compliance dates and comment deadlines for your functions appear automatically.</p>
           <code style={{ font: "13px var(--mono)", overflowWrap: "anywhere", background: "var(--sunk)", padding: "8px 10px", borderRadius: 4 }}>{calUrl}</code>
           <span className="muted" style={{ fontSize: 13 }}>Treat this address like a password: anyone with it can see your feed.</span>
+        </section>
+      )}
+
+      {tracker && (
+        <form className="cardbox" action={saveTrackerEmails} id="tracker-emails">
+          <h2>CGM Compliance Tracker emails</h2>
+          <p style={{ margin: 0 }} className="muted">Sent on weekday mornings, only for tasks with a due date. Client tasks are never included.</p>
+          {[
+            ["tracker_digest", "Weekday digest of overdue and coming-due tasks (for the clients you're a contact or project manager for)"],
+            ["tracker_reminders", "Reminders for tasks assigned to me: when a reminder window starts, on the due date, and each weekday while overdue"],
+            ["messages", "One notice a day when I have new unread messages"],
+          ].map(([k, label]) => (
+            <label key={k} className="checkrow">
+              <input type="checkbox" name={k} defaultChecked={!off.has(k)} /> {label}
+            </label>
+          ))}
+          <div><button className="btn-main" type="submit">Save email settings</button></div>
+        </form>
+      )}
+
+      {tracker && (
+        <section className="cardbox">
+          <h2>Task calendar</h2>
+          <p style={{ margin: 0 }}>Subscribe to this address in Outlook or Google Calendar to see task due dates{v.isStaff ? " (your clients' tasks and your team tasks)" : ` for ${v.company?.name || "your company"}`}. It updates on its own.</p>
+          <code style={{ font: "13px var(--mono)", overflowWrap: "anywhere", background: "var(--sunk)", padding: "8px 10px", borderRadius: 4 }}>{trackerCal}</code>
+          <span className="muted" style={{ fontSize: 13 }}>Treat this address like a password: anyone with it can see these due dates.</span>
         </section>
       )}
 

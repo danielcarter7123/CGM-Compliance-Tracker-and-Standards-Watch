@@ -420,3 +420,45 @@ test("client tasks: states, filters, stats and CSV follow the pilot", async () =
   assert.equal(csv[0], '"Client","Task","Description","Category","Assigned to","Responsible party","Due date","Priority","Status","Completed","Repeats","Links","Notes"');
   assert.equal(csv[1], '"Fake Peaker","Fake safety walk","","","","Contractor / vendor","2026-11-20","High","Not started","","Every 3 months","",""');
 });
+
+test("tracker emails: digest sections, reminder timing (incl. Monday catch-up) and rendering", async () => {
+  const m = await import("../lib/tracker-mail");
+  const t = (id: string, due: string | null, status = "open", extra = {}) =>
+    ({ id, company_id: "c1", title: `Fake ${id}`, standard_code: "PRC-005", requirement: "R3", facility: null, due_date: due, status, remind_days: [30, 7], evidence: null, ...extra }) as import("../lib/tracker-mail").MailTask;
+  const today = "2026-11-06"; // a Friday
+  const tasks = [t("late", "2026-11-01"), t("soon", "2026-11-20"), t("far", "2027-01-01"), t("nodate", null),
+    t("perf", "2026-10-01", "review"), t("perfok", "2026-10-02", "review", { evidence: "https://example.com/r" }), t("up", "2026-10-03", "review", { has_evidence: true })];
+  const s = m.digestSections(tasks, today);
+  assert.deepEqual([s.overdue, s.due30, s.noReport, s.review].map((l) => l.map((x) => x.id)), [["late"], ["soon"], ["perf"], ["perfok", "up"]]);
+  assert.equal(m.sectionCount(s), 5);
+
+  // Reminders: window start, due date, every day overdue; nothing otherwise.
+  assert.equal(m.taskReminder(t("a", "2026-12-06"), today), "due in 30 days");
+  assert.equal(m.taskReminder(t("a", "2026-11-13"), today), "due in 7 days");
+  assert.equal(m.taskReminder(t("a", "2026-11-12"), today), null);
+  assert.equal(m.taskReminder(t("a", "2026-11-06"), today), "due today");
+  assert.equal(m.taskReminder(t("a", "2026-11-04"), today), "2 days overdue");
+  assert.equal(m.taskReminder(t("a", "2026-11-04", "review"), today), null);
+  // Monday covers the weekend: a 7-day window that started Saturday or Sunday.
+  assert.equal(m.lookbackDays("2026-11-09"), 3);
+  assert.equal(m.lookbackDays("2026-11-10"), 1);
+  assert.equal(m.taskReminder(t("a", "2026-11-14"), "2026-11-09", 3), "due in 5 days");
+  assert.equal(m.taskReminder(t("a", "2026-11-13"), "2026-11-09", 3), null, "started the previous Friday: already sent");
+  assert.equal(m.isWeekday("2026-11-07"), false);
+  // Team tasks: 7 days before, on the day, while late.
+  assert.equal(m.teamReminder({ status: "inprogress", planned_date: "2026-11-13" }, today), "anticipated in 7 days");
+  assert.equal(m.teamReminder({ status: "inprogress", planned_date: "2026-11-10" }, today), null);
+  assert.equal(m.teamReminder({ status: "notstarted", planned_date: "2026-11-06" }, today), "anticipated today");
+  assert.equal(m.teamReminder({ status: "onhold", planned_date: "2026-11-05" }, today), "1 day past the anticipated date");
+  assert.equal(m.teamReminder({ status: "done", planned_date: "2026-11-05" }, today), null);
+
+  const d = m.renderClientDigest("Fake Client", s, "https://app.example", "https://app.example/unsubscribe?x=abc");
+  assert.equal(d.subject, "Fake Client: 1 overdue, 1 due in 30 days, 1 missing a report · CGM Compliance Tracker");
+  assert.ok(d.text.includes("OVERDUE (1)") && d.text.includes("Nov 1, 2026 · PRC-005 R3 · Fake late"));
+  assert.ok(d.html.includes("https://app.example/tracker/tasks?status=all&amp;t=late") && d.html.includes("Unsubscribe"));
+  assert.ok(!d.text.includes("Fake far") && !d.text.includes("Fake nodate"));
+  const r = m.renderReminders([{ kind: "task", id: "x", title: "Fake <relay>", date: "2026-11-04", note: "2 days overdue", client: "Fake Client" }], "https://app.example", "u");
+  assert.equal(r.subject, "Reminder: Fake <relay> is 2 days overdue");
+  assert.ok(r.html.includes("Fake &lt;relay&gt;"), "escaped");
+  assert.equal(m.renderMessagesNotice(2, "https://app.example", "u").subject, "You have unread messages · CGM Compliance Tracker");
+});

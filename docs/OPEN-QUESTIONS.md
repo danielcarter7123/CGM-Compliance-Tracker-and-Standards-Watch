@@ -40,12 +40,6 @@ Running `npm install`, `npm run typecheck`, `npm test` and `npm run build`, and 
    - legal review;
    - any client-required security controls.
 
-19. **CIP files in app storage** (added Nov 6, 2026; T5b is built with a safeguard meanwhile):
-   - Until CGM's Microsoft registration connects SharePoint, "Upload file" saves to the app's private storage.
-   - CIP evidence may include BES Cyber System Information, which `docs/EVIDENCE.md` keeps in SharePoint by default.
-   - Today, uploading on a CIP task asks the person to confirm "This file contains no BES Cyber System Information", and points them to paste a SharePoint link otherwise.
-   - Is that right, or should uploads on CIP tasks be blocked entirely until SharePoint is connected?
-
 ## Answered
 
 ### Nov 5, 2026 (first Claude Code session)
@@ -93,6 +87,8 @@ Running `npm install`, `npm run typecheck`, `npm test` and `npm run build`, and 
    - **What the date drives:** the performed date is the compliance date. Completion-based repeats count from it.
    - **PM review:** a CGM PM can correct the date while reviewing. If the task repeats from completion, the still-open next occurrence moves to match (SQL `next_due`).
    - **Approval** by a PM or admin is unchanged.
+
+19. **CIP files in app storage** (Nov 6, 2026). Until SharePoint is connected, uploads go to the app's private storage. On CIP tasks, keep the confirmation "This file contains no BES Cyber System Information" (with the pointer to paste a SharePoint link otherwise); don't block CIP uploads. Dan: CGM will use SharePoint once the app is fully built and live, so this only covers the interim.
 
 **Client data:** the live tracker's data is essential to how the internal tracker runs. It must be carried over completely and handled under CLAUDE.md rule 7.
 

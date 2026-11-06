@@ -2,6 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { runAlerts } from "@/lib/alerts";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+export const dynamic = "force-dynamic";
+
 /** Daily Standards Watch alerts. Vercel Cron calls this with "Authorization: Bearer <CRON_SECRET>"
  *  (vercel.json). Does nothing while automated emails are switched off on the Admin page. */
 export async function GET(req: NextRequest) {

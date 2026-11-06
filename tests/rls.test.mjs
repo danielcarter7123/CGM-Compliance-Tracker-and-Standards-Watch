@@ -565,3 +565,20 @@ test("client-task evidence: the add-on company's users add it under their own fo
   const [{ kind }] = (await db.query(`select kind from activity_log where kind = 'evidence' and target_id = '${id}'`)).rows;
   assert.equal(kind, "evidence");
 });
+
+// ---------- T8: email opt-outs and the send log ----------
+test("email opt-outs: each person manages only their own address; the send log is staff-read, job-written", async () => {
+  await db.exec("select set_config('request.jwt.claim.sub', '', false)");
+  await as(T_USER, "insert into email_optouts(email, kind) values ('t@a.com','tracker_reminders')");
+  assert.ok(await fails(T_USER, "insert into email_optouts(email, kind) values ('b@b.com','tracker_reminders')"), "not someone else's address");
+  assert.equal(await count(T_USER, "select count(*) from email_optouts"), 1);
+  assert.equal(await count(B_USER, "select count(*) from email_optouts"), 0, "can't see other people's opt-outs");
+  assert.equal((await as(B_USER, "delete from email_optouts returning email")).length, 0, "can't remove someone else's");
+  assert.equal(await count(STAFF, "select count(*) from email_optouts"), 1);
+  assert.equal((await as(T_USER, "delete from email_optouts where kind = 'tracker_reminders' returning email")).length, 1);
+  assert.ok(await fails(ADMIN, "insert into email_optouts(email, kind) values ('Mixed@Case.com','messages')"), "addresses are stored lowercase");
+  await db.exec("insert into tracker_email_log(key, kind, recipient, items) values ('reminders:x@y.com:2026-11-06','reminders','x@y.com',2)");
+  assert.equal(await count(STAFF, "select count(*) from tracker_email_log"), 1);
+  assert.equal(await count(T_USER, "select count(*) from tracker_email_log"), 0);
+  assert.ok(await fails(ADMIN, "insert into tracker_email_log(key, kind, recipient) values ('k','reminders','a@b.com')"), "only the job writes it");
+});

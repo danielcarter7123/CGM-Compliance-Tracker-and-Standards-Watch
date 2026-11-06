@@ -151,3 +151,5 @@ table.grid input.seats{width:72px;font:14px var(--body);padding:6px 8px;border:1
 .ws-footrow a{color:var(--accent);text-decoration:none}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ws-art{background:linear-gradient(135deg,#16233a,#1b2b46)}:root:not([data-theme="light"]) .ws-tracker .ws-art{background:linear-gradient(135deg,#13262c,#183139)}:root:not([data-theme="light"]) .ws-powerworks .ws-art{background:linear-gradient(135deg,#1a1d2d,#20243a)}}
 @media (max-width:850px){.ws-grid{grid-template-columns:minmax(0,1fr)}.ws-org{position:static;display:inline-block;margin-top:24px}.ws-hero .wrap{padding-block:34px 36px}.ws-art{height:100px}}
+.checkrow{display:flex;gap:8px;align-items:flex-start;font-size:15px;line-height:1.4}
+.checkrow input{margin-top:3px}

@@ -6,6 +6,8 @@ import { buildCalendar } from "@/lib/ical";
 import { siteUrl } from "@/lib/stripe";
 import { classify } from "@/lib/watch";
 
+export const dynamic = "force-dynamic";
+
 /** Per-subscriber iCalendar feed: compliance dates and comment deadlines for their functions. */
 export async function GET(_req: Request, { params }: { params: { token: string } }) {
   if (!/^[0-9a-f-]{36}$/i.test(params.token)) return new NextResponse("Not found", { status: 404 });
