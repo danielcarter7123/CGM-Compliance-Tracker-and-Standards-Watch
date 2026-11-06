@@ -25,7 +25,7 @@ const CLIENT_TABS = ["Dashboard", "Tasks", "Standards Library", "Messages", "Act
 const CASES: Record<string, Case> = {
   "CGM admin": {
     email: "admin@cgm.example", nav: ["Admin", "Account"], apps: ALL, plan: "CGM staff · every application", sections: STAFF_TABS,
-    allowed: ["/workspace", "/watch", "/tracker", "/tracker/standards", "/tracker/clients", "/admin", "/watch/review", "/watch/digest", "/account", "/powerworks"],
+    allowed: ["/workspace", "/watch", "/tracker", "/tracker/standards", "/tracker/clients", "/tracker/team", "/tracker/messages", "/admin", "/watch/review", "/watch/digest", "/account", "/powerworks"],
     denied: [],
   },
   "CGM project manager": {
@@ -46,7 +46,7 @@ const CASES: Record<string, Case> = {
   "All three apps (client admin)": {
     email: "admin@peaker.example", nav: ["Account"], apps: ALL, plan: "Enterprise access", sections: ["Dashboard", "Tasks", "Client Tasks", "Standards Library", "Messages", "Activity Log"],
     allowed: ["/workspace", "/watch", "/tracker", "/tracker/standards", "/account", "/powerworks"],
-    denied: [["/admin", "/workspace"], ["/watch/digest", "/workspace"], ["/tracker/clients", "/tracker"]],
+    denied: [["/admin", "/workspace"], ["/watch/digest", "/workspace"], ["/tracker/clients", "/tracker"], ["/tracker/team", "/tracker"]],
   },
   "All three apps (member)": {
     email: "member@peaker.example", nav: ["Account"], apps: ALL, plan: "Enterprise access", sections: ["Dashboard", "Tasks", "Client Tasks", "Standards Library", "Messages", "Activity Log"],
@@ -55,8 +55,8 @@ const CASES: Record<string, Case> = {
   },
   "Compliance Tracker only (member)": {
     email: "member@wind.example", nav: ["Account"], apps: ["CGM Compliance Tracker"], plan: "Essentials access", sections: CLIENT_TABS,
-    allowed: ["/workspace", "/tracker", "/account"],
-    denied: [["/watch", "/workspace"], ["/admin", "/workspace"]],
+    allowed: ["/workspace", "/tracker", "/tracker/messages", "/account"],
+    denied: [["/watch", "/workspace"], ["/admin", "/workspace"], ["/tracker/team", "/tracker"]],
   },
   "Signed in, no plan": {
     email: "noplan@nowhere.example", nav: ["Account"], apps: [], plan: "No applications yet", sections: [],

@@ -190,3 +190,16 @@
 .composer-task select{max-width:100%;font:inherit;font-size:13px;padding:3px 6px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink)}
 .composer-f{display:flex;justify-content:space-between;align-items:center}
 @media (max-width:760px){.msg-grid{grid-template-columns:1fr}.thread{min-height:360px}.msg-del{opacity:1}}
+
+/* Team Tasks (T6) */
+.team-strip{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:760px){.team-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.teamtable .clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:46ch}
+.teamtable .tlinks{display:flex;gap:10px;flex-wrap:wrap;font-size:12.5px;margin-top:2px}
+.teamtable td.late{color:var(--trk-bad);font-weight:600}
+.teamtable tfoot td{font-weight:600;border-top:2px solid var(--line)}
+.who{display:inline-flex;align-items:center;gap:6px}
+.avatar.sm{width:22px;height:22px;font-size:10px}
+.collabs{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px 12px}
+.trk-form fieldset.field legend{font-size:13px;font-weight:600;margin-bottom:4px}
+.trk .collabs label{text-transform:none;letter-spacing:0;font:400 14px var(--body);color:var(--ink)}

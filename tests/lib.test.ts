@@ -333,3 +333,30 @@ test("dashboard: the pilot's tiles, reminders, by-client order and upcoming sche
     ["December 2026", ["edge30"]], ["January 2027", ["far2"]], ["March 2027", ["far"]],
   ]);
 });
+
+test("team tasks: filters, stats, links and CSV follow the pilot", async () => {
+  const { filterTeam, teamStats, parseLinks, teamCsv } = await import("../lib/team");
+  const base = { description: null, owner_email: null, actual_date: null, links: [], created_at: "2026-01-01T00:00:00Z", created_by: null };
+  const rows = [
+    { ...base, id: "a", title: "Fake mine late", company_id: null, owner_id: "me", collaborators: [], planned_date: "2026-11-01", est_hours: 2.5, status: "inprogress" },
+    { ...base, id: "b", title: "Fake collab", company_id: "c1", owner_id: "x", collaborators: ["me"], planned_date: "2026-12-01", est_hours: "1.25", status: "notstarted" },
+    { ...base, id: "c", title: "Fake unassigned", company_id: "c1", owner_id: null, collaborators: [], planned_date: null, est_hours: null, status: "onhold" },
+    { ...base, id: "d", title: "Fake done", company_id: null, owner_id: "me", collaborators: [], planned_date: "2026-10-01", actual_date: "2026-11-03", est_hours: 4, status: "done" },
+  ] as import("../lib/team").TeamTask[];
+  const ctx = { me: "me", today: "2026-11-06", clientName: (id: string | null) => (id ? "Fake Client" : "Internal"), personName: (id: string | null) => (id === "x" ? "Pat Fake" : id ? "Me" : "") };
+  const ids = (f: Parameters<typeof filterTeam>[1]) => filterTeam(rows, f, ctx).map((t) => t.id);
+  assert.deepEqual(ids({}), ["a", "b"]); // default: mine or collaborating, open
+  assert.deepEqual(ids({ scope: "owned", status: "all" }), ["a", "d"]);
+  assert.deepEqual(ids({ scope: "unassigned" }), ["c"]);
+  assert.deepEqual(ids({ scope: "everyone", status: "late" }), ["a"]);
+  assert.deepEqual(ids({ scope: "everyone", client: "none", status: "all" }), ["a", "d"]);
+  assert.deepEqual(ids({ scope: "everyone", q: "pat fake" }), ["b"]);
+  const s = teamStats(rows, "me", "2026-11-06");
+  assert.deepEqual([s.mine, s.mineHours, s.late, s.open, s.openHours, s.doneThisMonth], [2, 3.75, 1, 3, 3.75, 1]);
+  assert.deepEqual(parseLinks("Folder | https://example.com/a\nhttps://example.com/b\nhttp://bad.example"), {
+    links: [{ label: "Folder", url: "https://example.com/a" }, { label: "", url: "https://example.com/b" }], refused: ["http://bad.example"],
+  });
+  const csv = teamCsv([rows[1]], ctx).split("\r\n");
+  assert.equal(csv[0], '"Task","Description","Client","Assigned to","Collaborators","Estimated hours","Anticipated completion","Actual completion","Status","Links"');
+  assert.equal(csv[1], '"Fake collab","","Fake Client","Pat Fake","Me","1.25","2026-12-01","","Not started",""');
+});

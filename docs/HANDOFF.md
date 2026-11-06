@@ -47,7 +47,7 @@ Watch pilot results: first Monday run Nov 2, 2026. Ten drafts were queued and al
 | **Live-data import** (`0004_legacy_import.sql`, `scripts/import-tracker.ts`): the live tracker's export becomes one SQL transaction (clients, contacts, Tracker entitlements, library, tasks with recurrence chains, team tasks, people, full history, deleted-record snapshots), keeping every original document in `legacy` | 8 import tests on a fake export shaped like the real one |
 | Seed data: `data/pilot-content.json` (live Watch content, Nov 2 review) and `data/tracker-standards-library.json` (CGM's 48 standards and 72 obligation templates; **no client data**) | load tests |
 
-Not built yet (T1, T2, T2a, T3, T5 and T6 Messages are done, see CHANGELOG): the Team Tasks, Client Tasks and Activity Log screens, evidence upload and the Microsoft Graph (SharePoint) code, task plans, tracker digests and reminders, and anything run against live Supabase, Stripe, Resend or Microsoft 365 (no accounts yet).
+Not built yet (T1, T2, T2a, T3, T5 and T6 are done, see CHANGELOG): the Client Tasks and Activity Log screens, evidence upload and the Microsoft Graph (SharePoint) code, task plans, tracker digests and reminders, and anything run against live Supabase, Stripe, Resend or Microsoft 365 (no accounts yet).
 
 ### Client data: carried over, not re-entered
 

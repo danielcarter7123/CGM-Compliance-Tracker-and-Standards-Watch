@@ -2,6 +2,17 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 6, 2026: T6 Team Tasks (Claude Code)
+
+CGM's internal work (TRACKER-SPEC §3.5), at `/tracker/team`; CGM staff only (the screen, the CSV export, and the database's existing "team staff" policy).
+- **Stat strip:** my open tasks with estimated hours, past anticipated date, team open tasks with hours, completed this month. Each opens the matching filter.
+- **Filters:** Assigned to me or collaborating (default) / Assigned to me / Everyone / Unassigned; All open / Past anticipated date / each status / All statuses; client (or Internal); search across title, description, links, client and people.
+- **Table:** task with up to 3 links and a 2-line description, client ("Internal" or "(removed client)"), assigned to, collaborators, hours, anticipated and actual dates, status with "· late". A footer sums the hours.
+- **Drawer:** task, description, links (https only, "Label | URL" per line), client, assigned to (or "Assign to me"), collaborators (no notification), anticipated and actual completion (actual never in the future; set to today when marked complete), estimated hours in 0.25 steps, status, created on/by; Mark complete; Delete with a confirming tick. Imported owners who haven't signed up show by email.
+- **Export CSV** (`cgm-team-tasks-<date>.csv`) in the pilot's columns, following the filters.
+- **Tests:** `lib/team.ts` unit test (filters, stats, links, CSV); `e2e/tracker-team.spec.ts` (add, refused http link, late, export, future date refused, complete, delete; a client user gets no tab, a redirect, a 403 export and an empty table by API); access cases for `/tracker/team` and `/tracker/messages`.
+- **T6 is complete.**
+
 ## Nov 6, 2026: T6 Messages (Claude Code)
 
 Built as decided (OPEN-QUESTIONS 6): in-app chat; client users use their company channel and can direct-message their CGM project manager. The daily "you have unread messages" email comes with T8 (opt-out per person); nothing emails today.
@@ -16,7 +27,6 @@ Built as decided (OPEN-QUESTIONS 6): in-app chat; client users use their company
 - **Discuss** on a task opens the client's channel with that task linked.
 - **Migration `0013_messages.sql`:** DMs only with your own PM (clients); one DM per pair; conversation activity set by trigger only; messages can't be edited or moved, only soft-deleted by their author; `people_names()`; General channel; realtime publication.
 - **Tests:** RLS cases for all of the above; `e2e/tracker-t6.spec.ts` covers Discuss, the task chip, links, delete, the PM DM, the database refusing other DMs and another company's channel, another company seeing nothing, and the PM's unread count.
-- **Still to do in T6:** the Team Tasks screen (staff only).
 
 ## Nov 6, 2026: close-out with a verified performed date (Claude Code)
 
