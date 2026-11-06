@@ -360,3 +360,30 @@ test("team tasks: filters, stats, links and CSV follow the pilot", async () => {
   assert.equal(csv[0], '"Task","Description","Client","Assigned to","Collaborators","Estimated hours","Anticipated completion","Actual completion","Status","Links"');
   assert.equal(csv[1], '"Fake collab","","Fake Client","Pat Fake","Me","1.25","2026-12-01","","Not started",""');
 });
+
+test("activity log: field changes from before/after rows and pilot history; CSV has one row per change", async () => {
+  const { changes, activityCsv, canRestore, canRevert } = await import("../lib/activity");
+  const ctx = { personName: (id: string) => (id === "p1" ? "Pat Fake" : "Someone"), clientName: (id: string) => (id === "c1" ? "Fake Client" : "(removed client)") };
+  const e = {
+    id: 1, at: "2026-11-06T15:00:00Z", actor_id: "p1", action: "updated", kind: "task", target_id: "t1", company_id: "c1", label: "Fake relay test",
+    old_row: { id: "t1", title: "Fake relay test", due_date: "2026-11-30", status: "open", assignee_id: null, updated_at: "a", next_id: null },
+    new_row: { id: "t1", title: "Fake relay test", due_date: "2026-12-15", status: "review", assignee_id: "p1", updated_at: "b", next_id: "t2" },
+    source: "app" as const, legacy: null, ref_id: null,
+  };
+  assert.deepEqual(changes(e, ctx), [
+    { field: "Due date", from: "2026-11-30", to: "2026-12-15" },
+    { field: "Status", from: "Open", to: "Performed, pending review" },
+    { field: "Assignee", from: "", to: "Pat Fake" },
+  ]);
+  const legacy = { ...e, id: 2, source: "legacy" as const, old_row: null, new_row: null, legacy: { note: "Fake note", changes: [{ f: "dueDate", from: "2026-01-01", to: "2026-02-01" }] } };
+  assert.deepEqual(changes(legacy, ctx), [{ field: "Due date", from: "2026-01-01", to: "2026-02-01" }]);
+  assert.equal(canRevert(e), true);
+  assert.equal(canRevert(legacy), false);
+  assert.equal(canRestore({ ...e, action: "deleted" }), true);
+  assert.equal(canRestore({ ...legacy, action: "deleted" }), false);
+  const csv = activityCsv([e, legacy], { ...ctx, who: () => "Pat Fake", client: () => "Fake Client" }).split("\r\n");
+  assert.equal(csv.length, 1 + 3 + 1);
+  assert.equal(csv[0], '"When","Who","Action","Record type","Record","Client","Field","From","To","Note"');
+  assert.equal(csv[1], '"2026-11-06T15:00:00Z","Pat Fake","Updated","Task","Fake relay test","Fake Client","Due date","2026-11-30","2026-12-15",""');
+  assert.ok(csv[4].endsWith('"Due date","2026-01-01","2026-02-01","Fake note"'));
+});

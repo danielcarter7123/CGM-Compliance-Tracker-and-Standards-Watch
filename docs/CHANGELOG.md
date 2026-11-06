@@ -2,6 +2,19 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 6, 2026: T7 Activity Log (Claude Code)
+
+`/tracker/activity` (TRACKER-SPEC §3.11). CGM staff see everything; a client user sees their own company's task, client-task and evidence history (the existing read policy).
+- **Filters:** date range (24 hours to all time; 30 days by default), person (staff, including pilot authors not yet signed up), record type, client (staff), search over record names and notes. 200 rows, then "Show more".
+- **Rows:** when, who (avatar and name), action tag, record type and name, client, details: the pilot's note and field changes with old values struck through (bookkeeping fields hidden, people and clients by name), plus RESTORED / REVERTED tags.
+- **Restore** (staff): re-inserts a deleted record from its log entry. Restoring a client also brings back what was deleted with it in the same moment (products, contacts, tasks, client tasks, evidence) and re-attaches its team tasks; task chains are re-linked. Messages in a deleted client's channel are not brought back.
+- **Revert** (staff): writes a change's old values back, only the fields that change touched. If the record changed since, it asks "Revert anyway? Edited since <date>" and changes nothing until confirmed.
+- **Append-only:** both are database functions (`restore_entry`, `revert_entry`, migration `0014_activity_restore.sql`) that run as the signed-in person, so each record's own write rules still apply (for example, restoring a client needs a CGM admin because products are admin-only). Their writes are logged by the ordinary triggers as "restored" / "reverted" with `ref_id` pointing at the entry acted on. Each entry can be restored or reverted once. Contacts are now logged too.
+- **Pilot history** carried over by the import is shown as recorded, with its notes and field changes; restore and revert apply to changes made in this app.
+- **Export CSV:** one row per field change, with the filters (`cgm-activity-log-<date>.csv`).
+- **Not logged:** messages (as in the pilot), and CSV exports (the pilot logged them; the log is trigger-only here).
+- **Tests:** RLS (restoring a deleted client with its chain, products, contacts and team tasks; all-or-nothing when a PM lacks rights; once only; revert with "edited since"; staff only; log still append-only); lib (change rendering, pilot field names, CSV); `e2e/tracker-t7.spec.ts`.
+
 ## Nov 6, 2026: T6 Team Tasks (Claude Code)
 
 CGM's internal work (TRACKER-SPEC §3.5), at `/tracker/team`; CGM staff only (the screen, the CSV export, and the database's existing "team staff" policy).

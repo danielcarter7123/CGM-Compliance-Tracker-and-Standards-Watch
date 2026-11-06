@@ -203,3 +203,17 @@
 .collabs{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px 12px}
 .trk-form fieldset.field legend{font-size:13px;font-weight:600;margin-bottom:4px}
 .trk .collabs label{text-transform:none;letter-spacing:0;font:400 14px var(--body);color:var(--ink)}
+
+/* Activity Log (T7) */
+.acttable td{vertical-align:top}
+.acttag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:600;background:var(--sunk);color:var(--ink)}
+.acttag.deleted{background:transparent;color:var(--trk-bad);border:1px solid var(--trk-bad)}
+.acttag.created,.acttag.restored{background:var(--effect-bg);color:var(--effect)}
+.acttag.approved,.acttag.completed{background:var(--effect-bg);color:var(--effect)}
+.acttag.performed{background:var(--approved-bg);color:var(--approved)}
+.acttag.reverted,.acttag.sent_back{background:var(--upcoming-bg);color:var(--upcoming)}
+.acttable .changes{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.acttable .changes del{color:var(--muted)}
+.acttable .actnote{margin:0 0 4px}
+.acttable td .chip{margin-top:4px}
+.revertask{display:grid;gap:6px;max-width:220px}

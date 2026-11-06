@@ -485,3 +485,68 @@ test("messages: clients DM only their own PM; messages can't be edited or moved,
   assert.deepEqual(names.map((n) => n.id).sort(), [PM, T_ADMIN].sort());
   await db.exec(`update companies set pm_id = null where id = '${A_CO}'`);
 });
+
+// ---------- T7: Restore and Revert (0014) ----------
+test("restore brings a deleted client back with its products, contacts, task chain and team tasks; logged, once, staff only", async () => {
+  const R_CO = "a0000000-0000-0000-0000-00000000000d";
+  await db.exec(`
+    select set_config('request.jwt.claim.sub', '', false);
+    insert into companies(id, name) values ('${R_CO}','Fake Restore Co');
+    insert into entitlements(company_id, product, source) values ('${R_CO}','tracker','contract');
+    insert into contacts(company_id, kind, name, email) values ('${R_CO}','compliance','Fake Person','fake@restore.example');
+  `);
+  const [{ id: t1 }] = (await db.query(`insert into tasks(company_id, title, due_date) values ('${R_CO}','Fake first','2026-01-31') returning id`)).rows;
+  const [{ id: t2 }] = (await db.query(`insert into tasks(company_id, title, due_date, prev_id) values ('${R_CO}','Fake second','2026-07-31','${t1}') returning id`)).rows;
+  await db.exec(`update tasks set next_id = '${t2}' where id = '${t1}'`);
+  const [{ id: tt }] = (await db.query(`insert into team_tasks(title, company_id) values ('Fake team work for R','${R_CO}') returning id`)).rows;
+
+  await as(ADMIN, `delete from companies where id = '${R_CO}'`);
+  assert.equal((await db.query(`select count(*) from tasks where company_id = '${R_CO}'`)).rows[0].count, 0);
+  const [{ id: del }] = (await db.query(`select id from activity_log where kind = 'client' and action = 'deleted' and target_id = '${R_CO}'`)).rows;
+
+  assert.ok(await fails(T_USER, `select public.restore_entry(${del})`), "clients can't restore");
+  assert.ok(await fails(PM, `select public.restore_entry(${del})`), "a PM can't restore products (entitlements are admin-only), so nothing is restored");
+  assert.equal((await db.query(`select count(*) from companies where id = '${R_CO}'`)).rows[0].count, 0, "all or nothing");
+
+  await as(ADMIN, `select public.restore_entry(${del})`);
+  const q = async (sql) => (await db.query(sql)).rows;
+  assert.equal((await q(`select name from companies where id = '${R_CO}'`))[0].name, "Fake Restore Co");
+  assert.equal((await q(`select count(*) from entitlements where company_id = '${R_CO}'`))[0].count, 1);
+  assert.equal((await q(`select count(*) from contacts where company_id = '${R_CO}'`))[0].count, 1);
+  const tasks = await q(`select id, prev_id, next_id from tasks where company_id = '${R_CO}' order by due_date`);
+  assert.deepEqual(tasks.map((t) => [t.id, t.prev_id, t.next_id]), [[t1, null, t2], [t2, t1, null]], "the chain is linked again");
+  assert.equal((await q(`select company_id from team_tasks where id = '${tt}'`))[0].company_id, R_CO);
+
+  const logged = await q(`select action, kind, ref_id, actor_id from activity_log where ref_id is not null and company_id = '${R_CO}' or (kind = 'team' and target_id = '${tt}' and action = 'restored')`);
+  assert.ok(logged.length >= 5 && logged.every((l) => l.action === "restored" && l.actor_id === ADMIN));
+  assert.ok(logged.some((l) => l.kind === "client" && Number(l.ref_id) === Number(del)));
+  assert.ok(await fails(ADMIN, `select public.restore_entry(${del})`), "only once");
+  const [{ id: created }] = await q(`select id from activity_log where kind = 'task' and action = 'created' and target_id = '${t1}'`);
+  assert.ok(await fails(ADMIN, `select public.restore_entry(${created})`), "only deletions");
+});
+
+test("revert writes old values back as a logged change; asks first when edited since; staff only", async () => {
+  await db.exec("select set_config('request.jwt.claim.sub', '', false)");
+  const [{ id: t }] = (await db.query(`insert into tasks(company_id, title, due_date) values ('${A_CO}','Fake revert me','2026-03-31') returning id`)).rows;
+  await as(STAFF, `update tasks set title = 'Fake renamed', due_date = '2026-04-30' where id = '${t}'`);
+  const entry = async () => Number((await db.query(`select id from activity_log where target_id = '${t}' and action = 'updated' order by id desc limit 1`)).rows[0].id);
+  const e1 = await entry();
+  assert.ok(await fails(T_USER, `select public.revert_entry(${e1})`), "clients can't revert");
+  assert.equal((await as(STAFF, `select public.revert_entry(${e1}) as since`))[0].since, null);
+  let [row] = (await db.query(`select title, due_date from tasks where id = '${t}'`)).rows;
+  assert.equal(row.title, "Fake revert me");
+  const [rv] = (await db.query(`select action, ref_id, actor_id from activity_log where target_id = '${t}' order by id desc limit 1`)).rows;
+  assert.deepEqual([rv.action, Number(rv.ref_id), rv.actor_id], ["reverted", e1, STAFF]);
+  assert.ok(await fails(STAFF, `select public.revert_entry(${e1})`), "only once");
+
+  // Edited since: nothing changes until confirmed.
+  await as(STAFF, `update tasks set title = 'Fake first edit' where id = '${t}'`);
+  const e2 = await entry();
+  await as(STAFF, `update tasks set notes = 'Fake later note' where id = '${t}'`);
+  assert.ok((await as(STAFF, `select public.revert_entry(${e2}) as since`))[0].since, "returns when it was last changed");
+  assert.equal((await db.query(`select title from tasks where id = '${t}'`)).rows[0].title, "Fake first edit");
+  await as(STAFF, `select public.revert_entry(${e2}, true)`);
+  [row] = (await db.query(`select title, notes from tasks where id = '${t}'`)).rows;
+  assert.deepEqual([row.title, row.notes], ["Fake revert me", "Fake later note"], "only that change's fields go back");
+  assert.equal((await as(ADMIN, "update activity_log set action = 'x' returning id")).length, 0, "the log stays append-only");
+});

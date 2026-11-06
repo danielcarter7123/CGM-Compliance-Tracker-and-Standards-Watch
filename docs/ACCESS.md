@@ -48,6 +48,7 @@ Nobody can raise their own role. Only CGM admins set staff roles and products. C
 | Messages: CGM channels | | | | | ✓ | ✓ | ✓ |
 | Messages: direct | | | | | members only | members only | members only |
 | Activity log | | | own company's task and client-task history | same | ✓ | ✓ | ✓ |
+| Activity log: restore and revert | | | | | ✓ | ✓ | ✓ |
 | Client record (company details) | | read own | read own | read own | read all | edit | edit, delete |
 | Contacts (digest recipients) | | | admin reads own | admin reads own | ✓ | ✓ | ✓ |
 | Products and roles | | read own | read own | read own | read | read | ✓ |
@@ -64,7 +65,7 @@ Nobody can raise their own role. Only CGM admins set staff roles and products. C
 - **Client task edits are narrow:** a trigger (`guard_task_update`) lets client users change only `status` (open → in progress → performed), `evidence` and `notes`. It sets who performed it and when. Anything else is refused with a clear message.
 - **Approval needs a PM or admin**, also enforced by the trigger, including "mark complete" directly.
 - **Recurrence happens in the database:** when a task becomes performed or done, `spawn_next_occurrence` creates the next one once, using the pilot's date rules. A client marking a task performed therefore schedules the next one without being able to create tasks themselves.
-- **The audit log is append-only.** Triggers write it, and nobody can insert, edit or delete rows directly. Restore and revert (pilot features) should be new actions that create new log rows.
+- **The audit log is append-only.** Triggers write it, and nobody can insert, edit or delete rows directly. Restore and revert (, ) are new changes that log themselves as "restored" / "reverted". They run as the person, so the record's own write rules apply: restoring a client needs a CGM admin, because products are admin-only.
 - **Staff can open everything because their role grants it**, not because of an entitlement.
 
 ## Decisions

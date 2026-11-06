@@ -23,7 +23,7 @@ export function trackerSections(v: Viewer, unread = 0): Section[] {
     { label: "Standards Library", href: "/tracker/standards" },
     ...(v.isStaff ? [{ label: "Clients", href: "/tracker/clients" }] : []),
     { label: "Messages", href: "/tracker/messages", badge: unread },
-    { label: "Activity Log" },
+    { label: "Activity Log", href: "/tracker/activity" },
   ];
 }
 
