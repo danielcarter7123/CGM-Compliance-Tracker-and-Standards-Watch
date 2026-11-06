@@ -105,7 +105,8 @@ test("nothing is dropped: problems are kept in legacy and reported", async () =>
   assert.equal((await one("select version from library_standards where code = 'VAR-002'")).version, "?");
   assert.ok(report.warnings.some((w) => w.includes("VAR-002")));
   assert.ok(report.warnings.some((w) => w.includes("Atlantis")));
-  assert.ok(report.warnings.some((w) => w.includes("not-an-email")));
+  assert.ok(report.warnings.some((w) => w.includes("plant_manager email is not valid")));
+  assert.ok(!report.warnings.some((w) => w.includes("not-an-email")), "warnings never print the contact's email");
 });
 
 test("clients become Tracker clients; sample clients don't; the add-on flag carries over", async () => {

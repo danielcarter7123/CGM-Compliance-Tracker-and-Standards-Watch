@@ -2,6 +2,22 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 6, 2026: T2a dry-run import of the live tracker, local only (Claude Code)
+
+- **The run:** the Nov 5 export went into the local Supabase only (`npm run import:tracker`, then `psql` inside the local database container). The export and the SQL stay in `data/private/`, which is git-ignored, and nothing from them is committed.
+- **Result:** every collection matched in and out, with no warnings. The one SQL transaction committed, and its reconciliation counts matched the report. The import wrote no app history rows.
+- **Checks** (totals only, no client details):
+  - every recurring chain is intact: each completed recurring task has exactly one next occurrence, which points back;
+  - no task references a missing standard;
+  - every client has its compliance contact, PM and Plant Manager;
+  - one active Tracker entitlement per client.
+- **App:** with the real data loaded, Dashboard, Tasks (all, completed), Clients, Standards and CSV export load with no page errors. The counts equal imported plus fake test data.
+- **Importer fix:** the "invalid email" warning no longer prints the address itself, so console output can't carry client contact details (CLAUDE.md rule 7). The test checks this.
+- **Still to do:**
+  - Dan compares the Tasks and Clients screens with the live tracker side by side;
+  - afterwards, `npm run db:reset`, `seed:dev` and `import:pilot` return the local database to fake data only before more automated test runs;
+  - the 41 recurring obligations still need their Repeat-from setting confirmed (the live tracker had none saved).
+
 ## Nov 5, 2026: T3 dashboard and reminders (Claude Code)
 
 **Dashboard** (`/tracker`, TRACKER-SPEC §3.2): read as the signed-in person, so staff see every client and a client sees their own company.

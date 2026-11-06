@@ -91,7 +91,8 @@ export function buildImportSql(exp: TrackerExport, today = new Date().toISOStrin
     });
     const person = (kind: string, name: unknown, mail: unknown, digest: boolean) => {
       if (!text(name) && !email(mail)) return;
-      if (mail && !email(mail)) warnings.push(`Client ${d.id}: ${kind} email "${mail}" is not valid; left blank (kept in legacy).`);
+      if (mail && !email(mail)) // The address itself isn't printed: warnings go to the console and must never carry client contact details (CLAUDE.md rule 7).
+      warnings.push(`Client ${d.id}: ${kind} email is not valid; left blank (original kept in legacy).`);
       contacts.push({ id: uuidFrom("contact", `${d.id}|${kind}`), company_id: id, kind, name: String(text(name) || text(mail)), email: email(mail), digest });
     };
     person("compliance", c.contact, c.contactEmail, c.digest !== false);
