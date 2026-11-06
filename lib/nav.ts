@@ -1,7 +1,7 @@
 import type { Viewer } from "./auth";
 
-/* The app's one menu. The whole app is CGM Compliance Tracker; NERC Standards Watch is one page in it
-   (its first section, as in the pilot). Sections not built yet show greyed out. These decide what to show
+/* The app's one menu. The whole app is CGM Compliance Tracker. NERC Standards Watch is one page in it with its
+   own header button (components/WatchButton.tsx), not one of these tabs (Dan's decision 16). Sections not built yet show greyed out. These decide what to show
    only; row level security decides what anyone can read. */
 
 export type Section = { label: string; href?: string; locked?: boolean };
@@ -9,7 +9,6 @@ export type Section = { label: string; href?: string; locked?: boolean };
 export function appSections(v: Viewer | null): Section[] {
   if (!v) return [];
   const out: Section[] = [];
-  if (v.hasAccess) out.push({ label: "Standards Watch", href: "/watch" });
   if (v.products.tracker) {
     out.push(
       { label: "Dashboard", href: "/tracker" },

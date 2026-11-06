@@ -87,3 +87,9 @@ table.grid input.seats{width:72px;font:14px var(--body);padding:6px 8px;border:1
 .subhead{font-family:var(--display);font-size:24px;font-weight:600;margin:0}
 .watchintro.page{padding-top:36px}
 .watchoffer{font-family:var(--display);font-weight:700;font-size:clamp(34px,4.6vw,56px);line-height:1;margin:0 0 14px;text-wrap:balance}
+
+/* NERC Standards Watch's own header button (not a section tab) */
+.sitenav a.watchbtn{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--accent);color:var(--accent);border-radius:999px;padding:6px 14px;font-weight:600;margin-right:6px}
+.sitenav a.watchbtn:hover{background:var(--accent);color:var(--accent-ink)}
+.sitenav a.watchbtn.here{background:var(--accent);color:var(--accent-ink)}
+@media (max-width:520px){.sitenav a.watchbtn{padding:5px 10px;font-size:12.5px}}

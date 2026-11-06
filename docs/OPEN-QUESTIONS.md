@@ -69,6 +69,12 @@ Running `npm install`, `npm run typecheck`, `npm test` and `npm run build`, and 
    - Watch-only subscribers see Standards Watch and a locked Compliance Tracker.
    - The front door is the split-screen sign-in page Dan approved: signed-out visitors to the app go straight to it, with no app header around it (option B, Dan's follow-up). The NERC Standards Watch offer for prospective subscribers is at `/standards-watch`, which the "Standards Watch plans" links and Stripe's cancel link point to.
    - Signed-in Tracker users open on the Dashboard. After signing in they see Watch first, with "Continue to the Dashboard", as in the pilot.
+16. **Standards Watch access and placement.**
+   - **Access:** Watch is a paid product people sign in to, with the same email-link accounts as the Tracker. There is no public full page and no separate Watch site.
+   - **Who sees what:** Watch-only customers sign in and land on the Watch page; the Tracker shows as one locked tab. A Watch customer who later signs a Tracker agreement keeps the same account (an admin switches the Tracker on).
+   - **Prospects:** `/standards-watch` (description, sample cards, plans) and the weekly digest serve people without an account.
+   - **Placement:** Watch has its own "NERC Standards Watch" button in the header (`components/WatchButton.tsx`), not a tab mixed in with the Tracker sections.
+   - **Offered, not built:** a one-click "Open Standards Watch" link in the digest that signs the reader in.
 
 **Client data:** the live tracker's data is essential to how the internal tracker runs. It must be carried over completely and handled under CLAUDE.md rule 7.
 

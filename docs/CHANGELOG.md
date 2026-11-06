@@ -2,6 +2,14 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 5, 2026: Standards Watch gets its own header button (Claude Code)
+
+**Decided by Dan** (OPEN-QUESTIONS 16):
+- **Access:** Watch stays a paid, signed-in product on the same accounts as the Tracker, with no separate site.
+- **Placement:** it has its own spot. The section tabs are now Tracker-only (`lib/nav.ts`), and a "NERC Standards Watch" button sits in the header beside Account, filled in while you're on the page (`components/WatchButton.tsx`).
+- **Watch-only customers:** they see the button plus one locked "Compliance Tracker" tab.
+- **Tests:** the access tests are updated for every role.
+
 ## Nov 5, 2026: T2 tasks core (Claude Code)
 
 **Tasks screen** (`/tracker/tasks`, every Tracker user; RLS limits clients to their own company):

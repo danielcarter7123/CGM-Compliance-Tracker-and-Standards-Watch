@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./watch.css";
 import "./app.css";
 import AppNav from "@/components/AppNav";
+import WatchButton from "@/components/WatchButton";
 import SiteChrome from "@/components/SiteChrome";
 import { appSections, whoLine } from "@/lib/nav";
 import { getViewer } from "@/lib/auth";
@@ -38,6 +39,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </div>
             </a>
             <nav className="sitenav" aria-label="Account and tools">
+              {viewer?.hasAccess && <WatchButton />}
               {viewer?.isEditor && <a className="admin" href="/admin/review">Review queue</a>}
               {viewer?.isEditor && <a className="admin" href="/admin/digest">Digest</a>}
               {viewer?.staffRole === "admin" && <a className="admin" href="/admin">Admin</a>}

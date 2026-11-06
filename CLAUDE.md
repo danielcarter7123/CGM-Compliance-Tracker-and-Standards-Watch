@@ -7,7 +7,7 @@ Guidance for Claude Code working in this repository. Before starting any milesto
 
 ## What this is
 
-**CGM Compliance Tracker** is the app. Its name is at the top of every screen and in every page title. **NERC Standards Watch is one scrollable page inside it** (`/watch`, the first section in the menu, as in the pilot), and that page is the only place the "NERC Standards Watch" name is used as a title. The Watch digest email and calendar feed keep the Watch name because they are that page's output. Dan's decision (OPEN-QUESTIONS 15); "build the Watch page first" was about launch order, never about branding.
+**CGM Compliance Tracker** is the app. Its name is at the top of every screen and in every page title. **NERC Standards Watch is one scrollable page inside it** (`/watch`), reached from its own "NERC Standards Watch" button in the header, never one of the Tracker's section tabs (decision 16). That page is the only place the "NERC Standards Watch" name is used as a title. The Watch digest email and calendar feed keep the Watch name because they are that page's output. Dan's decision (OPEN-QUESTIONS 15); "build the Watch page first" was about launch order, never about branding.
 
 Both are from CGM Consulting Group, for NERC-registered utilities:
 
