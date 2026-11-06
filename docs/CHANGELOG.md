@@ -2,7 +2,19 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
-## Nov 5, 2026: Watch alert emails removed (Claude Code)
+## Nov 5, 2026: Watch alerts back as an opt-in setting, off by default (Claude Code)
+
+**Decided by Dan:** the digest stays the default and main Watch email, but anyone who really wants a note for each change can turn alerts on (OPEN-QUESTIONS 14). This supersedes the removal below.
+
+**What changed:**
+- The alert job, cron and digest-page panel are back.
+- **Migration `0010_watch_alerts_opt_in.sql`:** re-adds `profiles.alerts_opt_in` with **default false**, and `alert_log`. `0009` stays in place, since it was already applied.
+- **Account page:** "Also email me alerts between digests (optional)", unchecked by default, with a note that the digest already covers everything.
+- **Tests:**
+  - RLS: nobody has alerts on by default; everyone has the digest on.
+  - e2e: a subscriber opts in and gets the alert once. Someone who didn't opt in gets nothing. One-click unsubscribe turns alerts back off.
+
+## Nov 5, 2026: Watch alert emails removed (Claude Code, superseded above)
 
 **Decided by Dan:** no Watch alert emails. NERC offers its own alerts, and the point of Watch is one reviewed weekly digest instead of a stream of email (OPEN-QUESTIONS 14).
 

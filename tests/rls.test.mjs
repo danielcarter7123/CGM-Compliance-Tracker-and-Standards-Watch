@@ -350,15 +350,19 @@ test("onboarding: users set their own functions, Regional Entity and onboarded t
 });
 
 // ---------- Delivery (0008) ----------
-test("digest opt-out is each user's own; there are no Watch alert tables (0009)", async () => {
-  const [r] = await as(W_USER, `update profiles set digest_opt_in = false where id = '${W_USER}' returning digest_opt_in`);
-  assert.equal(r.digest_opt_in, false);
-  assert.equal((await as(W_USER, `update profiles set digest_opt_in = false where id = '${T_USER}' returning id`)).length, 0, "not someone else's");
-  await db.exec(`update profiles set digest_opt_in = true where id = '${W_USER}'`);
-  const gone = (await db.query(`select to_regclass('public.alert_log') as t,
-    (select count(*) from information_schema.columns where table_name = 'profiles' and column_name = 'alerts_opt_in')::int as c`)).rows[0];
-  assert.equal(gone.t, null);
-  assert.equal(gone.c, 0);
+test("alerts are opt-in (0010): off by default; each person turns their own on; the alert log is staff-read, never API-written", async () => {
+  const defaults = (await db.query(`select bool_or(alerts_opt_in) as any_on, bool_and(digest_opt_in) as all_digest from profiles`)).rows[0];
+  assert.equal(defaults.any_on, false, "nobody gets alerts unless they ask");
+  assert.equal(defaults.all_digest, true, "everyone gets the digest by default");
+  const [r] = await as(W_USER, `update profiles set alerts_opt_in = true, digest_opt_in = false where id = '${W_USER}' returning alerts_opt_in, digest_opt_in`);
+  assert.deepEqual([r.alerts_opt_in, r.digest_opt_in], [true, false]);
+  assert.equal((await as(W_USER, `update profiles set alerts_opt_in = true where id = '${T_USER}' returning id`)).length, 0, "not someone else's");
+  await db.exec(`update profiles set alerts_opt_in = false, digest_opt_in = true where id = '${W_USER}'`);
+
+  await db.exec(`insert into alert_log(key, kind, label) values ('deadline:x:2099-01-01','deadline','Fake deadline')`);
+  assert.equal(await count(STAFF, "select count(*) from alert_log"), 1);
+  for (const u of [W_USER, T_ADMIN, NOPLAN]) assert.equal(await count(u, "select count(*) from alert_log"), 0, u);
+  for (const u of [ADMIN, STAFF, T_ADMIN]) assert.ok(await fails(u, `insert into alert_log(key, kind, label) values ('k-${u}','ferc','x')`), u);
 });
 
 test("drafts keep the value they replaced, visible to editors only", async () => {

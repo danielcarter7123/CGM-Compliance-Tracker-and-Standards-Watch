@@ -130,8 +130,9 @@ test("digest: plain-text part matches the HTML, with corrections, unsubscribe li
   assert.ok(!none.includes("CORRECTIONS"), "no corrections block when there are none");
 });
 
-test("corrections come from approved drafts and the values they replaced; new entries aren't corrections", async () => {
-  const { correctionLines } = await import("../lib/changes");
+test("corrections and alerts come from approved drafts and the values they replaced", async () => {
+  const { correctionLines, dueAlerts } = await import("../lib/changes");
+  const today = parseDate("2099-03-01");
   const at = "2099-02-25T15:00:00Z";
   const drafts = [
     { id: "a", section: "items", op: "upsert", key: "test-1", label: null, decided_at: at,
@@ -149,6 +150,16 @@ test("corrections come from approved drafts and the values they replaced; new en
     'TEST-000-1: milestone "Phase 3" (Sep 1, 2099) was removed.',
     "Fake comments close (Feb 10, 2099) was removed.",
   ]);
+  const deadlines = [
+    { id: "soon", d: "2099-03-10", t: "Fake ballot closes", fn: ["GO"] },
+    { id: "later", d: "2099-04-30", t: "Fake later", fn: null },
+    { id: "past", d: "2099-02-01", t: "Fake past", fn: null },
+  ];
+  const alerts = dueAlerts(drafts, deadlines as any, new Set(), today);
+  assert.deepEqual(alerts.map((a) => a.key), ["effective:a", "ferc:b", "effective:b", "deadline:soon:2099-03-10"], "old drafts and far deadlines don't alert");
+  assert.match(alerts[0].label, /moved from Jan 1, 2099 to Apr 1, 2099/);
+  assert.match(alerts[3].label, /in 9 days/);
+  assert.equal(dueAlerts(drafts, deadlines as any, new Set(["ferc:b", "deadline:soon:2099-03-10"]), today).length, 2, "already-sent alerts don't repeat");
 });
 
 test("calendar feed: valid iCalendar, folded lines, stable UIDs, filtered by function", async () => {

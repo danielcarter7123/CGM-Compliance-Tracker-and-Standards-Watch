@@ -60,7 +60,7 @@ async function approveOne(db: ReturnType<typeof createClient>, userId: string, i
     const problems = draftProblems(d.section, editedValue, (src || []).map((r) => String(r.key)));
     if (problems.length) throw new Error(problems.join(" "));
   }
-  const previous = await publishedValue(db, d.section, d.key); // kept for the digest's corrections
+  const previous = await publishedValue(db, d.section, d.key); // kept for corrections and alerts
   await applyDraft(db, d as Draft, editedValue ?? undefined);
   const { error: e2 } = await db
     .from("drafts")

@@ -83,11 +83,12 @@ All Watch email goes through `lib/mail.ts`: Resend when `RESEND_API_KEY` and `DI
 | Email | Sent by | Gated by the Admin email switch | Unsubscribe |
 |---|---|---|---|
 | Weekly digest | An editor, from `/admin/digest` | No (sent by hand) | `digest_opt_in`, signed link + one-click header |
+| Alerts, **opt-in, off by default** (new FERC approvals, effective dates set or moved, deadlines within 14 days) | Vercel Cron → `/api/jobs/alerts` daily at 13:00 UTC (`vercel.json`, `CRON_SECRET`) | Yes | `alerts_opt_in` (default false), signed link + one-click header |
 | Team invites | A company admin's action | No (a person's direct action) | n/a |
 
 - **Unsubscribe links** are HMAC-signed with `EMAIL_LINK_SECRET` (`lib/email-links.ts`). The page asks before acting, so link scanners can't unsubscribe anyone. The `List-Unsubscribe` header does one-click unsubscribe (RFC 8058).
-- **What changed:** approving a draft stores the value it replaced in `drafts.previous`. `lib/changes.ts` turns these into the digest's suggested corrections.
-- **No alert emails, by design:** NERC sends its own alerts, and Watch's job is one reviewed weekly digest (OPEN-QUESTIONS 14).
+- **What changed:** approving a draft stores the value it replaced in `drafts.previous`. `lib/changes.ts` turns these into the digest's suggested corrections and into alerts. `alert_log` makes sure each alert goes out once.
+- **Digest first:** NERC sends its own alerts, and Watch's job is one reviewed weekly digest. Alerts exist only for people who turn them on (OPEN-QUESTIONS 14).
 - **Calendar feed:** `lib/ical.ts` builds it. UIDs depend only on the entry, label and date, lines are folded at 75 octets, and the tests parse it with ical.js.
 
 ## Code map

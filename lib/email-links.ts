@@ -2,13 +2,14 @@ import "server-only";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { siteUrl } from "./stripe";
 
-/* Signed unsubscribe links for the weekly digest, the only bulk Watch email (no separate alert emails, by design).
+/* Signed unsubscribe links. The weekly digest is on by default; alerts are an opt-in extra. Each kind has its own
+   link, so stopping alerts doesn't stop the digest.
    The signature is an HMAC of the user id and kind with EMAIL_LINK_SECRET (server only), so a link
    can't be forged for someone else and needs no database token. */
 
-export type ListKind = "digest";
-export const LIST_NAME: Record<ListKind, string> = { digest: "the weekly Standards Watch digest" };
-export const LIST_COLUMN: Record<ListKind, "digest_opt_in"> = { digest: "digest_opt_in" };
+export type ListKind = "digest" | "alerts";
+export const LIST_NAME: Record<ListKind, string> = { digest: "the weekly Standards Watch digest", alerts: "Standards Watch alerts" };
+export const LIST_COLUMN: Record<ListKind, "digest_opt_in" | "alerts_opt_in"> = { digest: "digest_opt_in", alerts: "alerts_opt_in" };
 
 function secret() {
   const s = process.env.EMAIL_LINK_SECRET || (process.env.NODE_ENV !== "production" ? process.env.SUPABASE_SERVICE_ROLE_KEY : "");
@@ -17,7 +18,7 @@ function secret() {
 }
 const sign = (uid: string, kind: ListKind) => createHmac("sha256", secret()).update(`unsub:${kind}:${uid}`).digest("base64url").slice(0, 32);
 
-export const isListKind = (k: unknown): k is ListKind => k === "digest";
+export const isListKind = (k: unknown): k is ListKind => k === "digest" || k === "alerts";
 
 export function verifyUnsubscribe(uid: string, kind: ListKind, token: string) {
   if (!/^[0-9a-f-]{36}$/i.test(uid) || typeof token !== "string") return false;

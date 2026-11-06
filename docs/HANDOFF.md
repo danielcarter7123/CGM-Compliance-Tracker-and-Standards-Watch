@@ -136,7 +136,7 @@ Each milestone ends with `npm run typecheck && npm test && npm run build` green 
 - **W4. Billing:** Stripe test mode end to end, with the webhook writing `entitlements`. **Ask Dan:** prices, monthly vs annual, seats, trial, invoicing.
 - **W5. Delivery:**
   - digest unsubscribe link, plain-text part and corrections line;
-  - ~~alerts for FERC approvals, new effective dates and deadlines under 14 days~~ dropped by Dan: the digest is the only Watch email (OPEN-QUESTIONS 14);
+  - alerts for FERC approvals, new effective dates and deadlines under 14 days, as an opt-in setting that's off by default; the digest is the main Watch email (OPEN-QUESTIONS 14);
   - an iCal import check.
 - **W6. Monday task switch** (`docs/MONDAY-TASK.md`).
 

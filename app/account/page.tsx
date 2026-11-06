@@ -80,6 +80,14 @@ export default async function AccountPage({ searchParams }: { searchParams: { sa
           <input type="checkbox" name="digest" defaultChecked={v.digestOptIn} /> Email me the weekly digest
         </label>
         <div className="field">
+          <label style={{ display: "flex", gap: 8, alignItems: "center", textTransform: "none", letterSpacing: 0, fontSize: 15, fontWeight: 400, color: "var(--ink)" }}>
+            <input type="checkbox" name="alerts" defaultChecked={v.alertsOptIn} /> Also email me alerts between digests (optional)
+          </label>
+          <span className="muted" style={{ fontSize: 13 }}>
+            Off by default. The weekly digest already covers everything. Turn this on only if you want a separate email whenever FERC approves a standard, an effective date is set or moves, or a comment period or event is within 14 days.
+          </span>
+        </div>
+        <div className="field">
           <label htmlFor="full_name">Your name</label>
           <input id="full_name" name="full_name" type="text" defaultValue={v.fullName} />
         </div>
