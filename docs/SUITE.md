@@ -25,7 +25,8 @@ Each app has its own header. Inside an app, "← CGM Workspace" on the left goes
 ## Sign-in
 
 - **Microsoft (Entra ID) is the main sign-in.** The Workspace offers "Sign in with Microsoft" first. Powerworks signs in with Microsoft only, so if both use the same Entra setup, someone already signed in to Microsoft passes straight through Powerworks's sign-in.
-- **Fallback for clients without Microsoft 365:** an emailed one-time sign-in link. There are no passwords anywhere.
+- **Fallback for clients without Microsoft 365:** an emailed one-time sign-in link.
+- **No passwords anywhere** (confirmed by Dan, Nov 6, 2026). Don't add a password box to either side.
 - **Status:** the Microsoft button needs CGM's Entra app registration plus the Supabase Azure provider settings (`docs/SETUP.md`). Until they're set, the button shows as not yet available and the email link works.
 
 ## Powerworks plug-in
