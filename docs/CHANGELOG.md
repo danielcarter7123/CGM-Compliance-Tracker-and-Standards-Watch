@@ -2,6 +2,20 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 6, 2026: close-out with a verified performed date (Claude Code)
+
+**Decided by Dan** (OPEN-QUESTIONS 18): clients close tasks out when the report arrives, but the date recorded must be the date the work was performed.
+- **"Close out task"** (`components/CloseOutForm.tsx`):
+  - "Date the work was performed" starts at today, can be backdated, and is never future;
+  - a confirmation tick is required, and the server checks it too;
+  - a live line shows "Performed on <date> (backdated)" and when the next occurrence will be due;
+  - the button stays disabled until confirmed.
+- **PM correction:** the staff form shows "Date the work was performed" on performed or complete tasks. If the task repeats from completion, changing it moves the still-open next occurrence, computed with SQL `next_due` through RPC.
+- **Tests:**
+  - RLS: a client's backdated date is kept, a completion-based next occurrence counts from it, and the client can't change it afterwards;
+  - e2e: the button is disabled until confirmed, the backdated preview, the saved date and next due, and the PM correction moving the next occurrence;
+  - the T2 and T5 tests use the new steps.
+
 ## Nov 6, 2026: T5 client view (Claude Code)
 
 **Isolation, proven end to end** (`e2e/tracker-t5.spec.ts`): a Demo Wind Farm (fake) user tries to reach Sample Peaker (fake).

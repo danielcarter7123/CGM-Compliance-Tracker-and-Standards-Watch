@@ -27,12 +27,13 @@ test("tasks: create, mark performed, next occurrence, staff can't approve, PM ap
   await form.getByRole("button", { name: "Add task" }).click();
   await expect(page.getByText("Task added.")).toBeVisible();
 
-  // Mark performed (two steps); a monthly task due Jan 31 repeats on Feb 28 (month end clamps).
+  // Close out (performed date confirmed); a monthly task due Jan 31 repeats on Feb 28 (month end clamps).
   let drawer = page.getByRole("region", { name: TITLE });
-  await drawer.getByText("Mark performed").click();
-  await expect(drawer.getByText("The next occurrence is created right away, due Feb 28, 2027.")).toBeVisible();
-  await drawer.getByRole("button", { name: "Confirm performed" }).click();
-  await expect(page.getByText("Marked performed. The next occurrence is scheduled.")).toBeVisible();
+  await drawer.locator("details.perform > summary").click();
+  await expect(drawer.locator(".closeout-check")).toContainText("The next occurrence will be due Feb 28, 2027, counted from the due date.");
+  await drawer.getByLabel(/I've checked this is the date the work was performed/).check();
+  await drawer.locator("form.closeout").getByRole("button", { name: "Close out task" }).click();
+  await expect(page.getByText(/Closed out as performed on .* The next occurrence is scheduled./)).toBeVisible();
   drawer = page.getByRole("region", { name: TITLE });
   await expect(drawer.locator(".pill")).toHaveText("Pending review");
   await expect(drawer.getByRole("link", { name: "Next occurrence, due Feb 28, 2027 →" })).toBeVisible();

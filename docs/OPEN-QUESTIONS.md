@@ -82,6 +82,11 @@ Running `npm install`, `npm run typecheck`, `npm test` and `npm run build`, and 
    - **Sign-in:** one shared sign-in screen in the cinematic design (Dan's image). **Microsoft is the main path**, as the Powerworks chat advised. The fallback for clients without Microsoft 365 is the emailed one-time link. **No password box: confirmed by Dan, Nov 6, 2026.** No passwords are stored anywhere in CGM Workspace.
    - **Powerworks:** the tile is a plain link to its own address (`POWERWORKS_URL`), never an iframe, never merged code. A "coming soon" page stands in until it's set.
    - **Client ID and name:** use the same client ID (`companies.id`) and name in every app. One place to set up clients across the Workspace and the Powerworks Control Center is decided at plug-in time.
+18. **Closing out tasks with the right date** (Nov 6, 2026). Clients often do the work and get the report a month later. They close the task out when the report arrives, but the date recorded must be the date the work was performed.
+   - **"Close out task"** (the pilot's "Mark performed") asks for "Date the work was performed". It starts at today, can be backdated but never set in the future, and needs a confirmation tick. It shows the resulting next due date before it's saved.
+   - **What the date drives:** the performed date is the compliance date. Completion-based repeats count from it.
+   - **PM review:** a CGM PM can correct the date while reviewing. If the task repeats from completion, the still-open next occurrence moves to match (SQL `next_due`).
+   - **Approval** by a PM or admin is unchanged.
 
 **Client data:** the live tracker's data is essential to how the internal tracker runs. It must be carried over completely and handled under CLAUDE.md rule 7.
 

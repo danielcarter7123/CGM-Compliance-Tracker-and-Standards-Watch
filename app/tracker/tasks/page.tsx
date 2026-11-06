@@ -1,3 +1,4 @@
+import CloseOutForm from "@/components/CloseOutForm";
 import { requireTracker } from "@/lib/guards";
 import { REGISTERED_FUNCTIONS, standardLink } from "@/lib/functions";
 import { createClient } from "@/lib/supabase/server";
@@ -179,6 +180,15 @@ export default async function Tasks({ searchParams: sp }: { searchParams: SP }) 
                   </select>
                 </div>
               )}
+              {!isNew && (sel.status === "review" || sel.status === "done") && (
+                <div className="field">
+                  <label htmlFor="t_done">Date the work was performed</label>
+                  <input id="t_done" name="completed_at" type="date" defaultValue={sel.completed_at || ""} max={todayIso()} />
+                  <span className="muted small">
+                    Check it against the report before approving.{sel.recur_basis === "done" && sel.next_id ? " Changing it moves the next occurrence's due date to match." : ""}
+                  </span>
+                </div>
+              )}
               <div className="field">
                 <label htmlFor="t_ev">Evidence location</label>
                 <input id="t_ev" name="evidence" type="text" defaultValue={sel.evidence || ""} placeholder="https://… link to the dated evidence folder" />
@@ -200,30 +210,21 @@ export default async function Tasks({ searchParams: sp }: { searchParams: SP }) 
             </dl>
           )}
           {!staff && !isNew && (
-            <p className="muted small clientnote">CGM sets the due date, repeat schedule and assignee. To change one, ask your CGM project manager. You can mark the task performed and post evidence and notes.</p>
+            <p className="muted small clientnote">CGM sets the due date, repeat schedule and assignee. To change one, ask your CGM project manager. You can close out the task (with the date the work was performed) and post evidence and notes.</p>
           )}
 
           {!isNew && (sel.status === "open" || sel.status === "inprogress") && (
             <details className="perform">
-              <summary className="btn-main sm">Mark performed</summary>
-              <form action={markPerformed} className="trk-form">
-                {keepFields}
-                <input type="hidden" name="id" value={sel.id} />
-                <div className="row2">
-                  <div className="field">
-                    <label htmlFor="p_date">Date performed</label>
-                    <input id="p_date" name="performed_on" type="date" defaultValue={todayIso()} max={todayIso()} required />
-                  </div>
-                  <div className="field">
-                    <label htmlFor="p_ev">Evidence link (optional)</label>
-                    <input id="p_ev" name="evidence" type="text" defaultValue={sel.evidence || ""} placeholder="https://…" />
-                  </div>
-                </div>
-                <p className="muted small">
-                  Performed counts for compliance.{sel.recur_n > 0 && sel.due_date ? ` The next occurrence is created right away, due ${fmt(nextDuePreview(sel.recur_basis === "done" ? todayIso() : sel.due_date, sel.recur_n, sel.recur_unit))}${sel.recur_basis === "done" ? " if performed today" : ""}.` : ""} A CGM project manager approves it once the report is posted.
-                </p>
-                <div><button className="btn-main" type="submit">Confirm performed</button></div>
-              </form>
+              <summary className="btn-main sm">Close out task</summary>
+              <CloseOutForm
+                action={markPerformed}
+                id={sel.id}
+                filters={Object.fromEntries(Object.entries(f).filter(([, x]) => x)) as Record<string, string>}
+                evidence={sel.evidence || ""}
+                today={todayIso()}
+                due={sel.due_date}
+                recur={{ n: sel.recur_n, unit: sel.recur_unit, basis: sel.recur_basis }}
+              />
             </details>
           )}
 

@@ -57,16 +57,34 @@ export async function saveTask(formData: FormData) {
   if (id) {
     const update: Record<string, unknown> = { ...row };
     if (["open", "inprogress", "review", "done"].includes(status)) update.status = status;
+    // A PM correcting the performed date (checked against the report). Never a future date.
+    const performed = str(formData, "completed_at");
+    const { data: before } = await db.from("tasks").select("completed_at, next_id").eq("id", id).maybeSingle();
+    if (performed) {
+      if (!DATE.test(performed)) again("Enter the performed date as a date.");
+      if (performed > todayIso()) again("The performed date can't be in the future.");
+      update.completed_at = performed;
+    }
     const { error } = await db.from("tasks").update(update).eq("id", id);
     if (error) again(error.message);
-    back(to(formData, id, `ok=${encodeURIComponent("Task saved.")}`));
+    // Repeating from completion: move the still-open next occurrence to match (date math in SQL next_due).
+    let moved = "";
+    if (performed && before && performed !== before.completed_at && row.recur_basis === "done" && row.recur_n > 0 && before.next_id) {
+      const { data: nextDue, error: e1 } = await db.rpc("next_due", { base: performed, n: row.recur_n, unit: row.recur_unit });
+      if (e1) again(e1.message);
+      const { data: nt, error: e2 } = await db.from("tasks").update({ due_date: nextDue }).eq("id", before.next_id).in("status", ["open", "inprogress"]).select("id");
+      if (e2) again(e2.message);
+      if (nt?.length) moved = ` The next occurrence is now due ${nextDue}.`;
+    }
+    back(to(formData, id, `ok=${encodeURIComponent(`Task saved.${moved}`)}`));
   }
   const { data, error } = await db.from("tasks").insert({ ...row, status: status === "inprogress" ? "inprogress" : "open", created_by: v.userId }).select("id").single();
   if (error || !data) return again(error?.message || "Couldn't add the task.");
   back(to(formData, data.id as string, `ok=${encodeURIComponent("Task added.")}`));
 }
 
-/** "Mark performed": performed counts for compliance; the database records who and when and, for a
+/** "Close out task" (the pilot's "Mark performed"): performed counts for compliance. The date is the date the
+ *  work was performed, confirmed by the person (it may be backdated; reports often arrive weeks later); the database records who and when and, for a
  *  repeating task, creates the next occurrence right away. Client users can do this for their own tasks. */
 export async function markPerformed(formData: FormData) {
   await requireTracker("/tracker/tasks");
@@ -76,6 +94,7 @@ export async function markPerformed(formData: FormData) {
   const err = (msg: string) => back(to(formData, id, `error=${encodeURIComponent(msg)}`));
   if (!DATE.test(date)) err("Enter the date the work was performed.");
   if (date > todayIso()) err("The performed date can't be in the future.");
+  if (formData.get("confirm_date") !== "on") err("Check the date the work was performed (not the date the report arrived), then tick the box to confirm it.");
   if (evidence && !isLink(evidence) && /^http:/i.test(evidence)) err("Evidence links must start with https://");
   const update: Record<string, unknown> = { status: "review", completed_at: date };
   if (evidence) update.evidence = evidence;
@@ -83,7 +102,7 @@ export async function markPerformed(formData: FormData) {
   const { error } = await db.from("tasks").update(update).eq("id", id);
   if (error) err(error.message);
   const { data: t } = await db.from("tasks").select("next_id").eq("id", id).maybeSingle();
-  back(to(formData, id, `ok=${encodeURIComponent(t?.next_id ? "Marked performed. The next occurrence is scheduled." : "Marked performed.")}`));
+  back(to(formData, id, `ok=${encodeURIComponent(`Closed out as performed on ${date}.${t?.next_id ? " The next occurrence is scheduled." : ""} A CGM project manager will review it.`)}`));
 }
 
 /** "Approve & close": CGM project managers and admins (the database refuses anyone else). */

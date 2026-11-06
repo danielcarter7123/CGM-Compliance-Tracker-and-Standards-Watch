@@ -437,3 +437,15 @@ test("T5: CGM PMs invite into any client; client admins only their own; clients 
   assert.equal(await count(B_USER, `select count(*) from tasks where id = '${t.id}'`), 0, "or see it");
   await db.exec(`delete from tasks where id = '${t.id}'`);
 });
+
+test("close-out: a client backdates the performed date (report arrived later); a completion-based next occurrence counts from it", async () => {
+  const [t] = (await db.query(`insert into tasks(company_id, title, due_date, recur_n, recur_unit, recur_basis)
+    values ('${A_CO}','Fake relay test (report comes later)', current_date + 10, 12, 'm', 'done') returning id`)).rows;
+  const [p] = await as(T_USER, `update tasks set status = 'review', completed_at = current_date - 40 where id = '${t.id}' returning completed_at::text as d, next_id`);
+  const { rows: [exp] } = await db.query(`select (current_date - 40)::text as performed, public.next_due(current_date - 40, 12, 'm')::text as next`);
+  assert.equal(p.d, exp.performed, "the backdated performed date is kept");
+  const { rows: [n] } = await db.query(`select due_date::text as d from tasks where id = '${p.next_id}'`);
+  assert.equal(n.d, exp.next, "next occurrence counts from the performed date, not the close-out day");
+  assert.ok(await fails(T_USER, `update tasks set completed_at = current_date - 50 where id = '${t.id}'`), "the client can't change it afterwards; the PM can");
+  await db.exec(`delete from tasks where id in ('${t.id}', '${p.next_id}')`);
+});

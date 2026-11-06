@@ -73,10 +73,11 @@ test("a client user can't reach another company by URL or API; marks own task pe
     const drawer = page.getByRole("region", { name: mine.title });
     await expect(drawer.getByText("CGM sets the due date, repeat schedule and assignee.")).toBeVisible();
     await expect(drawer.getByLabel("Due date")).toHaveCount(0);
-    await drawer.getByText("Mark performed").click();
-    await drawer.getByLabel("Evidence link (optional)").fill("https://sharepoint.example/fake-evidence");
-    await drawer.getByRole("button", { name: "Confirm performed" }).click();
-    await expect(page.getByText("Marked performed.")).toBeVisible();
+    await drawer.locator("details.perform > summary").click();
+    await drawer.getByLabel("Evidence or report link (optional)").fill("https://sharepoint.example/fake-evidence");
+    await drawer.getByLabel(/I've checked this is the date the work was performed/).check();
+    await drawer.locator("form.closeout").getByRole("button", { name: "Close out task" }).click();
+    await expect(page.getByText(/Closed out as performed on/)).toBeVisible();
     await expect(page.getByRole("region", { name: mine.title }).locator(".pill")).toHaveText("Pending review");
   } finally {
     await service(`tasks?id=in.(${mine.id},${theirs.id})`, { method: "DELETE" });
@@ -106,4 +107,50 @@ test("CGM invites a client user from the client's details; the person joins that
   const row = page.getByRole("region", { name: "People" }).locator("li", { hasText: email });
   await row.getByRole("button", { name: `Remove ${email}` }).click();
   await expect(page.getByText("Removed from this client.")).toBeVisible();
+});
+
+test("close-out: the client confirms a backdated performed date; the PM corrects it and the next occurrence follows", async ({ page }) => {
+  const { nextDuePreview } = await import("../lib/tasks");
+  const { fmt } = await import("../lib/watch");
+  const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const daysAgo = (n: number) => { const d = new Date(); d.setDate(d.getDate() - n); return iso(d); };
+  const [wind] = await service(`companies?select=id&name=eq.${encodeURIComponent("Demo Wind Farm LLC (fake)")}`);
+  const [task] = await service("tasks", { method: "POST", body: JSON.stringify({
+    company_id: wind.id, title: `Fake relay test ${run}`, due_date: daysAgo(-10), recur_n: 12, recur_unit: "m", recur_basis: "done",
+  }) });
+  const ids = [task.id];
+  try {
+    await signIn(page, "member@wind.example", "/tracker");
+    await page.goto(`/tracker/tasks?status=all&t=${task.id}`);
+    let drawer = page.getByRole("region", { name: task.title });
+    await drawer.locator("details.perform > summary").click();
+    const button = drawer.locator("form.closeout").getByRole("button", { name: "Close out task" });
+    await expect(button).toBeDisabled(); // nothing closes until the date is confirmed
+    const performed = daysAgo(40);
+    await drawer.getByLabel("Date the work was performed", { exact: true }).fill(performed);
+    await expect(drawer.locator(".closeout-check")).toContainText(`Performed on ${fmt(performed)} (backdated).`);
+    await expect(drawer.locator(".closeout-check")).toContainText(`The next occurrence will be due ${fmt(nextDuePreview(performed, 12, "m"))}, counted from this date.`);
+    await drawer.getByLabel(/I've checked this is the date the work was performed/).check();
+    await button.click();
+    await expect(page.getByText(`Closed out as performed on ${performed}.`)).toBeVisible();
+    const [after] = await service(`tasks?select=completed_at,next_id&id=eq.${task.id}`);
+    expect(after.completed_at).toBe(performed);
+    ids.push(after.next_id);
+    const [next] = await service(`tasks?select=due_date&id=eq.${after.next_id}`);
+    expect(next.due_date).toBe(nextDuePreview(performed, 12, "m"));
+
+    // The PM checks the report and corrects the date; the open next occurrence moves to match.
+    await page.context().clearCookies();
+    await signIn(page, "pm@cgm.example", "/tracker");
+    await page.goto(`/tracker/tasks?status=all&t=${task.id}`);
+    drawer = page.getByRole("region", { name: task.title });
+    const corrected = daysAgo(45);
+    await drawer.getByLabel("Date the work was performed", { exact: true }).fill(corrected);
+    await drawer.getByRole("button", { name: "Save", exact: true }).click();
+    await expect(page.getByText(`Task saved. The next occurrence is now due ${nextDuePreview(corrected, 12, "m")}.`)).toBeVisible();
+    const [moved] = await service(`tasks?select=due_date&id=eq.${after.next_id}`);
+    expect(moved.due_date).toBe(nextDuePreview(corrected, 12, "m"));
+  } finally {
+    await service(`tasks?id=in.(${ids.filter(Boolean).join(",")})`, { method: "DELETE" });
+  }
 });
