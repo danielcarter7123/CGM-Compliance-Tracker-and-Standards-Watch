@@ -1,6 +1,6 @@
 # Moving the Monday task to the app
 
-> **Now there are two drafters.** The app has its own weekly drafting job (`lib/watch-job.ts`). Vercel Cron runs it Mondays at 15:00 UTC, before the Monday task's 9:47 AM Mountain run, and an editor can start it from `/admin/review` with "Run it now".
+> **Now there are two drafters.** The app has its own weekly drafting job (`lib/watch-job.ts`). Vercel Cron runs it Mondays at 17:00 UTC (10 a.m. Mountain, 11 a.m. in summer), after the NERC newsletter, which sometimes arrives around 9 a.m., and after the Monday task's 9:47 AM Mountain run. An editor can also start it from `/admin/review` with "Run it now". Drafts the Monday task already queued show as pending, so the job skips them.
 >
 > - **What it reads:** NERC, FERC, Federal Register and Regional Entity sites (web search and fetch limited to those domains). It doesn't read Outlook, so the emailed newsletter remains the Monday task's job.
 > - **No duplicates:** both write ids as `<date>-<section>-<key>`, and the API ignores a repeated id, so whichever runs second can't queue a duplicate. The Monday task's `GET /api/drafts` also shows the job's drafts as pending.

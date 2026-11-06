@@ -21,7 +21,7 @@ export default function DraftingJobPanel({ runs }: { runs: JobRun[] }) {
       <div className="rhead">
         <span className="rtag">Editor only</span>
         <h2>Weekly drafting job</h2>
-        <span className="rc">Mondays at 15:00 UTC</span>
+        <span className="rc">Mondays at 10 a.m. Mountain (11 a.m. in summer)</span>
         <button
           type="button"
           className="btn"

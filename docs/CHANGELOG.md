@@ -10,7 +10,7 @@ What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.
   - It answers through one strict `submit_drafts` tool.
   - It uses prompt caching across paused turns and the server-side refusal fallback.
 - `lib/watch-job-core.ts` (pure, unit-tested): submission → drafts in the Monday task's shape. Values are checked against the Edit-first rules, problems are flagged rather than dropped, and the ids match the Monday task so nothing is queued twice. Only https refs are kept, and drafts already pending are skipped.
-- **Schedule:** `/api/jobs/watch-drafts` runs Mondays at 15:00 UTC (`vercel.json`, `CRON_SECRET`).
+- **Schedule:** `/api/jobs/watch-drafts` runs Mondays at 17:00 UTC (`vercel.json`, `CRON_SECRET`): 10 a.m. Mountain in winter, 11 a.m. in summer. Dan moved it from 15:00 UTC because NERC's newsletter sometimes arrives around 9 a.m.
 - **Review page:** "Weekly drafting job" panel with the last five runs (summary, what wasn't confirmed, estimated cost) and a two-click "Run it now".
 - **Migration `0011_watch_job_runs.sql`:** the run log, readable by editors only, plus an RLS test.
 - **New setting:** `ANTHROPIC_API_KEY` (`.env.example`). Without it, runs are logged as skipped.

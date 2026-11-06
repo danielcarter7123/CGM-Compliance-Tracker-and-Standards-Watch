@@ -94,7 +94,7 @@ All Watch email goes through `lib/mail.ts`: Resend when `RESEND_API_KEY` and `DI
 ## Weekly drafting job
 
 - **What it does:** once a week, `lib/watch-job.ts` asks Claude (`claude-opus-5-5`, adaptive thinking, effort `high`) to draft the week's Standards Watch changes.
-- **Triggers:** Vercel Cron calls `/api/jobs/watch-drafts` Mondays at 15:00 UTC (with `CRON_SECRET`), or an editor clicks "Run it now" on `/admin/review`.
+- **Triggers:** Vercel Cron calls `/api/jobs/watch-drafts` Mondays at 17:00 UTC, which is 10 a.m. Mountain standard time and 11 a.m. daylight time, after NERC's Monday newsletter, which can arrive around 9 a.m. (with `CRON_SECRET`), or an editor clicks "Run it now" on `/admin/review`.
 - **What Claude gets:** the published content, pending drafts and the last 60 days of decisions. Server-side `web_search` and `web_fetch` are limited to NERC, FERC, the Federal Register and the six Regional Entities.
 - **What Claude returns:** it answers only through the strict `submit_drafts` tool.
 - **Checks before anything is queued:** `lib/watch-job-core.ts` checks every value with `lib/draft-fields.ts`. It keeps only https refs and skips anything already pending. Drafts with problems are still queued, flagged "Needs editing before approval".
