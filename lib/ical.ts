@@ -39,7 +39,7 @@ export function buildCalendar({ items, deadlines, functions, site, now = new Dat
   const titles = new Map(mine.map((i) => [i.id, i.title]));
   const lines: string[] = [
     "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//CGM Consulting Group//Standards Watch//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
-    "X-WR-CALNAME:NERC Standards Watch", "NAME:NERC Standards Watch",
+    "X-WR-CALNAME:CGM Standards Watch", "NAME:CGM Standards Watch",
     "REFRESH-INTERVAL;VALUE=DURATION:PT12H", "X-PUBLISHED-TTL:PT12H",
   ];
   const seen = new Set<string>();

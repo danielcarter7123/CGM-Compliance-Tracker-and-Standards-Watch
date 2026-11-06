@@ -54,12 +54,29 @@ test("digest renders for each function group and filters transmission-only items
   assert.match(digestSubject(content), /Week of/);
 });
 
-test("entitlement rules: Tracker includes Watch; Client Tasks needs a live Tracker", async () => {
+test("entitlement rules: separate apps; Client Tasks needs a live Tracker; same as SQL company_has", async () => {
   const { productsFrom } = await import("../lib/entitlements");
-  assert.deepEqual(productsFrom([{ product: "watch", status: "active" }]), { watch: true, tracker: false, client_tasks: false });
-  assert.deepEqual(productsFrom([{ product: "tracker", status: "trialing" }]), { watch: true, tracker: true, client_tasks: false });
-  assert.deepEqual(productsFrom([{ product: "tracker", status: "canceled" }, { product: "client_tasks", status: "active" }]), { watch: false, tracker: false, client_tasks: false });
-  assert.deepEqual(productsFrom([{ product: "tracker", status: "active" }, { product: "client_tasks", status: "active" }]), { watch: true, tracker: true, client_tasks: true });
+  const none = { watch: false, tracker: false, client_tasks: false, powerworks: false };
+  assert.deepEqual(productsFrom([{ product: "watch", status: "active" }]), { ...none, watch: true });
+  assert.deepEqual(productsFrom([{ product: "tracker", status: "trialing" }]), { ...none, tracker: true }, "the Tracker no longer includes Watch");
+  assert.deepEqual(productsFrom([{ product: "tracker", status: "canceled" }, { product: "client_tasks", status: "active" }]), none);
+  assert.deepEqual(productsFrom([{ product: "tracker", status: "active" }, { product: "client_tasks", status: "active" }]), { ...none, tracker: true, client_tasks: true });
+  assert.deepEqual(productsFrom([{ product: "powerworks", status: "active" }]), { ...none, powerworks: true });
+
+  // Compare with SQL company_has on every combination of live products.
+  const { freshDb } = await import("./helpers/pg.mjs");
+  const db = await freshDb();
+  const prods = ["watch", "tracker", "client_tasks", "powerworks"] as const;
+  for (let mask = 0; mask < 16; mask++) {
+    const ents = prods.filter((_, i) => mask & (1 << i)).map((product) => ({ product, status: "active" }));
+    const id = (await db.query<{ id: string }>("insert into companies(name) values ('Fake combo') returning id")).rows[0].id;
+    for (const e of ents) await db.query("insert into entitlements(company_id, product, status) values ($1,$2,'active')", [id, e.product]);
+    const ts = productsFrom(ents as any);
+    for (const p of prods) {
+      const sql = (await db.query<{ ok: boolean }>("select public.company_has($1, $2) as ok", [id, p])).rows[0].ok;
+      assert.equal(ts[p], sql, `mask ${mask} product ${p}`);
+    }
+  }
 });
 
 test("the CGM standards library loads into the tracker tables", async () => {

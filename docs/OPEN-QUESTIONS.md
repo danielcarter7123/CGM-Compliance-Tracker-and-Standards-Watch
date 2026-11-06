@@ -75,6 +75,13 @@ Running `npm install`, `npm run typecheck`, `npm test` and `npm run build`, and 
    - **Prospects:** `/standards-watch` (description, sample cards, plans) and the weekly digest serve people without an account.
    - **Placement:** Watch has its own "NERC Standards Watch" button in the header (`components/WatchButton.tsx`), not a tab mixed in with the Tracker sections.
    - **Offered, not built:** a one-click "Open Standards Watch" link in the digest that signs the reader in.
+17. **Three separate apps in one CGM Workspace** (Nov 6, 2026). This supersedes 15 and 16 where they differ; the contract is `docs/SUITE.md`.
+   - **The apps:** CGM Standards Watch (the newsletter), CGM Compliance Tracker (tasks) and CGM Powerworks (asset management, a separate project) are three separate apps owned by CGM. A client uses them with one account and has exactly the apps their plan includes. The Tracker no longer includes Watch.
+   - **After sign-in:** people land on the **CGM Workspace** launcher (Dan's demo), with Essentials, Operations or Enterprise following from the number of apps.
+   - **Inside each app:** its own header, with "← CGM Workspace" on the left. No cross-app buttons.
+   - **Sign-in:** one shared sign-in screen in the cinematic design (Dan's image). **Microsoft is the main path**, as the Powerworks chat advised. The fallback for clients without Microsoft 365 is the emailed one-time link, chosen instead of a password box so no passwords are stored. Dan can still ask for passwords.
+   - **Powerworks:** the tile is a plain link to its own address (`POWERWORKS_URL`), never an iframe, never merged code. A "coming soon" page stands in until it's set.
+   - **Client ID and name:** use the same client ID (`companies.id`) and name in every app. One place to set up clients across the Workspace and the Powerworks Control Center is decided at plug-in time.
 
 **Client data:** the live tracker's data is essential to how the internal tracker runs. It must be carried over completely and handled under CLAUDE.md rule 7.
 

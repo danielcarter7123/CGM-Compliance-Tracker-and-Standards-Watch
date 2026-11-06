@@ -25,7 +25,7 @@ export async function approveDraft(id: string, editedValue?: Record<string, unkn
   } catch (e) {
     return { ok: false, error: (e as Error).message };
   } finally {
-    revalidatePath("/admin/review");
+    revalidatePath("/watch/review");
     revalidatePath("/watch");
   }
 }
@@ -45,7 +45,7 @@ export async function approveAll(ids: string[]): Promise<Result> {
   } catch (e) {
     return { ok: false, error: done ? `Published ${done}, then: ${(e as Error).message}` : (e as Error).message };
   } finally {
-    revalidatePath("/admin/review");
+    revalidatePath("/watch/review");
     revalidatePath("/watch");
   }
 }
@@ -79,7 +79,7 @@ export async function rejectDraft(id: string): Promise<Result> {
       .eq("id", id)
       .eq("status", "pending");
     if (error) throw new Error(error.message);
-    revalidatePath("/admin/review");
+    revalidatePath("/watch/review");
     return { ok: true };
   } catch (e) {
     return { ok: false, error: (e as Error).message };
@@ -94,7 +94,7 @@ export async function runDraftingJob(): Promise<Result> {
   const { createAdminClient } = await import("@/lib/supabase/admin");
   try {
     const r = await runWatchJob(createAdminClient(), "manual");
-    revalidatePath("/admin/review");
+    revalidatePath("/watch/review");
     return r.status === "error" ? { ok: false, error: r.message } : { ok: true, message: r.message };
   } catch (e) {
     return { ok: false, error: (e as Error).message };

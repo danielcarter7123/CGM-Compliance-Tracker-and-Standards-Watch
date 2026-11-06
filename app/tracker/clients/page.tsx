@@ -164,13 +164,15 @@ export default async function Clients({ searchParams }: { searchParams: { c?: st
           {!isNew && (
             <form action={setClientProducts} className="trk-form addons">
               <input type="hidden" name="id" value={sel.id} />
-              <span className="lbl">Add-ons and products</span>
+              <span className="lbl">Applications</span>
               <fieldset disabled={!isAdmin} className="addonlist">
-                <label className="checkline"><input type="checkbox" name="tracker" defaultChecked={has(sel.id, "tracker")} /> Compliance Tracker (includes Standards Watch)</label>
-                <label className="checkline"><input type="checkbox" name="client_tasks" defaultChecked={has(sel.id, "client_tasks")} /> Client Tasks add-on</label>
+                <label className="checkline"><input type="checkbox" name="watch" defaultChecked={has(sel.id, "watch")} /> CGM Standards Watch</label>
+                <label className="checkline"><input type="checkbox" name="tracker" defaultChecked={has(sel.id, "tracker")} /> CGM Compliance Tracker</label>
+                <label className="checkline"><input type="checkbox" name="client_tasks" defaultChecked={has(sel.id, "client_tasks")} /> Client Tasks add-on (needs the Tracker)</label>
+                <label className="checkline"><input type="checkbox" name="powerworks" defaultChecked={has(sel.id, "powerworks")} /> CGM Powerworks</label>
               </fieldset>
               <span className="muted small">
-                Client Tasks gives this client its own task list for work outside NERC, such as environmental, safety, maintenance and internal tasks. It only works while the Tracker is on.
+                Each CGM Workspace application is separate. Client Tasks gives this client its own task list for work outside NERC (environmental, safety, maintenance, internal); it only works while the Tracker is on.
                 {!isAdmin && " Only CGM admins change products."}
               </span>
               {isAdmin && <div><button className="btn-line sm" type="submit">Save products</button></div>}

@@ -70,9 +70,19 @@ async function fails(uid, sql) {
 const count = async (uid, sql) => Number((await as(uid, sql))[0].count);
 
 // ---------- Standards Watch ----------
-test("Watch content: Watch and Tracker clients and staff read it; no plan reads nothing", async () => {
-  for (const u of [ADMIN, STAFF, W_USER, T_USER, B_USER]) assert.equal(await count(u, "select count(*) from standards"), 1, u);
-  assert.equal(await count(NOPLAN, "select count(*) from standards"), 0);
+test("Watch content: Watch subscribers and staff read it; the Tracker alone doesn't include it (0012); no plan reads nothing", async () => {
+  for (const u of [ADMIN, STAFF, W_USER]) assert.equal(await count(u, "select count(*) from standards"), 1, u);
+  for (const u of [T_USER, B_USER, NOPLAN]) assert.equal(await count(u, "select count(*) from standards"), 0, u);
+  // Give client B Standards Watch as its own app: now its users read it.
+  await db.exec(`insert into entitlements(company_id, product) values ('${B_CO}','watch')`);
+  assert.equal(await count(B_USER, "select count(*) from standards"), 1);
+  assert.equal(await count(B_USER, "select count(*) from tasks"), 1, "and still their own tasks");
+  await db.exec(`delete from entitlements where company_id = '${B_CO}' and product = 'watch'`);
+  // Powerworks is a product too, and grants nothing in these two apps.
+  await db.exec(`insert into entitlements(company_id, product) values ('${W_CO}','powerworks')`);
+  assert.equal(await count(W_USER, "select count(*) from tasks"), 0);
+  assert.ok(await fails(ADMIN, `insert into entitlements(company_id, product) values ('${W_CO}','not-a-product')`));
+  await db.exec(`delete from entitlements where company_id = '${W_CO}' and product = 'powerworks'`);
 });
 
 test("Watch drafts: CGM admins only", async () => {

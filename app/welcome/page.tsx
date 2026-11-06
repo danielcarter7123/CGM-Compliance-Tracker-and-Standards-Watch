@@ -12,7 +12,7 @@ export const metadata = { title: "Welcome" };
  *  are filtered from day one. Everything here can be changed later on the account page. */
 export default async function WelcomePage({ searchParams }: { searchParams: { next?: string; joined?: string; error?: string } }) {
   const n = searchParams.next;
-  const next = n?.startsWith("/") && !n.startsWith("//") && !n.startsWith("/welcome") ? n : "/watch";
+  const next = n?.startsWith("/") && !n.startsWith("//") && !n.startsWith("/welcome") ? n : "/workspace";
   const v = await requireViewer(`/welcome?next=${encodeURIComponent(next)}`);
   if (v.isStaff) redirect(next);
 
@@ -27,7 +27,7 @@ export default async function WelcomePage({ searchParams }: { searchParams: { ne
   return (
     <main className="wrap page" style={{ display: "grid", gap: 18 }}>
       <div>
-        <h1>{companyName ? `Welcome to CGM Compliance Tracker, ${companyName}` : "Welcome to CGM Compliance Tracker"}</h1>
+        <h1>{companyName ? `Welcome to CGM Workspace, ${companyName}` : "Welcome to CGM Workspace"}</h1>
         <p className="lede">Two quick choices so Standards Watch and your weekly email show what applies to you. You can change them any time on your account page.</p>
       </div>
       {searchParams.error && <p className="notice">Couldn&apos;t save: {searchParams.error}</p>}

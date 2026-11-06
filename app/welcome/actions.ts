@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ALL_FUNCTIONS, REGIONS } from "@/lib/types";
 
 const safeNext = (n: unknown) =>
-  typeof n === "string" && n.startsWith("/") && !n.startsWith("//") && !n.startsWith("/welcome") ? n : "/watch";
+  typeof n === "string" && n.startsWith("/") && !n.startsWith("//") && !n.startsWith("/welcome") ? n : "/workspace";
 
 /** Saves the first-login choices. Runs as the user, so the database only lets them change their own profile. */
 export async function finishWelcome(formData: FormData) {

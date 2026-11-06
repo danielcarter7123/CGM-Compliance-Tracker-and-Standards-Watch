@@ -31,7 +31,7 @@ test("review queue: edit with checks, reject, approve all, decision log", async 
     { id: `e2e-dl-${run}`, section: "deadlines", op: "upsert", key: `e2e-dl-${run}`, label: `Fake deadline ${run}`, value: { d: "2099-02-01", t: "Fake comment period (test)", fn: null } },
   ]);
 
-  await signIn(page, "admin@cgm.example", "/admin/review");
+  await signIn(page, "admin@cgm.example", "/watch/review");
   const item = draft(page, `${STD} (fake)`);
   await expect(item).toContainText("Fake standard for automated tests");
   await expect(item).toContainText("U.S. effective date"); // field names, not raw keys
@@ -62,7 +62,7 @@ test("review queue: edit with checks, reject, approve all, decision log", async 
   await expect(card).toContainText("Fake phase 2");
 
   // Decision log: who, edited flag, filters.
-  await page.goto("/admin/review/log");
+  await page.goto("/watch/review/log");
   await expect(page.locator(".logrow", { hasText: `${STD} (fake)` })).toContainText("Approved · edited");
   await page.getByLabel("Decision").selectOption("rejected");
   await page.getByRole("button", { name: "Filter" }).click();
@@ -75,7 +75,7 @@ test("review queue: edit with checks, reject, approve all, decision log", async 
     { id: `e2e-rm-item-${run}`, section: "items", op: "remove", key: ITEM, label: `Remove ${STD} (fake)` },
     { id: `e2e-rm-src-${run}`, section: "sources", op: "remove", key: `e2esrc${run}`, label: `Remove fake source ${run}` },
   ]);
-  await page.goto("/admin/review");
+  await page.goto("/watch/review");
   await page.getByRole("button", { name: "Approve all" }).click();
   await page.getByRole("button", { name: /Click again to publish all \d+/ }).click();
   await expect(page.getByText(/Published all \d+\./)).toBeVisible();
@@ -86,8 +86,8 @@ test("review queue: edit with checks, reject, approve all, decision log", async 
 
 test("only CGM admins reach the review queue and the decision log", async ({ page }) => {
   await signIn(page, "pm@cgm.example", "/watch");
-  for (const path of ["/admin/review", "/admin/review/log"]) {
+  for (const path of ["/watch/review", "/watch/review/log"]) {
     await page.goto(path);
-    await expect(page).toHaveURL(/\/tracker$/); // their home: the Dashboard
+    await expect(page).toHaveURL(/\/workspace$/); // back to the CGM Workspace launcher
   }
 });

@@ -111,7 +111,7 @@ test("clients: a PM adds a client with contacts and mapped entities; staff only 
   await page.context().clearCookies();
   await signIn(page, "admin@cgm.example", "/tracker/clients");
   await page.locator(".clienttable .rowlink", { hasText: name }).click();
-  await page.getByLabel("Compliance Tracker (includes Standards Watch)").check();
+  await page.getByLabel("CGM Compliance Tracker").check();
   await page.getByRole("button", { name: "Save products" }).click();
   await expect(page.getByText("Products updated.")).toBeVisible();
   await expect(page.locator(".clienttable tbody tr", { hasText: name })).not.toContainText("TRACKER OFF");

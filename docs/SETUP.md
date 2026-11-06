@@ -78,7 +78,7 @@ Milestone F1 adds an admin screen for this.
 1. Add and verify your sending domain (DNS records at whoever hosts cgmconsultinggroup.com). A subdomain such as `watch.cgmconsultinggroup.com` keeps digest mail separate from your normal email reputation.
 2. Create an API key and put it in `RESEND_API_KEY`. Set `DIGEST_FROM`, for example `CGM Standards Watch <watch@cgmconsultinggroup.com>`.
 3. Sign-in emails: in Supabase, **Authentication > Emails > SMTP Settings**, enable custom SMTP with host `smtp.resend.com`, port 465, user `resend`, password = the Resend API key. Supabase's built-in sender is rate-limited and only meant for testing.
-4. Test: open `/admin/digest`, preview each function view, then send. While only your account exists it goes to you alone.
+4. Test: open `/watch/digest`, preview each function view, then send. While only your account exists it goes to you alone.
 
 ## 6b. Microsoft 365 (SharePoint evidence)
 
@@ -113,3 +113,27 @@ Follow [IMPORT.md](IMPORT.md): export from the live tracker, dry run into local 
 | `/watch` empty for an editor | `npm run import:pilot` hasn't been run against this project |
 | Digest says "not sent" | `RESEND_API_KEY` or `DIGEST_FROM` missing, or the domain isn't verified |
 | `/api/drafts` returns 401 | Token mismatch, or `DRAFTS_API_TOKEN` shorter than 24 characters |
+
+## Microsoft sign-in (CGM Workspace's main sign-in)
+
+Microsoft is the main way into CGM Workspace (decision 17, `docs/SUITE.md`); the emailed link is the fallback for people without Microsoft 365. Until these steps are done, the button on the sign-in page says it isn't connected yet.
+
+1. **Microsoft Entra** (CGM's Microsoft 365 admin center → Entra ID → App registrations → New registration):
+   - Name: `CGM Workspace`.
+   - Supported account types: **Accounts in any organizational directory (multitenant)**, so client staff can sign in with their own company's Microsoft 365. Single-tenant would allow CGM staff only.
+   - Redirect URI (Web): `https://<your-project>.supabase.co/auth/v1/callback`. Locally: `http://127.0.0.1:54321/auth/v1/callback`.
+   - Certificates & secrets → New client secret. Copy the **value** and the **Application (client) ID**.
+   - Use the **same Entra setup as CGM Powerworks** if possible, so someone signed in once passes straight into Powerworks.
+2. **Supabase** (Dashboard → Authentication → Providers → Azure): turn it on and paste the client ID and secret. Leave the tenant URL as `https://login.microsoftonline.com/common` for multitenant.
+3. **Vercel:** set `NEXT_PUBLIC_MICROSOFT_SIGNIN=on` and redeploy. The button becomes active.
+4. **Locally (optional):** add to `supabase/config.toml`, then `npm run db:stop && npm run db:start`:
+
+   ```toml
+   [auth.external.azure]
+   enabled = true
+   client_id = "env(AZURE_CLIENT_ID)"
+   secret = "env(AZURE_SECRET)"
+   url = "https://login.microsoftonline.com/common"
+   ```
+
+A person who signs in with Microsoft gets the same account as their emailed-link sign-in when the email address matches.

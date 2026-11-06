@@ -38,7 +38,7 @@ export function digestSections(content: Content, functions: string[]) {
 }
 
 export function digestSubject(content: Content) {
-  return `NERC Standards Watch: ${content.week?.label ?? "this week's changes"}`;
+  return `CGM Standards Watch: ${content.week?.label ?? "this week's changes"}`;
 }
 
 export function renderDigest(content: Content, functions: string[], siteUrl: string, opts: DigestOptions = {}) {
@@ -69,7 +69,7 @@ export function renderDigest(content: Content, functions: string[], siteUrl: str
 
   return `<!doctype html><html><body style="margin:0;background:${C.bg}">
   <div style="max-width:640px;margin:0 auto;padding:24px 20px;background:${C.bg}">
-    <div style="font:600 12px Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:${C.accent}">CGM Consulting Group · NERC Standards Watch</div>
+    <div style="font:600 12px Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:${C.accent}">CGM Workspace · CGM Standards Watch</div>
     <div style="font:13px Arial,sans-serif;color:${C.muted};margin:4px 0 18px">Filtered for ${esc(fnLabel)} · reviewed ${esc(fmt(content.reviewed))}</div>
     ${correctionsHtml}${week}
     ${updated.length ? h2("Updated this week") + table(updated) : ""}
@@ -84,7 +84,7 @@ export function renderDigest(content: Content, functions: string[], siteUrl: str
 export function renderDigestText(content: Content, functions: string[], siteUrl: string, opts: DigestOptions = {}) {
   const { updated, ahead, deadlines, fnLabel } = digestSections(content, functions);
   const corrections = (opts.corrections || []).filter((c) => c.trim());
-  const out: string[] = ["NERC STANDARDS WATCH · CGM Consulting Group", `Filtered for ${fnLabel} · reviewed ${fmt(content.reviewed)}`, ""];
+  const out: string[] = ["CGM STANDARDS WATCH · CGM Consulting Group", `Filtered for ${fnLabel} · reviewed ${fmt(content.reviewed)}`, ""];
   const section = (h: string, rows: Row[]) => {
     if (!rows.length) return;
     out.push(h.toUpperCase(), "-".repeat(h.length));

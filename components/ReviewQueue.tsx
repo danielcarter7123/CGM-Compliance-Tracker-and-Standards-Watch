@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { approveAll, approveDraft, rejectDraft } from "@/app/admin/review/actions";
+import { approveAll, approveDraft, rejectDraft } from "@/app/watch/review/actions";
 import DraftEditor from "@/components/DraftEditor";
 import { draftProblems, fieldLabel } from "@/lib/draft-fields";
 import { TOPICS, type Draft } from "@/lib/types";

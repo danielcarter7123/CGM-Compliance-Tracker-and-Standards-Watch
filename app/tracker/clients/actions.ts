@@ -85,22 +85,24 @@ export async function saveClient(formData: FormData) {
   back(`c=${companyId}&ok=${encodeURIComponent(id ? `${name} saved.` : `${name} added. A CGM admin turns the Tracker on for it under Add-ons.`)}`);
 }
 
-/** Admin only: switch the Compliance Tracker and the Client Tasks add-on for a client (writes entitlements). */
+/** Admin only: switch a client's CGM Workspace applications (writes entitlements). Each app is separate;
+ *  Client Tasks needs the Tracker. Stripe-billed Standards Watch is changed in Stripe. */
 export async function setClientProducts(formData: FormData) {
   const v = await requireStaff("/tracker/clients");
   const id = str(formData, "id");
   if (v.staffRole !== "admin") back(`c=${id}&error=${encodeURIComponent("Only CGM admins change a client's products.")}`);
   const db = createClient();
-  const want = { tracker: formData.get("tracker") === "on", client_tasks: formData.get("client_tasks") === "on" };
+  const want = { watch: formData.get("watch") === "on", tracker: formData.get("tracker") === "on", client_tasks: formData.get("client_tasks") === "on", powerworks: formData.get("powerworks") === "on" };
   if (want.client_tasks && !want.tracker) back(`c=${id}&error=${encodeURIComponent("Client Tasks only works while the Tracker is on.")}`);
   const now = new Date().toISOString();
-  for (const product of ["tracker", "client_tasks"] as const) {
+  for (const product of ["watch", "tracker", "client_tasks", "powerworks"] as const) {
     const { data: cur } = await db.from("entitlements").select("status, source").eq("company_id", id).eq("product", product).maybeSingle();
     const live = cur && (cur.status === "active" || cur.status === "trialing");
     if (want[product] && !live) {
       const { error } = await db.from("entitlements").upsert({ company_id: id, product, status: "active", source: "contract", updated_at: now }, { onConflict: "company_id,product" });
       if (error) back(`c=${id}&error=${encodeURIComponent(error.message)}`);
     } else if (!want[product] && live) {
+      if (cur.source === "stripe") back(`c=${id}&error=${encodeURIComponent("CGM Standards Watch is billed through Stripe for this client. Cancel it in Stripe so billing stops too.")}`);
       const { error } = await db.from("entitlements").update({ status: "canceled", updated_at: now }).eq("company_id", id).eq("product", product);
       if (error) back(`c=${id}&error=${encodeURIComponent(error.message)}`);
     }

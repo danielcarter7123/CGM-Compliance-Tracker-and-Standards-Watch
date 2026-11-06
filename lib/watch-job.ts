@@ -8,7 +8,7 @@ import { JOB_AUTHOR, SUBMIT_TOOL, estimateCost, submissionToDrafts, type Submiss
 
 /* The weekly Standards Watch drafting job (Dan's decision 9: cheap but reliable). Once a week Claude reads
    this week's NERC and FERC news on official sites and proposes drafts in the pilot's draft shape. It never
-   publishes: drafts wait in /admin/review for an editor (CLAUDE.md rule 4). The Monday task in Dan's Claude
+   publishes: drafts wait in /watch/review for an editor (CLAUDE.md rule 4). The Monday task in Dan's Claude
    account stays as the backup; both use the same draft ids, so whichever runs second can't duplicate drafts.
    Web pages are untrusted input: Claude may only search and fetch the official domains below, its only
    output is the submit tool, and every value is checked again before it's queued. */
@@ -20,7 +20,7 @@ const OFFICIAL = [
   "texasre.org", "wecc.org", "serc.org", "rfirst.org", "mro.net", "npcc.org",
 ];
 
-const SYSTEM = `You maintain CGM Consulting Group's "NERC Standards Watch" for its editor. Once a week you draft the week's changes for the editor to review. You never publish anything: your only output is one call to submit_drafts, and every draft waits for the editor's approval.
+const SYSTEM = `You maintain CGM Consulting Group's "CGM Standards Watch" for its editor. Once a week you draft the week's changes for the editor to review. You never publish anything: your only output is one call to submit_drafts, and every draft waits for the editor's approval.
 
 WHAT YOU GET
 The user message has today's date and the currently published content in draft shape: week {label, covers, items[{b,t}]}, sources {key:{t,u}}, items {id:{...}}, deadlines {id:{d,t,who,fn}}, activity {id:{d,src,t}}. It also lists drafts already waiting (don't duplicate them) and recent decisions (don't re-propose something the editor rejected unless the facts changed).

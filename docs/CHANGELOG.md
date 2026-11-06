@@ -2,6 +2,39 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 6, 2026: CGM Workspace: three separate apps (Claude Code)
+
+**Decided by Dan** (OPEN-QUESTIONS 17, contract in `docs/SUITE.md`): CGM Standards Watch, CGM Compliance Tracker and CGM Powerworks are separate apps on one CGM account. Clients get exactly the apps their plan includes. This supersedes decisions 15 and 16 where they differ.
+
+**Sign-in** (`/login`): Dan's cinematic design, with the full-bleed plant at dusk and a dark glass card.
+- **Microsoft first:** "Sign in with Microsoft" (Supabase Azure provider). The button is active once `NEXT_PUBLIC_MICROSOFT_SIGNIN=on`; the setup steps are in `docs/SETUP.md`.
+- **Email-link fallback** for people without Microsoft 365. There are no passwords.
+
+**Launcher** (`/workspace`, from Dan's demo):
+- banner, organization box, "Your applications" with the plan badge (Essentials, Operations or Enterprise by number of apps);
+- three cards, each "Open application" or "Explore access";
+- everyone lands here after signing in, and locked addresses come back here.
+
+**Each app is separate:**
+- Standards Watch (`/watch`; editor screens moved to `/watch/review`, `/watch/review/log`, `/watch/digest`) and Compliance Tracker (`/tracker`) each have their own header, title and footer, with "← CGM Workspace" on the left.
+- There are no links between apps. The Watch button and the Watch page's "Continue to the Dashboard" bar are gone.
+- Account and Admin are Workspace pages.
+
+**Products** (`0012_separate_apps.sql`):
+- **New product:** `powerworks`.
+- **Tracker separate from Watch:** the Tracker no longer includes Watch, in `company_has()` and `productsFrom()`. A unit test compares the two on all 16 product combinations.
+- **No one lost access:** Tracker clients kept Watch as its own entitlement.
+- **Importer:** gives imported live clients both apps, since the pilot opened with Watch.
+- **Client panel:** has all four switches. A Stripe-billed Watch can't be switched off there.
+
+**Powerworks:** the launcher tile links to `POWERWORKS_URL` (a separate site, never framed). Until that's set, `/powerworks` is a "coming soon" page.
+
+**Names:** "CGM Standards Watch" (page, digest subject and header, calendar name), "CGM Workspace" (sign-in, launcher, invites, email sender).
+
+**Local data:** the trial-import data was removed from the local database (`db:reset`, `seed:dev`, `import:pilot`). The fake companies now cover Watch only, Tracker only, and all three apps.
+
+**Tests:** RLS (Watch not included with the Tracker, Powerworks product), unit (entitlements against SQL), import (both apps). e2e: every role's launcher cards, plan, Tracker header and tabs, no cross-app links, redirects to the launcher, app names, the Powerworks placeholder.
+
 ## Nov 6, 2026: T2a dry-run import of the live tracker, local only (Claude Code)
 
 - **The run:** the Nov 5 export went into the local Supabase only (`npm run import:tracker`, then `psql` inside the local database container). The export and the SQL stay in `data/private/`, which is git-ignored, and nothing from them is committed.

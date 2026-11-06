@@ -35,7 +35,7 @@ async function queue(drafts: Record<string, unknown>[]) {
   expect(res.status, await res.text()).toBe(200);
 }
 async function approveEverything(page: Page) {
-  await page.goto("/admin/review");
+  await page.goto("/watch/review");
   const all = page.getByRole("button", { name: "Approve all" });
   if (await all.count()) {
     await all.click();
@@ -51,13 +51,13 @@ test("digest: corrections suggested, sent with plain text and unsubscribe; the l
   const STD = `TEST-000-${run}`, key = `test-dg-${run}`;
   await queue([{ id: `dg-add-${run}`, section: "items", op: "upsert", key, label: `${STD} (fake)`,
     value: { std: STD, title: "Fake standard (digest test)", fn: ["GO"], topic: "ops", effective: "2099-01-01", what: "Test data.", src: [] } }]);
-  await signIn(page, "admin@cgm.example", "/admin/review");
+  await signIn(page, "admin@cgm.example", "/watch/review");
   await approveEverything(page);
   await queue([{ id: `dg-chg-${run}`, section: "items", op: "upsert", key, label: `${STD} (fake) date change`,
     value: { std: STD, title: "Fake standard (digest test)", fn: ["GO"], topic: "ops", effective: "2099-04-01", what: "Test data.", src: [] } }]);
   await approveEverything(page);
 
-  await page.goto("/admin/digest");
+  await page.goto("/watch/digest");
   const box = page.getByLabel("Corrections to earlier digests (one per line, optional)");
   await expect(box).toHaveValue(new RegExp(`${STD}: U.S. effective date changed from Jan 1, 2099 to Apr 1, 2099.`));
   await box.fill(`${STD}: U.S. effective date changed from Jan 1, 2099 to Apr 1, 2099. (fake test correction)`);
@@ -69,7 +69,7 @@ test("digest: corrections suggested, sent with plain text and unsubscribe; the l
   await page.getByRole("button", { name: "Click again to send to all subscribers" }).click();
   await expect(page.getByText(/Sent to \d+ subscribers?\./)).toBeVisible();
 
-  const m = await waitForMail("admin@watch.example", "NERC Standards Watch");
+  const m = await waitForMail("admin@watch.example", "CGM Standards Watch");
   const full = (await (await fetch(`${MAILPIT}/api/v1/message/${m.ID}`)).json()) as { Text: string; HTML: string };
   const headers = (await (await fetch(`${MAILPIT}/api/v1/message/${m.ID}/headers`)).json()) as Record<string, string[]>;
   expect(full.Text).toContain("(fake test correction)");
@@ -119,9 +119,9 @@ test("alerts: opt-in only; nothing while emails are off; once on, each alert is 
 
   await queue([{ id: `al-add-${run}`, section: "items", op: "upsert", key, label: `${STD} (fake)`,
     value: { std: STD, title: "Fake standard (alert test)", fn: ["GO", "GOP"], topic: "ops", ferc: "2099-01-15", effective: "2099-10-01", what: "Test data.", src: [] } }]);
-  await signIn(page, "admin@cgm.example", "/admin/review");
+  await signIn(page, "admin@cgm.example", "/watch/review");
   await approveEverything(page);
-  await page.goto("/admin/digest");
+  await page.goto("/watch/digest");
   await expect(page.locator(".dlist li", { hasText: `${STD} approved by FERC` })).toBeVisible();
   await expect(page.getByText("Automated emails are off, so nothing is sent.")).toBeVisible();
 
@@ -157,7 +157,7 @@ test("alerts: opt-in only; nothing while emails are off; once on, each alert is 
   await expect(page.getByLabel(/Also email me alerts between digests/)).not.toBeChecked(); // one-click turned them off again
 
   await page.context().clearCookies();
-  await signIn(page, "admin@cgm.example", "/admin/review");
+  await signIn(page, "admin@cgm.example", "/watch/review");
   await queue([{ id: `al-rm-${run}`, section: "items", op: "remove", key, label: `Remove ${STD} (fake)` }]);
   await approveEverything(page);
 });

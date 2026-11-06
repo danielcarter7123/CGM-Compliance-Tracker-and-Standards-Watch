@@ -26,7 +26,8 @@ export async function signIn(page: Page, email: string, next = "/account") {
 
 /** The top-right links in the header (account and editor tools). */
 export async function navLinks(page: Page): Promise<string[]> {
-  return (await page.locator("nav.sitenav a").allInnerTexts()).map((t) => t.replace("🔒", "").trim());
+  // The Account link starts with the initials avatar; keep the label (last line) only.
+  return (await page.locator("nav.sitenav a").allInnerTexts()).map((t) => t.replace("🔒", "").trim().split(/\s*\n\s*/).pop()!.trim());
 }
 
 /** The section menu under the CGM Compliance Tracker header, including greyed-out sections. */

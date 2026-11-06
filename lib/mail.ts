@@ -20,7 +20,7 @@ async function viaMailpit(m: Mail) {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
-      From: { Email: "no-reply@cgm.example", Name: "CGM Compliance Tracker" },
+      From: { Email: "no-reply@cgm.example", Name: "CGM Workspace" },
       To: [{ Email: m.to }],
       Subject: m.subject,
       Text: m.text,

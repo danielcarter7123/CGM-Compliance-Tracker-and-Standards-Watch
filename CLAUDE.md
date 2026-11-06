@@ -7,12 +7,17 @@ Guidance for Claude Code working in this repository. Before starting any milesto
 
 ## What this is
 
-**CGM Compliance Tracker** is the app. Its name is at the top of every screen and in every page title. **NERC Standards Watch is one scrollable page inside it** (`/watch`), reached from its own "NERC Standards Watch" button in the header, never one of the Tracker's section tabs (decision 16). That page is the only place the "NERC Standards Watch" name is used as a title. The Watch digest email and calendar feed keep the Watch name because they are that page's output. Dan's decision (OPEN-QUESTIONS 15); "build the Watch page first" was about launch order, never about branding.
+**CGM Workspace** is a suite of three separate apps owned by CGM Consulting Group, used with one account (decision 17; contract in `docs/SUITE.md`):
 
-Both are from CGM Consulting Group, for NERC-registered utilities:
+- After sign-in, people land on the **CGM Workspace** launcher (`/workspace`), which shows the apps their plan includes.
+- **CGM Standards Watch** (`/watch`) and **CGM Compliance Tracker** (`/tracker`) are built here, each with its own header and a "← CGM Workspace" back arrow. Never add buttons or tabs that cross between apps.
+- **CGM Powerworks** is a separate project with its own server and database. Here it is only a launcher tile linking to `POWERWORKS_URL` (or the `/powerworks` placeholder). Never frame it or merge its code.
+- **Products are separate:** a Tracker subscription does not include Standards Watch.
 
-- **Standards Watch**: a reviewed, function-filtered view of NERC standards that FERC has approved, versions taking effect, and requirements phasing in. It comes with a weekly digest and a calendar feed. Sold self-serve through Stripe.
-- **Compliance Tracker**: CGM's operator console for running each client's NERC compliance program. It covers recurring tasks from a standards library, review and approval, internal team work, messages and an audit log. Clients on a Tracker agreement see and act on their own company's tasks. It includes Standards Watch. An optional **Client Tasks** add-on gives a client a non-NERC task list.
+The two apps built here, for NERC-registered utilities:
+
+- **CGM Standards Watch**: a reviewed, function-filtered view of NERC standards that FERC has approved, versions taking effect, and requirements phasing in. It comes with a weekly digest and a calendar feed. Sold self-serve through Stripe.
+- **CGM Compliance Tracker**: CGM's operator console for running each client's NERC compliance program. It covers recurring tasks from a standards library, review and approval, internal team work, messages and an audit log. Clients on a Tracker agreement see and act on their own company's tasks. An optional **Client Tasks** add-on gives a client a non-NERC task list.
 
 Both began as claude.ai artifacts (the "pilots"). `docs/reference/pilot-watch-page.html` and `docs/reference/pilot-tracker-page.html` (the Sandbox Copy: the features to build) are the references for look and behavior. `docs/reference/live-tracker-page.html` is the live tracker, whose data is imported; `docs/tracker/TRACKER-SPEC.md` describes the Tracker in full.
 

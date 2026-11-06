@@ -13,7 +13,7 @@ test("drafting job: the cron route needs its secret", async ({ request }) => {
 
 test("drafting job: editors see the panel and its run log; without an API key a run is logged as skipped", async ({ page }) => {
   test.skip(!!process.env.ANTHROPIC_API_KEY, "a key is set: running would call the Claude API");
-  await signIn(page, "admin@cgm.example", "/admin/review");
+  await signIn(page, "admin@cgm.example", "/watch/review");
   const panel = page.getByRole("region", { name: "Weekly drafting job" });
   await expect(panel).toContainText("It never publishes anything.");
   await panel.getByRole("button", { name: "Run it now" }).click();
@@ -25,6 +25,6 @@ test("drafting job: editors see the panel and its run log; without an API key a 
 
 test("drafting job: PMs and clients don't see it", async ({ page }) => {
   await signIn(page, "pm@cgm.example", "/watch");
-  await page.goto("/admin/review");
-  await expect(page).toHaveURL(/\/tracker$/); // their home: the Dashboard
+  await page.goto("/watch/review");
+  await expect(page).toHaveURL(/\/workspace$/); // back to the CGM Workspace launcher
 });

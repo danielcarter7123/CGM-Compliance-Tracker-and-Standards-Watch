@@ -44,12 +44,13 @@ test("page furniture: hero jump flashes the card; calendar, CTA, sources and dis
   await expect(page.getByRole("heading", { name: "Not sure which of these apply to your facilities?" })).toBeVisible();
   await expect(page.locator(".foot.sources li").first()).toBeVisible();
   await expect(page.getByText("for awareness only and is not a compliance determination")).toBeVisible();
-  // Watch-only company: the bottom bar shows the Tracker as locked.
-  await expect(page.locator(".nextbar .nbtn.locked")).toBeVisible();
 });
 
-test("Tracker clients get the Continue to the Dashboard bar", async ({ page }) => {
-  await signIn(page, "member@wind.example", "/watch");
-  await page.locator(".nextbar a", { hasText: "Continue to the Dashboard" }).click();
-  await expect(page).toHaveURL(/\/tracker$/);
+test("CGM Standards Watch is its own app: back to CGM Workspace, no Tracker links", async ({ page }) => {
+  await signIn(page, "member@peaker.example", "/watch");
+  await expect(page.locator(".mast .bname")).toContainText("CGM Standards Watch");
+  await expect(page.locator(".nextbar")).toHaveCount(0);
+  await expect(page.locator('a[href="/tracker"]')).toHaveCount(0);
+  await page.locator(".backlink").click();
+  await expect(page).toHaveURL(/\/workspace$/);
 });

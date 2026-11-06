@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { previewDigest, sendDigest } from "@/app/admin/digest/actions";
+import { previewDigest, sendDigest } from "@/app/watch/digest/actions";
 
 /** Corrections box, live preview (HTML and plain text) and the two-click send. */
 export default function DigestComposer({

@@ -4,9 +4,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import type { Content } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "NERC Standards Watch plans" };
+export const metadata = { title: "Plans" };
 
-/** Public offer page for NERC Standards Watch (subscribe self-serve). The app's front door is the sign-in screen;
+/** Public offer page for CGM Standards Watch (subscribe self-serve). The app's front door is the sign-in screen;
  *  this page is for marketing links and the "Standards Watch plans" links. Teaser cards come from live content. */
 export default async function StandardsWatchOffer({ searchParams }: { searchParams: { checkout?: string } }) {
   let content: Content | null = null;
@@ -20,7 +20,7 @@ export default async function StandardsWatchOffer({ searchParams }: { searchPara
   return (
     <main>
       <section className="section wrap watchintro page" id="standards-watch">
-        <div className="watchname">NERC Standards Watch</div>
+        <div className="watchname">CGM Standards Watch</div>
         <h1 className="watchoffer">Know which NERC standards are changing, before they reach you</h1>
         <p className="secnote">
           Included with the Tracker, and available on its own. Every week CGM Consulting Group reviews NERC and FERC activity and tells you,
@@ -34,7 +34,7 @@ export default async function StandardsWatchOffer({ searchParams }: { searchPara
         {content && content.items.length > 0 && (
           <>
             <div className="sechead"><h3 className="subhead">A look at this week</h3></div>
-            <p className="secnote">A few entries from the current NERC Standards Watch. Subscribers see every standard, filtered to their functions.</p>
+            <p className="secnote">A few entries from the current CGM Standards Watch. Subscribers see every standard, filtered to their functions.</p>
             <WatchView content={content} defaultFunctions={[]} teaser />
           </>
         )}

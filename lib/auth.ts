@@ -47,7 +47,7 @@ export async function getViewer(): Promise<Viewer | null> {
   const staffRole = (p.staff_role as StaffRole | null) ?? null;
   const isStaff = !!staffRole;
   const isEditor = staffRole === "admin" || p.role === "editor";
-  const products = isStaff ? { watch: true, tracker: true, client_tasks: true } : productsFrom(entitlements);
+  const products = isStaff ? { watch: true, tracker: true, client_tasks: true, powerworks: true } : productsFrom(entitlements);
   return {
     userId: auth.user.id,
     email: auth.user.email ?? null,

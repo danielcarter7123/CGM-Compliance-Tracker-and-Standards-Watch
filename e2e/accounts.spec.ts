@@ -25,12 +25,12 @@ test("a company admin invites a colleague, who joins on sign-in, sets up, and ca
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
   await signIn(page, newbie, "/welcome");
-  await expect(page.getByRole("heading", { name: "Welcome to CGM Compliance Tracker, Sample Peaker LLC (fake)" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Welcome to CGM Workspace, Sample Peaker LLC (fake)" })).toBeVisible();
   await expect(page.getByLabel("GO", { exact: true })).toBeChecked(); // started from the company's functions
   await page.getByLabel("Your name").fill("Nina Newbie (fake)");
   await page.getByLabel("Regional Entity").selectOption("SERC");
   await page.getByRole("button", { name: "Continue" }).click();
-  await expect(page).toHaveURL(/\/watch$/);
+  await expect(page).toHaveURL(/\/workspace$/);
   await page.goto("/tracker");
   await expect(page).toHaveURL(/\/tracker$/);
   await page.goto("/account");
@@ -42,7 +42,7 @@ test("a company admin invites a colleague, who joins on sign-in, sets up, and ca
   await admin.getByRole("button", { name: `Remove ${newbie}` }).click();
   await expect(admin.getByText("Removed from your company.")).toBeVisible();
   await page.goto("/tracker");
-  await expect(page).toHaveURL(/\/account\?need=tracker/);
+  await expect(page).toHaveURL(/\/workspace\?locked=tracker/);
   await ctx.close();
 });
 

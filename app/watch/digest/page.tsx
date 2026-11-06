@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 /** Editor only: preview the weekly email for any set of functions, add corrections, then send it to everyone.
  *  Also shows which alerts the daily job would send next. Everything is read as the editor (RLS). */
 export default async function DigestPage({ searchParams }: { searchParams: { fn?: string } }) {
-  await requireEditor("/admin/digest");
+  await requireEditor("/watch/digest");
   const fns = (searchParams.fn || "").split(",").filter((f) => ALL_FUNCTIONS.includes(f));
   const db = createClient();
   const content = await loadContent(db);
@@ -46,7 +46,7 @@ export default async function DigestPage({ searchParams }: { searchParams: { fn?
           <div className="rhead">
             <span className="rtag">Editor only</span><h2>Preview as</h2>
             <span className="rc">
-              <a href="/admin/digest">All</a> · <a href="/admin/digest?fn=GO,GOP">GO/GOP</a> · <a href="/admin/digest?fn=TO,TOP,TP,PC">TO/TOP/TP/PC</a>
+              <a href="/watch/digest">All</a> · <a href="/watch/digest?fn=GO,GOP">GO/GOP</a> · <a href="/watch/digest?fn=TO,TOP,TP,PC">TO/TOP/TP/PC</a>
             </span>
           </div>
           <div className="rlist">

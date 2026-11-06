@@ -5,8 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
-  const nextParam = url.searchParams.get("next") || "/watch";
-  const next = nextParam.startsWith("/") ? nextParam : "/watch";
+  const nextParam = url.searchParams.get("next") || "/workspace";
+  const next = nextParam.startsWith("/") ? nextParam : "/workspace";
   if (code) {
     const supabase = createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);

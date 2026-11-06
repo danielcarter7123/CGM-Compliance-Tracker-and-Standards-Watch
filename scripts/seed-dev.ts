@@ -19,7 +19,7 @@ type Person = {
 // One fake company per product mix the access matrix cares about.
 export const COMPANIES = [
   { key: "watch", name: "Example Watch Co (fake)", region: "WECC", functions: ["GO", "GOP"], products: ["watch"] },
-  { key: "full", name: "Sample Peaker LLC (fake)", region: "SERC", functions: ["GO", "GOP"], products: ["tracker", "client_tasks"] },
+  { key: "full", name: "Sample Peaker LLC (fake)", region: "SERC", functions: ["GO", "GOP"], products: ["watch", "tracker", "client_tasks", "powerworks"] },
   { key: "tracker", name: "Demo Wind Farm LLC (fake)", region: "MRO", functions: ["GO", "GOP", "GO-2", "GOP-2"], products: ["tracker"] },
 ] as const;
 

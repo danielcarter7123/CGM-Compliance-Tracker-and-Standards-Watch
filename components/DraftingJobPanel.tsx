@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { runDraftingJob } from "@/app/admin/review/actions";
+import { runDraftingJob } from "@/app/watch/review/actions";
 
 export type JobRun = {
   id: string; started_at: string; finished_at: string | null; trigger: string; status: string; drafts_queued: number;

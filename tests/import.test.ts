@@ -109,9 +109,9 @@ test("nothing is dropped: problems are kept in legacy and reported", async () =>
   assert.ok(!report.warnings.some((w) => w.includes("not-an-email")), "warnings never print the contact's email");
 });
 
-test("clients become Tracker clients; sample clients don't; the add-on flag carries over", async () => {
+test("clients become Tracker and Standards Watch clients (separate apps); sample clients don't; the add-on flag carries over", async () => {
   const ents = (await db.query<any>("select c.legacy_id, e.product from entitlements e join companies c on c.id = e.company_id order by 1, 2")).rows;
-  assert.deepEqual(ents.map((e) => `${e.legacy_id}:${e.product}`), ["c1:tracker", "c2:client_tasks", "c2:tracker"]);
+  assert.deepEqual(ents.map((e) => `${e.legacy_id}:${e.product}`), ["c1:tracker", "c1:watch", "c2:client_tasks", "c2:tracker", "c2:watch"]);
   const kinds = (await db.query<any>("select kind, email, digest from contacts where company_id = (select id from companies where legacy_id = 'c1') order by kind")).rows;
   assert.deepEqual(kinds.map((k) => k.kind), ["compliance", "plant_manager", "pm"]);
   assert.equal(kinds.find((k) => k.kind === "plant_manager").email, null);

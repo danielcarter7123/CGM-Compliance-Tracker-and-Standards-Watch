@@ -23,7 +23,7 @@ const when = (s: string | null) =>
 /** Editor only: every decision on a Watch draft, newest first, with who decided and whether it was edited.
  *  Drafts are never deleted, so this is the full record of what reached subscribers and why. */
 export default async function DecisionLog({ searchParams }: { searchParams: { status?: string; section?: string; page?: string } }) {
-  await requireEditor("/admin/review/log");
+  await requireEditor("/watch/review/log");
   const db = createClient();
   const page = Math.max(0, Number(searchParams.page) || 0);
   const status = searchParams.status === "approved" || searchParams.status === "rejected" ? searchParams.status : "";
@@ -44,13 +44,13 @@ export default async function DecisionLog({ searchParams }: { searchParams: { st
     const all = { status, section, ...over };
     for (const [k, v] of Object.entries(all)) if (String(v) !== "" && String(v) !== "0") p.set(k, String(v));
     const s = p.toString();
-    return `/admin/review/log${s ? `?${s}` : ""}`;
+    return `/watch/review/log${s ? `?${s}` : ""}`;
   };
 
   return (
     <main className="console">
       <div className="wrap">
-        <p><a href="/admin/review">← Review queue</a></p>
+        <p><a href="/watch/review">← Review queue</a></p>
         <h1>Decision log</h1>
         <p>Every approved and rejected Standards Watch draft, newest first. Edited means you changed the draft before approving it.</p>
 

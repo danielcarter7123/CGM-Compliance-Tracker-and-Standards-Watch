@@ -18,7 +18,7 @@ export function needsWelcome(v: Viewer) {
 
 export async function requireTracker(next = "/tracker"): Promise<Viewer> {
   const v = await requireViewer(next);
-  if (!v.products.tracker) redirect("/account?need=tracker");
+  if (!v.products.tracker) redirect("/workspace?locked=tracker");
   if (needsWelcome(v)) redirect(`/welcome?next=${encodeURIComponent(next)}`);
   return v;
 }
@@ -35,7 +35,7 @@ export async function requireAdmin(next = "/admin"): Promise<Viewer> {
   return v;
 }
 
-export async function requireEditor(next = "/admin/review"): Promise<Viewer> {
+export async function requireEditor(next = "/watch/review"): Promise<Viewer> {
   const v = await requireViewer(next);
   if (!v.isEditor) redirect(homeFor(v));
   return v;

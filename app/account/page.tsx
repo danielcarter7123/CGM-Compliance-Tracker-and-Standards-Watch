@@ -9,7 +9,7 @@ import { savePreferences, signOut } from "./actions";
 export const dynamic = "force-dynamic";
 
 const STATUS: Record<string, string> = { active: "Active", trialing: "Trial", past_due: "Payment past due", canceled: "Cancelled" };
-const PRODUCT: Record<string, string> = { watch: "Standards Watch", tracker: "Compliance Tracker (includes Standards Watch)", client_tasks: "Client Tasks add-on" };
+const PRODUCT: Record<string, string> = { watch: "CGM Standards Watch", tracker: "CGM Compliance Tracker", client_tasks: "Client Tasks add-on (Compliance Tracker)", powerworks: "CGM Powerworks" };
 
 export default async function AccountPage({ searchParams }: { searchParams: { saved?: string; error?: string; need?: string; checkout?: string; team?: string; who?: string } }) {
   const v = await getViewer();
@@ -28,7 +28,7 @@ export default async function AccountPage({ searchParams }: { searchParams: { sa
       {searchParams.need === "subscription" && !v.hasAccess && <p className="notice">Standards Watch needs an active subscription. Choose a plan below.</p>}
       {searchParams.need === "tracker" && !v.products.tracker && (
         <p className="notice">
-          The Compliance Tracker is available by agreement with CGM Consulting Group. It includes Standards Watch, plus your NERC tasks, reminders and evidence in one place.{" "}
+          CGM Compliance Tracker is available by agreement with CGM Consulting Group: your NERC tasks, reminders and evidence in one place.{" "}
           <a href="mailto:dan@cgmconsultinggroup.com?subject=Compliance%20Tracker">Ask CGM about access</a>.
         </p>
       )}

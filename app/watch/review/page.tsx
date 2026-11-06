@@ -14,7 +14,7 @@ export const maxDuration = 800;
 /** Editor-only review queue. Dark navy console, so it never reads as client-facing. */
 export default async function ReviewPage() {
   const v = await getViewer();
-  if (!v) redirect("/login?next=/admin/review");
+  if (!v) redirect("/login?next=/watch/review");
   if (!v.isEditor) redirect(homeFor(v));
 
   const db = createClient();
@@ -40,7 +40,7 @@ export default async function ReviewPage() {
         <DraftingJobPanel runs={(runs || []) as JobRun[]} />
         {decided && decided.length > 0 && (
           <section className="review" style={{ marginTop: 24 }}>
-            <div className="rhead"><span className="rtag">Log</span><h2>Recent decisions</h2><a className="only" href="/admin/review/log">Full decision log →</a></div>
+            <div className="rhead"><span className="rtag">Log</span><h2>Recent decisions</h2><a className="only" href="/watch/review/log">Full decision log →</a></div>
             <div className="rlist">
               {decided.map((x) => (
                 <div key={x.id} className="draft" style={{ borderLeftColor: x.status === "approved" ? "var(--adm-add)" : "var(--adm-del)" }}>

@@ -1,6 +1,6 @@
 # Moving the Monday task to the app
 
-> **Now there are two drafters.** The app has its own weekly drafting job (`lib/watch-job.ts`). Vercel Cron runs it Mondays at 17:00 UTC (10 a.m. Mountain, 11 a.m. in summer), after the NERC newsletter, which sometimes arrives around 9 a.m., and after the Monday task's 9:47 AM Mountain run. An editor can also start it from `/admin/review` with "Run it now". Drafts the Monday task already queued show as pending, so the job skips them.
+> **Now there are two drafters.** The app has its own weekly drafting job (`lib/watch-job.ts`). Vercel Cron runs it Mondays at 17:00 UTC (10 a.m. Mountain, 11 a.m. in summer), after the NERC newsletter, which sometimes arrives around 9 a.m., and after the Monday task's 9:47 AM Mountain run. An editor can also start it from `/watch/review` with "Run it now". Drafts the Monday task already queued show as pending, so the job skips them.
 >
 > - **What it reads:** NERC, FERC, Federal Register and Regional Entity sites (web search and fetch limited to those domains). It doesn't read Outlook, so the emailed newsletter remains the Monday task's job.
 > - **No duplicates:** both write ids as `<date>-<section>-<key>`, and the API ignores a repeated id, so whichever runs second can't queue a duplicate. The Monday task's `GET /api/drafts` also shows the job's drafts as pending.
@@ -17,8 +17,8 @@ When the app is live, only the destination changes. The sources, the read-only O
 |---|---|---|
 | Reads current state | Artifact store `watch/content` | `GET /api/drafts` |
 | Writes drafts | Artifact store `watch_drafts` | `POST /api/drafts` |
-| Where you review | Pilot page, editor panel | `/admin/review` |
-| After approving | Daily sync copies to the tracker | Digest from `/admin/digest` |
+| Where you review | Pilot page, editor panel | `/watch/review` |
+| After approving | Daily sync copies to the tracker | Digest from `/watch/digest` |
 
 ## Draft shape (unchanged)
 
@@ -57,7 +57,7 @@ When the app is live, only the destination changes. The sources, the read-only O
    ```
 
    Keep every other instruction, including: Outlook is search and read only; never send, draft, forward, move, label, flag, delete or reply to email, or create calendar events.
-3. Run it once by hand and check that `/admin/review` shows the drafts.
+3. Run it once by hand and check that `/watch/review` shows the drafts.
 4. Turn off the daily pilot-to-tracker sync task once the tracker reads from the app instead.
 
 ## Rotating the token

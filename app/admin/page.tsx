@@ -6,7 +6,7 @@ import { addCompany, setEmails, setPerson, setProducts } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-const PRODUCT_LABEL = { watch: "Standards Watch", tracker: "Compliance Tracker", client_tasks: "Client Tasks add-on" } as const;
+const PRODUCT_LABEL = { watch: "CGM Standards Watch", tracker: "CGM Compliance Tracker", client_tasks: "Client Tasks add-on", powerworks: "CGM Powerworks" } as const;
 const OK: Record<string, string> = {
   products: "Products updated.",
   company: "Company added.",
@@ -61,7 +61,7 @@ export default async function AdminPage({ searchParams }: { searchParams: { ok?:
       <section className="cardbox wide">
         <h2>Companies and products</h2>
         <p className="muted" style={{ margin: 0, fontSize: 13 }}>
-          The Compliance Tracker includes Standards Watch. Client Tasks only works while the Tracker is on. Stripe subscriptions are changed in Stripe.
+          Each application is separate (CGM Workspace). Client Tasks is an add-on that only works while the Compliance Tracker is on. Stripe subscriptions are changed in Stripe.
         </p>
         <div className="tablewrap">
           <table className="grid">

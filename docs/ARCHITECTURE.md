@@ -2,19 +2,32 @@
 
 One Next.js app and one Supabase database serve both products: Standards Watch (`/watch`) and the Compliance Tracker (`/tracker`, to be built). The flow below is Standards Watch content; the Tracker's data is entered by CGM staff and client users directly, under the access rules further down.
 
+## CGM Workspace (three apps, one account)
+
+See `docs/SUITE.md`. Routes by app:
+
+| App | Routes | Header |
+|---|---|---|
+| CGM Workspace | `/login` (no header), `/workspace` (launcher), `/account`, `/admin`, `/welcome`, `/unsubscribe`, `/powerworks` (placeholder) | `AppHeader app="workspace"` |
+| CGM Standards Watch | `/watch`, `/watch/review`, `/watch/review/log`, `/watch/digest`, public `/standards-watch` | `AppHeader app="watch"` with "← CGM Workspace" |
+| CGM Compliance Tracker | `/tracker`, `/tracker/tasks`, `/tracker/standards`, `/tracker/clients` | `AppHeader app="tracker"` with "← CGM Workspace", tabs, Reminders |
+| CGM Powerworks | its own site at `POWERWORKS_URL` | its own, with "← CGM workspace" (`VITE_WORKSPACE_URL`) |
+
+Each area's `layout.tsx` adds its own header (`components/AppHeader.tsx`); the root layout has none. Menus and plan names live in `lib/nav.ts`.
+
 ## Flow
 
 ```
 NERC newsletter (Outlook) ─┐
 NERC / FERC websites ──────┴─> Monday draft task ──POST /api/drafts──> drafts (pending)
                                                                           │
-                                       CGM editor at /admin/review ───────┤ approve / edit / reject
+                                       CGM editor at /watch/review ───────┤ approve / edit / reject
                                                                           ▼
                                      standards · deadlines · actions · sources · weekly_summaries
                                                                           │
                      ┌────────────────────────┬───────────────────────────┼───────────────────────┐
                      ▼                        ▼                           ▼                       ▼
-               /watch (web)        /admin/digest → Resend      /api/calendar/[token]      landing teaser
+               /watch (web)        /watch/digest → Resend      /api/calendar/[token]      landing teaser
 ```
 
 Nothing reaches subscribers without an editor approving it. The task can only write drafts.
@@ -82,7 +95,7 @@ All Watch email goes through `lib/mail.ts`: Resend when `RESEND_API_KEY` and `DI
 
 | Email | Sent by | Gated by the Admin email switch | Unsubscribe |
 |---|---|---|---|
-| Weekly digest | An editor, from `/admin/digest` | No (sent by hand) | `digest_opt_in`, signed link + one-click header |
+| Weekly digest | An editor, from `/watch/digest` | No (sent by hand) | `digest_opt_in`, signed link + one-click header |
 | Alerts, **opt-in, off by default** (new FERC approvals, effective dates set or moved, deadlines within 14 days) | Vercel Cron → `/api/jobs/alerts` daily at 13:00 UTC (`vercel.json`, `CRON_SECRET`) | Yes | `alerts_opt_in` (default false), signed link + one-click header |
 | Team invites | A company admin's action | No (a person's direct action) | n/a |
 
@@ -94,7 +107,7 @@ All Watch email goes through `lib/mail.ts`: Resend when `RESEND_API_KEY` and `DI
 ## Weekly drafting job
 
 - **What it does:** once a week, `lib/watch-job.ts` asks Claude (`claude-opus-5-5`, adaptive thinking, effort `high`) to draft the week's Standards Watch changes.
-- **Triggers:** Vercel Cron calls `/api/jobs/watch-drafts` Mondays at 17:00 UTC, which is 10 a.m. Mountain standard time and 11 a.m. daylight time, after NERC's Monday newsletter, which can arrive around 9 a.m. (with `CRON_SECRET`), or an editor clicks "Run it now" on `/admin/review`.
+- **Triggers:** Vercel Cron calls `/api/jobs/watch-drafts` Mondays at 17:00 UTC, which is 10 a.m. Mountain standard time and 11 a.m. daylight time, after NERC's Monday newsletter, which can arrive around 9 a.m. (with `CRON_SECRET`), or an editor clicks "Run it now" on `/watch/review`.
 - **What Claude gets:** the published content, pending drafts and the last 60 days of decisions. Server-side `web_search` and `web_fetch` are limited to NERC, FERC, the Federal Register and the six Regional Entities.
 - **What Claude returns:** it answers only through the strict `submit_drafts` tool.
 - **Checks before anything is queued:** `lib/watch-job-core.ts` checks every value with `lib/draft-fields.ts`. It keeps only https refs and skips anything already pending. Drafts with problems are still queued, flagged "Needs editing before approval".

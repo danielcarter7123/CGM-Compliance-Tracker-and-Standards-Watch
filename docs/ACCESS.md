@@ -1,16 +1,17 @@
 # Access by subscription
 
-One app, two products. What a person can open depends on **who they are** (CGM staff or a client user) and **what their company has bought**. The database enforces all of this (row level security in `supabase/migrations/0002_platform.sql` and `0003_tracker.sql`), and `tests/rls.test.mjs` checks each rule.
+One account, separate apps (CGM Workspace, decision 17). What a person can open depends on **who they are** (CGM staff or a client user) and **what their company has bought**. The database enforces all of this (row level security in `supabase/migrations/0002_platform.sql` and `0003_tracker.sql`), and `tests/rls.test.mjs` checks each rule.
 
 ## Products a client company can hold
 
 | Product | What it is | How it's sold | Includes |
 |---|---|---|---|
 | `watch` | Standards Watch: reviewed standards changes, weekly digest, calendar feed | Self-serve through Stripe Checkout | n/a |
-| `tracker` | Compliance Tracker: the client's NERC tasks, run by CGM, with client visibility | By agreement; a CGM admin switches it on (`source = 'contract'`) | Standards Watch |
+| `tracker` | Compliance Tracker: the client's NERC tasks, run by CGM, with client visibility | By agreement; a CGM admin switches it on (`source = 'contract'`) | Nothing else. Watch is separate |
 | `client_tasks` | Client Tasks add-on: the client's non-NERC task list | By agreement, on top of `tracker` | Works only while `tracker` is live |
+| `powerworks` | CGM Powerworks: asset management (separate app; this project only shows its launcher tile) | By agreement; a CGM admin switches it on | n/a |
 
-These live in `entitlements(company_id, product, status, source, current_period_end)`. Only `active` and `trialing` grant access. Ending the Tracker ends the Watch it included (unless the company also holds `watch`) and the Client Tasks add-on.
+These live in `entitlements(company_id, product, status, source, current_period_end)`. Only `active` and `trialing` grant access. Ending the Tracker also ends the Client Tasks add-on.
 
 ## People
 

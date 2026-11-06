@@ -99,6 +99,8 @@ export function buildImportSql(exp: TrackerExport, today = new Date().toISOStrin
     person("pm", c.pmName, c.pmEmail, c.pmDigest !== false);
     person("plant_manager", c.plantMgrName, c.plantMgrEmail, c.plantMgrDigest === true);
     if (!c.sample) entitlements.push({ company_id: id, product: "tracker", status: "active", source: "contract", notes: "Imported from the pilot tracker" });
+    // The pilot tracker opened with Standards Watch, so its clients keep Watch, now as its own app (decision 17).
+    if (!c.sample) entitlements.push({ company_id: id, product: "watch", status: "active", source: "contract", notes: "Imported from the pilot tracker (Standards Watch was part of it)" });
     if (!c.sample && c.workspace === true) entitlements.push({ company_id: id, product: "client_tasks", status: "active", source: "contract", notes: "Imported from the pilot tracker" });
   }
   count("clients", (C.clients || []).length, companies.length);
