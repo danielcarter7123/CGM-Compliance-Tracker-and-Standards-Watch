@@ -8,6 +8,10 @@ export type Viewer = {
   email: string | null;
   fullName: string;
   functions: string[];
+  /** Regional Entity chosen at onboarding. */
+  region: string | null;
+  /** Finished the first-login welcome screen. CGM staff never see it. */
+  onboarded: boolean;
   digestOptIn: boolean;
   calendarToken: string;
   company: { id: string; name: string } | null;
@@ -47,6 +51,8 @@ export async function getViewer(): Promise<Viewer | null> {
     email: auth.user.email ?? null,
     fullName: (p.full_name as string | null) || "",
     functions: (p.functions as string[]) || [],
+    region: (p.region as string | null) ?? null,
+    onboarded: isStaff || !!p.onboarded_at,
     digestOptIn: p.digest_opt_in !== false,
     calendarToken: String(p.calendar_token),
     company,

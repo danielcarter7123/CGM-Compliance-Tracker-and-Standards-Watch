@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import WatchView from "@/components/WatchView";
 import { getViewer } from "@/lib/auth";
+import { needsWelcome } from "@/lib/guards";
 import { loadContent } from "@/lib/content";
 import { createClient } from "@/lib/supabase/server";
 
@@ -10,6 +11,7 @@ export default async function WatchPage() {
   const viewer = await getViewer();
   if (!viewer) redirect("/login?next=/watch");
   if (!viewer.hasAccess) redirect("/account?need=subscription");
+  if (needsWelcome(viewer)) redirect("/welcome?next=/watch");
   // Read as the subscriber: row level security confirms the subscription again.
   const content = await loadContent(createClient());
   return (

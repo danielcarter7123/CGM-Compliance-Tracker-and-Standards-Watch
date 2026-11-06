@@ -22,7 +22,7 @@ These live in `entitlements(company_id, product, status, source, current_period_
 | Client company admin | `company_role = 'admin'` | Their company's users and billing (the first buyer becomes admin) |
 | Client member | `company_role = 'member'` | Their company's data, per the company's products |
 
-Nobody can raise their own role. Only CGM admins set staff roles, company membership and products. Company admins can change only `company_role` for people in their own company.
+Nobody can raise their own role. Only CGM admins set staff roles and products. Company admins can change `company_role` for people in their own company, invite colleagues (within the company's seats), and remove them (`remove_member()`), but never themselves. Invitees join by signing in with the invited address (`accept_invite()`).
 
 ## The matrix
 
@@ -52,6 +52,8 @@ Nobody can raise their own role. Only CGM admins set staff roles, company member
 | Products and roles | | read own | read own | read own | read | read | ✓ |
 | Billing (Stripe portal) | | company admin | company admin | company admin | | | |
 | App switches (automated emails on/off) | | | | | read | read | ✓ |
+| Team: invite, revoke, change role, remove (own company) | | company admin | company admin | company admin | read | ✓ any company (screen comes with T5) | ✓ any company (screen comes with T5) |
+| Seats per company | | read own | read own | read own | read | read | ✓ |
 
 ## Rules worth knowing
 

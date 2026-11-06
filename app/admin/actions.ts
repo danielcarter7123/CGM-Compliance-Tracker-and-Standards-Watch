@@ -18,6 +18,11 @@ export async function setProducts(formData: FormData) {
   const db = createClient();
   const companyId = String(formData.get("company_id"));
   const wanted = new Set(formData.getAll("products").map(String));
+  const seats = Number(formData.get("seats"));
+  if (Number.isInteger(seats) && seats >= 1 && seats <= 500) {
+    const { error } = await db.from("companies").update({ seats }).eq("id", companyId);
+    if (error) done(error);
+  }
   const { data: current, error: readErr } = await db.from("entitlements").select("product, status, source").eq("company_id", companyId);
   if (readErr) done(readErr);
   for (const product of PRODUCTS as readonly Product[]) {

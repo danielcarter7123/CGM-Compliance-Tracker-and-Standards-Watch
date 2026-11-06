@@ -59,3 +59,5 @@ table.grid td{padding:9px 10px;border-top:1px solid var(--line);vertical-align:m
 table.grid select,.cardbox select{font:14px var(--body);padding:6px 8px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink)}
 .btn-line.sm,.btn-main.sm{padding:6px 12px;font-size:13px}
 .checks.tight label{padding:3px 10px}
+.selectbox,.field select{font:15px var(--body);padding:9px 11px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink);max-width:320px}
+table.grid input.seats{width:72px;font:14px var(--body);padding:6px 8px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink)}

@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { getViewer } from "@/lib/auth";
 import { siteUrl } from "@/lib/stripe";
-import { ALL_FUNCTIONS } from "@/lib/types";
+import TeamCard from "@/components/TeamCard";
+import { ALL_FUNCTIONS, REGIONS } from "@/lib/types";
 import { fmt } from "@/lib/watch";
 import { savePreferences, signOut } from "./actions";
 
@@ -10,7 +11,7 @@ export const dynamic = "force-dynamic";
 const STATUS: Record<string, string> = { active: "Active", trialing: "Trial", past_due: "Payment past due", canceled: "Cancelled" };
 const PRODUCT: Record<string, string> = { watch: "Standards Watch", tracker: "Compliance Tracker (includes Standards Watch)", client_tasks: "Client Tasks add-on" };
 
-export default async function AccountPage({ searchParams }: { searchParams: { saved?: string; error?: string; need?: string; checkout?: string } }) {
+export default async function AccountPage({ searchParams }: { searchParams: { saved?: string; error?: string; need?: string; checkout?: string; team?: string; who?: string } }) {
   const v = await getViewer();
   if (!v) redirect("/login?next=/account");
   const stripeWatch = v.entitlements.find((e) => e.product === "watch" && e.source === "stripe");
@@ -68,6 +69,13 @@ export default async function AccountPage({ searchParams }: { searchParams: { sa
           </div>
           <span className="muted" style={{ fontSize: 13 }}>Your Watch page and weekly email are filtered to these. Leave all unchecked to see everything.</span>
         </div>
+        <div className="field">
+          <label htmlFor="region">Regional Entity</label>
+          <select id="region" name="region" defaultValue={v.region || ""}>
+            <option value="">Not sure</option>
+            {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+          </select>
+        </div>
         <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <input type="checkbox" name="digest" defaultChecked={v.digestOptIn} /> Email me the weekly digest
         </label>
@@ -77,6 +85,8 @@ export default async function AccountPage({ searchParams }: { searchParams: { sa
         </div>
         <div><button className="btn-main" type="submit">Save preferences</button></div>
       </form>
+
+      {!v.isStaff && v.company && v.companyRole === "admin" && <TeamCard v={v} team={searchParams.team} who={searchParams.who} />}
 
       {v.hasAccess && (
         <section className="cardbox">

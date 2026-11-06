@@ -69,7 +69,12 @@ Server code that must bypass the rules (Stripe webhook, drafts API, digest send,
 4. `/api/stripe/portal` sends a company admin to Stripe's portal to change plan, card or cancel. Cancellation flips the entitlement to `canceled` and access ends.
 5. The Compliance Tracker and Client Tasks add-on are contract products: a CGM admin sets them on the company (`source = 'contract'`).
 
-Seats are stored but not yet enforced. To add colleagues today, set their `company_id` by hand (SETUP.md step 5). Self-serve team invites are on the roadmap.
+**Team and seats** (`0007_accounts.sql`):
+- A company admin invites colleagues from the account page. The invitee signs in with that address, and the sign-in callback calls `accept_invite()`, which puts them in the company.
+- `companies.seats` (default 5; CGM admins change it on the Admin page) caps members plus open invites. The database refuses an invite past the cap.
+- Invites expire after 14 days. `revoke_invite()` and `remove_member()` are the only ways to revoke an invite or take someone off a company.
+- New client users see `/welcome` once (name, functions, Regional Entity, digest) before Watch or the Tracker.
+- Invite emails go through `lib/mail.ts`: Resend when configured, the local mail catcher in development. If neither is available, the account page tells the admin to ask the person to sign in.
 
 ## Code map
 

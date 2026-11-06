@@ -10,7 +10,13 @@ export async function GET(request: NextRequest) {
   if (code) {
     const supabase = createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(new URL(next, url.origin));
+    if (!error) {
+      // Join the company that invited this address, if any. A full company is reported on the account page.
+      const { data: joined, error: inviteError } = await supabase.rpc("accept_invite");
+      if (inviteError) return NextResponse.redirect(new URL(`/account?error=${encodeURIComponent(inviteError.message)}`, url.origin));
+      if (joined) return NextResponse.redirect(new URL(`/welcome?joined=${encodeURIComponent(String(joined))}&next=${encodeURIComponent(next)}`, url.origin));
+      return NextResponse.redirect(new URL(next, url.origin));
+    }
   }
   return NextResponse.redirect(new URL("/login?error=link", url.origin));
 }

@@ -100,6 +100,7 @@ async function main() {
         company_id: p.company ? companyIds[p.company] : null,
         company_role: p.company_role ?? "member",
         functions: p.functions ?? [],
+        onboarded_at: new Date().toISOString(),
       }).eq("id", id),
       `profile ${p.email}`,
     );

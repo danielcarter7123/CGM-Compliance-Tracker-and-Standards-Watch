@@ -269,3 +269,82 @@ test("app settings: emails ship off; staff read, only CGM admins change them; cl
   assert.equal(r.updated_by, ADMIN);
   await as(ADMIN, `update app_settings set value = 'false' where key = 'emails_enabled'`);
 });
+
+// ---------- Accounts: invites, seats, onboarding (0007) ----------
+const NEW_A = "60000000-0000-0000-0000-000000000001"; // will be invited to client A
+const NEW_X = "60000000-0000-0000-0000-000000000002"; // nobody invited them
+
+test("company admins invite colleagues; members, other companies and CGM staff (non-PM) can't", async () => {
+  const [inv] = await as(T_ADMIN, `insert into invites(company_id, email) values ('${A_CO}','New@A.com') returning email, invited_by, company_role`);
+  assert.equal(inv.email, "new@a.com", "addresses are stored lower case");
+  assert.equal(inv.invited_by, T_ADMIN);
+  assert.equal(inv.company_role, "member");
+  assert.ok(await fails(T_USER, `insert into invites(company_id, email) values ('${A_CO}','m@a.com')`), "members can't invite");
+  assert.ok(await fails(B_USER, `insert into invites(company_id, email) values ('${A_CO}','b2@a.com')`), "other companies can't");
+  assert.ok(await fails(T_ADMIN, `insert into invites(company_id, email) values ('${B_CO}','x@b.com')`), "admins invite only into their own company");
+  assert.ok(await fails(STAFF, `insert into invites(company_id, email) values ('${A_CO}','s@a.com')`), "CGM staff can't");
+  assert.ok(await fails(T_ADMIN, `insert into invites(company_id, email) values ('${A_CO}','new@a.com')`), "no duplicate open invite");
+  assert.ok(await fails(T_ADMIN, `insert into invites(company_id, email) values ('${A_CO}','t@a.com')`), "can't invite someone already on the team");
+
+  assert.equal(await count(T_ADMIN, "select count(*) from invites"), 1);
+  assert.equal(await count(T_USER, "select count(*) from invites"), 0, "members don't see invites");
+  assert.equal(await count(B_USER, "select count(*) from invites"), 0);
+  assert.equal(await count(STAFF, "select count(*) from invites"), 1, "staff see them");
+  assert.equal((await as(T_ADMIN, `update invites set company_role = 'admin' returning id`)).length, 0, "invites can't be edited directly");
+  assert.equal((await as(T_ADMIN, `delete from invites returning id`)).length, 0);
+});
+
+test("the invitee joins on sign-in; nobody else can take the invite", async () => {
+  await db.exec(`insert into auth.users values ('${NEW_X}','stranger@x.com'),('${NEW_A}','new@a.com')`);
+  assert.equal((await as(NEW_X, "select public.accept_invite() as c"))[0].c, null, "no invite for this address");
+  assert.equal((await as(NEW_X, `select company_id from profiles where id = '${NEW_X}'`))[0].company_id, null);
+  assert.equal(await count(NEW_X, "select count(*) from invites"), 0, "invitees can't read invites");
+
+  const [{ c }] = await as(NEW_A, "select public.accept_invite() as c");
+  assert.equal(c, "Client A");
+  const [p] = await as(NEW_A, `select company_id, company_role, onboarded_at from profiles where id = '${NEW_A}'`);
+  assert.equal(p.company_id, A_CO);
+  assert.equal(p.company_role, "member");
+  assert.equal(p.onboarded_at, null, "new people see the welcome screen");
+  assert.equal(await count(NEW_A, "select count(*) from tasks"), await count(T_USER, "select count(*) from tasks"), "and now see their company's tasks");
+  assert.equal((await as(NEW_A, "select public.accept_invite() as c"))[0].c, null, "accepting twice does nothing");
+  const [i] = (await db.query(`select accepted_by from invites where email = 'new@a.com'`)).rows;
+  assert.equal(i.accepted_by, NEW_A);
+});
+
+test("seat limits: members plus open invites can't pass the company's seats", async () => {
+  await db.exec(`update companies set seats = 4 where id = '${A_CO}'`); // T_USER, T_ADMIN, NEW_A = 3 used
+  await as(T_ADMIN, `insert into invites(company_id, email) values ('${A_CO}','fourth@a.com')`);
+  assert.ok(await fails(T_ADMIN, `insert into invites(company_id, email) values ('${A_CO}','fifth@a.com')`), "full");
+  assert.ok(await fails(T_ADMIN, `update companies set seats = 10 where id = '${A_CO}' returning id`) ||
+    (await as(T_ADMIN, `update companies set seats = 10 where id = '${A_CO}' returning id`)).length === 0, "clients can't raise their seats");
+  const [{ id }] = await as(T_ADMIN, `select id from invites where email = 'fourth@a.com'`);
+  assert.ok(await fails(T_USER, `select public.revoke_invite('${id}')`), "members can't revoke");
+  assert.ok(await fails(B_USER, `select public.revoke_invite('${id}')`), "other companies can't revoke");
+  await as(T_ADMIN, `select public.revoke_invite('${id}')`);
+  await as(T_ADMIN, `insert into invites(company_id, email) values ('${A_CO}','fifth@a.com')`); // the revoked seat is free again
+  await as(PM, `select public.revoke_invite(id) from invites where email = 'fifth@a.com'`);
+  await db.exec(`update companies set seats = 5 where id = '${A_CO}'`);
+});
+
+test("company admins remove colleagues from their own company only, never themselves", async () => {
+  assert.ok(await fails(T_USER, `select public.remove_member('${NEW_A}')`), "members can't remove anyone");
+  assert.ok(await fails(B_USER, `select public.remove_member('${NEW_A}')`), "other companies can't");
+  assert.ok(await fails(T_ADMIN, `select public.remove_member('${B_USER}')`), "not people in other companies");
+  assert.ok(await fails(T_ADMIN, `select public.remove_member('${T_ADMIN}')`), "not themselves");
+  assert.ok(await fails(T_ADMIN, `select public.remove_member('${STAFF}')`), "not CGM staff");
+  await as(T_ADMIN, `select public.remove_member('${NEW_A}')`);
+  const [r] = (await db.query(`select company_id, company_role from profiles where id = '${NEW_A}'`)).rows;
+  assert.equal(r.company_id, null);
+  assert.equal(r.company_role, "member");
+  assert.equal(await count(NEW_A, "select count(*) from tasks"), 0, "a removed person loses access at once");
+  assert.equal((await as(T_ADMIN, `update profiles set company_id = null where id = '${T_USER}' returning id`))[0]?.id ?? T_USER, T_USER);
+  assert.equal((await db.query(`select company_id from profiles where id = '${T_USER}'`)).rows[0].company_id, A_CO, "direct edits still can't change membership");
+});
+
+test("onboarding: users set their own functions, Regional Entity and onboarded time; region must be real", async () => {
+  const [r] = await as(NEW_X, `update profiles set functions = '{GO,GOP}', region = 'SERC', onboarded_at = now() where id = '${NEW_X}' returning region, onboarded_at`);
+  assert.equal(r.region, "SERC");
+  assert.ok(r.onboarded_at);
+  assert.ok(await fails(NEW_X, `update profiles set region = 'Mars' where id = '${NEW_X}'`));
+});

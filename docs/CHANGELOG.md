@@ -2,6 +2,34 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 5, 2026: W2 accounts: welcome screen, invites, seats (Claude Code)
+
+**Decided by Dan:** editor-only screens get a red striped band so they stand out.
+
+**Migration `0007_accounts.sql`:**
+- `profiles.onboarded_at` (existing people are backfilled as done) and a check on `profiles.region`;
+- new `invites` table: lower-case email, member or admin role, 14-day expiry;
+- the seat check runs in a trigger: members plus open invites can't pass `companies.seats`;
+- `accept_invite()`, `revoke_invite()`, `remove_member()`, which are the only ways to change membership besides CGM admins;
+- `protect_profile_fields` gains a transaction-local trusted flag those functions use;
+- 5 new RLS tests (27 in all).
+
+**Screens:**
+- `/welcome`: first sign-in for client users. It asks for name, functions (starting from the company's), Regional Entity and the digest.
+- Account page:
+  - "Your team" for company admins: seats used, members (change role, remove), open invites (revoke) and the invite form;
+  - Regional Entity can be changed.
+- Admin page: a seats box per company.
+- The sign-in callback joins invitees to their company and sends them to the welcome screen.
+
+**Email.** `lib/mail.ts` sends invite emails:
+- through Resend when it's configured (placeholder values don't count);
+- otherwise to the local mail catcher in development.
+
+Invites are sent even while automated emails are off: they're a person's direct action, like sign-in links.
+
+**Tests:** `e2e/accounts.spec.ts` covers invite → email → sign in → joined → welcome → access → removal → access ends, the seat limit and revoking, and that members can't manage the team.
+
 ## Nov 5, 2026: W1 Standards Watch parity and one color scheme (Claude Code)
 
 **Decided by Dan:** sign-in stays on the email link for now; every screen uses the CGM white-and-blue palette (`docs/OPEN-QUESTIONS.md` 12–13).

@@ -61,3 +61,6 @@ export type Draft = {
   created_at: string;
   created_by: string | null;
 };
+
+/** NERC Regional Entities, as stored in companies.region and profiles.region. */
+export const REGIONS = ["MRO", "NPCC", "RF", "SERC", "Texas RE", "WECC"] as const;

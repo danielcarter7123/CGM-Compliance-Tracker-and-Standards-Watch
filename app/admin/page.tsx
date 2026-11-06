@@ -15,7 +15,7 @@ const OK: Record<string, string> = {
   "emails-off": "Automated emails are off.",
 };
 
-type Company = { id: string; name: string; sample: boolean };
+type Company = { id: string; name: string; sample: boolean; seats: number };
 type Ent = { company_id: string; product: string; status: string; source: string };
 type Person = { id: string; email: string | null; full_name: string | null; staff_role: string | null; company_id: string | null; company_role: string };
 
@@ -24,7 +24,7 @@ export default async function AdminPage({ searchParams }: { searchParams: { ok?:
   await requireAdmin();
   const db = createClient();
   const [{ data: companies }, { data: ents }, { data: people }, emailsOn] = await Promise.all([
-    db.from("companies").select("id, name, sample").order("name"),
+    db.from("companies").select("id, name, sample, seats").order("name"),
     db.from("entitlements").select("company_id, product, status, source"),
     db.from("profiles").select("id, email, full_name, staff_role, company_id, company_role").order("email"),
     emailsEnabled(db),
@@ -65,7 +65,7 @@ export default async function AdminPage({ searchParams }: { searchParams: { ok?:
         </p>
         <div className="tablewrap">
           <table className="grid">
-            <thead><tr><th>Company</th><th>Products</th><th /></tr></thead>
+            <thead><tr><th>Company</th><th>Products</th><th>Seats</th><th /></tr></thead>
             <tbody>
               {((companies || []) as Company[]).map((c) => (
                 <tr key={c.id}>
@@ -83,6 +83,9 @@ export default async function AdminPage({ searchParams }: { searchParams: { ok?:
                         );
                       })}
                     </form>
+                  </td>
+                  <td>
+                    <input form={`p-${c.id}`} type="number" name="seats" min={1} max={500} defaultValue={c.seats} aria-label={`Seats for ${c.name}`} className="seats" />
                   </td>
                   <td><button className="btn-line sm" form={`p-${c.id}`} type="submit">Save</button></td>
                 </tr>

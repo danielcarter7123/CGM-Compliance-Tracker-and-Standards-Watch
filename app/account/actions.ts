@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { ALL_FUNCTIONS } from "@/lib/types";
+import { ALL_FUNCTIONS, REGIONS } from "@/lib/types";
 
 export async function savePreferences(formData: FormData) {
   const db = createClient();
@@ -15,6 +15,7 @@ export async function savePreferences(formData: FormData) {
     .update({
       functions,
       digest_opt_in: formData.get("digest") === "on",
+      region: (REGIONS as readonly string[]).includes(String(formData.get("region"))) ? String(formData.get("region")) : null,
       full_name: String(formData.get("full_name") || "").slice(0, 120) || null,
     })
     .eq("id", auth.user.id);
