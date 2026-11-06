@@ -2,6 +2,24 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 5, 2026: weekly NERC drafting job (Claude Code)
+
+**Decision 9 built:** the app drafts Standards Watch changes itself each week, and your Monday task stays as the backup.
+- `lib/watch-job.ts`: Claude Opus 5.5 with web search and fetch limited to official sites (NERC, FERC, Federal Register, Regional Entities).
+  - It gets the published content, pending drafts and recent decisions.
+  - It answers through one strict `submit_drafts` tool.
+  - It uses prompt caching across paused turns and the server-side refusal fallback.
+- `lib/watch-job-core.ts` (pure, unit-tested): submission → drafts in the Monday task's shape. Values are checked against the Edit-first rules, problems are flagged rather than dropped, and the ids match the Monday task so nothing is queued twice. Only https refs are kept, and drafts already pending are skipped.
+- **Schedule:** `/api/jobs/watch-drafts` runs Mondays at 15:00 UTC (`vercel.json`, `CRON_SECRET`).
+- **Review page:** "Weekly drafting job" panel with the last five runs (summary, what wasn't confirmed, estimated cost) and a two-click "Run it now".
+- **Migration `0011_watch_job_runs.sql`:** the run log, readable by editors only, plus an RLS test.
+- **New setting:** `ANTHROPIC_API_KEY` (`.env.example`). Without it, runs are logged as skipped.
+- **Dependency:** `@anthropic-ai/sdk` 1.6.0, pinned.
+- **Tests:**
+  - unit: submission handling (bad dates flagged, bad JSON and unknown sections skipped, duplicates and pending skipped, non-https refs dropped, week key forced) and the cost estimate;
+  - e2e: cron secret, editor panel, a run without a key logged as skipped, PMs can't reach it.
+- **Not tested automatically:** a real run, which calls the Claude API and costs money.
+
 ## Nov 5, 2026: Watch alerts back as an opt-in setting, off by default (Claude Code)
 
 **Decided by Dan:** the digest stays the default and main Watch email, but anyone who really wants a note for each change can turn alerts on (OPEN-QUESTIONS 14). This supersedes the removal below.

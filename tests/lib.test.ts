@@ -190,3 +190,33 @@ test("calendar feed: valid iCalendar, folded lines, stable UIDs, filtered by fun
   assert.equal(folded.replace(/\r\n /g, ""), long, "folding round-trips");
   assert.ok(folded.split("\r\n").every((l) => Buffer.byteLength(l, "utf8") <= 75));
 });
+
+test("drafting job: a submission becomes drafts in the Monday task's shape, checked, deduplicated and safe", async () => {
+  const { submissionToDrafts, estimateCost, JOB_AUTHOR } = await import("../lib/watch-job-core");
+  const keys = Object.keys(pilot.sources);
+  const good = { std: "TEST-000-1", title: "Fake standard", fn: ["GO"], topic: "ops", effective: "2099-01-01", what: "Test data.", src: [keys[0]] };
+  const sub = {
+    summary: "Fake week.", sources_checked: ["https://www.nerc.com/fake"], unconfirmed: [],
+    drafts: [
+      { section: "items", op: "upsert", key: "test-000-1", label: "TEST-000-1 (fake)", reason: "Fake.", refs: [{ t: "NERC", u: "https://www.nerc.com/fake" }, { t: "bad", u: "javascript:alert(1)" }], value_json: JSON.stringify(good) },
+      { section: "items", op: "upsert", key: "test-000-2", label: "Bad date (fake)", reason: "Fake.", refs: [], value_json: JSON.stringify({ ...good, std: "TEST-000-2", effective: "2099-02-30" }) },
+      { section: "items", op: "upsert", key: "test-000-3", label: "Not JSON", reason: "", refs: [], value_json: "{oops" },
+      { section: "deadlines", op: "upsert", key: "already-waiting", label: "Dup", reason: "", refs: [], value_json: JSON.stringify({ d: "2099-01-01", t: "x", fn: null }) },
+      { section: "items", op: "upsert", key: "test-000-1", label: "Same twice", reason: "", refs: [], value_json: JSON.stringify(good) },
+      { section: "week", op: "upsert", key: "anything", label: "Week (fake)", reason: "", refs: [], value_json: JSON.stringify({ label: "Week of Jan 5, 2099", items: [{ b: "Fake", t: "Nothing changed." }] }) },
+      { section: "drop_table", op: "upsert", key: "x", label: "Weird", reason: "", refs: [], value_json: "{}" },
+      { section: "sources", op: "remove", key: "oldSource", label: "Remove a source (fake)", reason: "", refs: [], value_json: "" },
+    ],
+  };
+  const { rows, skipped } = submissionToDrafts(sub as any, { today: "2099-01-05", sourceKeys: keys, pending: [{ section: "deadlines", key: "already-waiting" }] });
+  assert.deepEqual(rows.map((r) => r.id), ["2099-01-05-items-test-000-1", "2099-01-05-items-test-000-2", "2099-01-05-week-week", "2099-01-05-sources-oldSource"]);
+  assert.equal(skipped.length, 4, skipped.join(" | "));
+  assert.ok(rows.every((r) => r.created_by === JOB_AUTHOR && r.status === "pending"));
+  assert.deepEqual(rows[0].refs, [{ t: "NERC", u: "https://www.nerc.com/fake" }], "only https links are kept");
+  assert.equal(rows[0].reason, "Fake.");
+  assert.match(rows[1].reason || "", /^Needs editing before approval: U\.S\. effective date must be a real date/);
+  assert.equal(rows[2].key, "week");
+  assert.equal(rows[3].value, null);
+  assert.ok(Object.keys(rows[0]).sort().join() === ["created_by", "id", "key", "label", "op", "reason", "refs", "section", "status", "value"].join(), "draft row columns");
+  assert.equal(estimateCost({ input: 100000, output: 10000, cacheRead: 200000, cacheWrite: 0, searches: 10 }), 0.74);
+});

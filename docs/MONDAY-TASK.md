@@ -1,5 +1,12 @@
 # Moving the Monday task to the app
 
+> **Now there are two drafters.** The app has its own weekly drafting job (`lib/watch-job.ts`). Vercel Cron runs it Mondays at 15:00 UTC, before the Monday task's 9:47 AM Mountain run, and an editor can start it from `/admin/review` with "Run it now".
+>
+> - **What it reads:** NERC, FERC, Federal Register and Regional Entity sites (web search and fetch limited to those domains). It doesn't read Outlook, so the emailed newsletter remains the Monday task's job.
+> - **No duplicates:** both write ids as `<date>-<section>-<key>`, and the API ignores a repeated id, so whichever runs second can't queue a duplicate. The Monday task's `GET /api/drafts` also shows the job's drafts as pending.
+> - **Turning the Monday task off:** once the job has run well for a few weeks, Dan can turn it off or keep it for the email newsletter only.
+
+
 Today the scheduled task "Standards Watch Monday drafts" (Mondays 9:47 AM Mountain) reads the NERC newsletter in Outlook, checks the NERC and FERC sites as backup, and writes drafts into the pilot artifact's `watch_drafts` collection. You approve them on the pilot page.
 
 When the app is live, only the destination changes. The sources, the read-only Outlook rule and the draft shape stay the same.

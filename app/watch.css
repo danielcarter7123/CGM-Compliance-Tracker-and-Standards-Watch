@@ -266,3 +266,4 @@ a.nbtn.locked{cursor:pointer}
 .review .rhead a.only{color:var(--adm-accent)}
 @media (max-width:640px){.edrow{grid-template-columns:minmax(0,1fr)}.dlist li{grid-template-columns:minmax(0,1fr)}}
 .review .edform .field{align-content:start}
+.review .rhead > .btn{margin-left:auto}

@@ -370,3 +370,11 @@ test("drafts keep the value they replaced, visible to editors only", async () =>
   assert.equal(await count(ADMIN, "select count(*) from drafts where previous is not null"), 1);
   for (const u of [PM, STAFF, W_USER]) assert.equal(await count(u, "select count(*) from drafts where previous is not null"), 0, u);
 });
+
+test("weekly drafting job runs: editors read them; nobody else, and nobody writes through the API (0011)", async () => {
+  await db.exec(`insert into watch_job_runs(trigger, status, summary) values ('manual','skipped','Fake run')`);
+  assert.equal(await count(ADMIN, "select count(*) from watch_job_runs"), 1);
+  for (const u of [PM, STAFF, W_USER, T_ADMIN, NOPLAN]) assert.equal(await count(u, "select count(*) from watch_job_runs"), 0, u);
+  for (const u of [ADMIN, PM, W_USER]) assert.ok(await fails(u, `insert into watch_job_runs(trigger) values ('manual')`), u);
+  assert.equal((await as(ADMIN, `update watch_job_runs set status = 'ok' returning id`)).length, 0);
+});

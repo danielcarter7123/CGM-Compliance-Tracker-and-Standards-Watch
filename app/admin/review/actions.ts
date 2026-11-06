@@ -85,3 +85,18 @@ export async function rejectDraft(id: string): Promise<Result> {
     return { ok: false, error: (e as Error).message };
   }
 }
+
+/** "Run it now" on the review page: the weekly drafting job, run by an editor. */
+export async function runDraftingJob(): Promise<Result> {
+  const v = await getViewer();
+  if (!v?.isEditor) return { ok: false, error: "Only CGM editors can run the drafting job." };
+  const { runWatchJob } = await import("@/lib/watch-job");
+  const { createAdminClient } = await import("@/lib/supabase/admin");
+  try {
+    const r = await runWatchJob(createAdminClient(), "manual");
+    revalidatePath("/admin/review");
+    return r.status === "error" ? { ok: false, error: r.message } : { ok: true, message: r.message };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
