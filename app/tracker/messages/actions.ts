@@ -61,7 +61,10 @@ export async function sendMessage(formData: FormData) {
   const db = createClient();
   let taskRef: Record<string, string> | null = null;
   const taskId = str(formData, "task_id");
-  if (taskId) {
+  if (taskId.startsWith("ctask:")) {
+    const { data: t } = await db.from("client_tasks").select("id, title").eq("id", taskId.slice(6)).maybeSingle(); // only ones this person can see
+    if (t) taskRef = { kind: "ctask", id: t.id as string, label: t.title as string };
+  } else if (taskId) {
     const { data: t } = await db.from("tasks").select("id, title").eq("id", taskId).maybeSingle(); // only tasks this person can see
     if (t) taskRef = { kind: "task", id: t.id as string, label: t.title as string };
   }

@@ -82,15 +82,15 @@ export function teamStats(all: TeamTask[], me: string, today: string) {
   };
 }
 
-/** Links: one per line as "Label | https://…" (or just the URL). Only https links are kept, at most 3. */
-export function parseLinks(text: string): { links: TeamLink[]; refused: string[] } {
+/** Links: one per line as "Label | https://…" (or just the URL). Only https links are kept, at most `max` (3 for team tasks). */
+export function parseLinks(text: string, max = 3): { links: TeamLink[]; refused: string[] } {
   const links: TeamLink[] = [], refused: string[] = [];
   for (const line of text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean)) {
     const [a, b] = line.includes("|") ? line.split("|").map((s) => s.trim()) : ["", line];
     if (/^https:\/\/\S+$/i.test(b)) links.push({ label: a.slice(0, 80), url: b });
     else refused.push(line);
   }
-  return { links: links.slice(0, 3), refused };
+  return { links: links.slice(0, max), refused };
 }
 export const linksText = (links: TeamLink[] | null) => (links || []).map((l) => (l.label ? `${l.label} | ${l.url}` : l.url)).join("\n");
 

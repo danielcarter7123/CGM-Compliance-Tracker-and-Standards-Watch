@@ -18,7 +18,7 @@ export function trackerSections(v: Viewer, unread = 0): Section[] {
   return [
     { label: "Dashboard", href: "/tracker" },
     { label: "Tasks", href: "/tracker/tasks" },
-    ...(!v.isStaff && v.products.client_tasks ? [{ label: "Client Tasks" }] : []),
+    ...(v.isStaff || v.products.client_tasks ? [{ label: "Client Tasks", href: "/tracker/client-tasks" }] : []),
     ...(v.isStaff ? [{ label: "Team Tasks", href: "/tracker/team" }] : []),
     { label: "Standards Library", href: "/tracker/standards" },
     ...(v.isStaff ? [{ label: "Clients", href: "/tracker/clients" }] : []),

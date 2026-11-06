@@ -2,6 +2,21 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 6, 2026: Client Tasks screen (Claude Code)
+
+`/tracker/client-tasks` (TRACKER-SPEC §3.7, "Client Tasks"): the add-on's own task list for a client's work outside NERC compliance.
+- **Who:** CGM staff (every add-on client; a "Client Tasks" tab next to Tasks rather than the pilot's Clients sub-tab) and client users whose company has the add-on (their own list, which they can add to, edit, complete and delete, as the database already allowed). Others get no tab, a redirect, a refused export and nothing by API.
+- **Add-on clients** are companies with both the Tracker and Client Tasks live. CGM admins can "Turn on Client Tasks" for a Tracker client from this screen (the same switch as Clients › Applications); PMs are pointed to an admin.
+- **Stat strip:** overdue, due within 30 days, open, completed this month (for the chosen client or all).
+- **Filters:** client (staff), status (all open, overdue, due ≤ 30 days, each status, all), category, responsible party, search.
+- **Columns:** due, task (2-line description), client (staff), category, assigned to with responsible party, priority (high in red), repeats, status.
+- **Drawer:** task, client (staff), category (pick or type), description, assigned to, responsible party, due date, priority, status, date completed (never in the future; today if empty), repeats every N months/years/days with a preview of the next due date, links (https), notes; Discuss, Mark complete, Delete with a confirming tick.
+- **Repeats** always follow the due date and need one; the database schedules the next one when a task is completed (`spawn_next_client_task`). No review step.
+- **Separate:** client tasks don't appear on the dashboard, in reminders or in digests.
+- **Discuss** opens the client's channel with the client task linked; its chip opens it in Client Tasks.
+- **Export CSV** in the pilot's columns (`client-tasks-<date>.csv`).
+- **Tests:** lib (states, filters, stats, repeats, CSV); `e2e/tracker-ctasks.spec.ts` (a client creates one, completion schedules the next from the due date, Discuss chip, export, CGM sees it, a client without the add-on is refused everywhere); access cases.
+
 ## Nov 6, 2026: T7 Activity Log (Claude Code)
 
 `/tracker/activity` (TRACKER-SPEC §3.11). CGM staff see everything; a client user sees their own company's task, client-task and evidence history (the existing read policy).

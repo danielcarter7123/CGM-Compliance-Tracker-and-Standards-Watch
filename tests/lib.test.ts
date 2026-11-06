@@ -387,3 +387,36 @@ test("activity log: field changes from before/after rows and pilot history; CSV 
   assert.equal(csv[1], '"2026-11-06T15:00:00Z","Pat Fake","Updated","Task","Fake relay test","Fake Client","Due date","2026-11-30","2026-12-15",""');
   assert.ok(csv[4].endsWith('"Due date","2026-01-01","2026-02-01","Fake note"'));
 });
+
+test("client tasks: states, filters, stats and CSV follow the pilot", async () => {
+  const { ctState, ctWhen, filterCTasks, ctStats, ctCsv, ctRecur } = await import("../lib/clienttasks");
+  const base = { description: null, notes: null, assigned_to: null, party: "client", priority: "normal", completed_at: null, recur_n: 0, recur_unit: "m",
+    links: [], created_at: "", created_by: null, prev_id: null, next_id: null, company_id: "c1", category: null };
+  const rows = [
+    { ...base, id: "a", title: "Fake permit renewal", due_date: "2026-11-01", status: "inprogress", category: "Environmental" },
+    { ...base, id: "b", title: "Fake safety walk", due_date: "2026-11-20", status: "notstarted", party: "contractor", priority: "high", recur_n: 3 },
+    { ...base, id: "c", title: "Fake far task", due_date: "2027-03-01", status: "onhold", company_id: "c2" },
+    { ...base, id: "d", title: "Fake done", due_date: "2026-10-01", status: "done", completed_at: "2026-11-02" },
+  ] as import("../lib/clienttasks").CTask[];
+  const today = "2026-11-06", name = (id: string) => (id === "c1" ? "Fake Peaker" : "Fake Other");
+  assert.deepEqual(rows.map((t) => ctState(t, today)), ["overdue", "window", "onhold", "done"]);
+  assert.equal(ctWhen(rows[0], today, (d) => d), "5 days overdue");
+  assert.equal(ctWhen(rows[1], today, (d) => d), "Due in 14 days");
+  assert.equal(ctWhen(rows[3], today, (d) => d), "Completed 2026-11-02");
+  const ids = (f: Parameters<typeof filterCTasks>[1]) => filterCTasks(rows, f, today, name).map((t) => t.id);
+  assert.deepEqual(ids({}), ["a", "b", "c"]);
+  assert.deepEqual(ids({ status: "overdue" }), ["a"]);
+  assert.deepEqual(ids({ status: "d30" }), ["b"]);
+  assert.deepEqual(ids({ status: "all", client: "c1" }), ["a", "b", "d"]);
+  assert.deepEqual(ids({ party: "contractor" }), ["b"]);
+  assert.deepEqual(ids({ cat: "Environmental" }), ["a"]);
+  assert.deepEqual(ids({ q: "fake other" }), ["c"]);
+  const s = ctStats(rows, today);
+  assert.deepEqual([s.overdue, s.due30, s.open, s.doneThisMonth], [1, 1, 3, 1]);
+  assert.equal(ctStats(rows, today, "c2").open, 1);
+  assert.equal(ctRecur(rows[1]), "Every 3 months");
+  assert.equal(ctRecur({ recur_n: 1, recur_unit: "y" }), "Every year");
+  const csv = ctCsv([rows[1]], name).split("\r\n");
+  assert.equal(csv[0], '"Client","Task","Description","Category","Assigned to","Responsible party","Due date","Priority","Status","Completed","Repeats","Links","Notes"');
+  assert.equal(csv[1], '"Fake Peaker","Fake safety walk","","","","Contractor / vendor","2026-11-20","High","Not started","","Every 3 months","",""');
+});

@@ -217,3 +217,8 @@
 .acttable .actnote{margin:0 0 4px}
 .acttable td .chip{margin-top:4px}
 .revertask{display:grid;gap:6px;max-width:220px}
+
+/* Client Tasks (add-on) */
+.cttable .clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:46ch}
+.cttable td.hi{color:var(--trk-bad);font-weight:600}
+.trk input.narrow{width:90px}

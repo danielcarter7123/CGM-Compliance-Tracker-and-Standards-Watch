@@ -107,6 +107,9 @@ export default async function Messages({ searchParams: sp }: { searchParams: Rec
   if (sp.task) {
     const { data } = await db.from("tasks").select("id, title").eq("id", sp.task).maybeSingle();
     discuss = (data as typeof discuss) || null;
+  } else if (sp.ctask) {
+    const { data } = await db.from("client_tasks").select("id, title").eq("id", sp.ctask).maybeSingle();
+    discuss = data ? { id: `ctask:${data.id}`, title: `${data.title} (client task)` } : null;
   }
 
   const channels = chats.filter((c) => c.type === "channel").sort((a, b) => (a.name === "General" ? -1 : b.name === "General" ? 1 : (a.name || "").localeCompare(b.name || "")));
@@ -187,7 +190,7 @@ export default async function Messages({ searchParams: sp }: { searchParams: Rec
                       <>
                         <p className="msg-b">{linkify(m.body)}</p>
                         {m.task_ref && (
-                          <a className="taskchip" href={`/tracker/tasks?status=all&t=${m.task_ref.id}`}>▤ {m.task_ref.label}</a>
+                          <a className="taskchip" href={m.task_ref.kind === "ctask" ? `/tracker/client-tasks?status=all&t=${m.task_ref.id}` : `/tracker/tasks?status=all&t=${m.task_ref.id}`}>▤ {m.task_ref.label}</a>
                         )}
                         {m.author_id === v.userId && sel && (
                           <form action={deleteMessage} className="msg-del">
