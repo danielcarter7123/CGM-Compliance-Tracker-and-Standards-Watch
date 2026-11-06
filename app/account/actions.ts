@@ -15,7 +15,6 @@ export async function savePreferences(formData: FormData) {
     .update({
       functions,
       digest_opt_in: formData.get("digest") === "on",
-      alerts_opt_in: formData.get("alerts") === "on",
       region: (REGIONS as readonly string[]).includes(String(formData.get("region"))) ? String(formData.get("region")) : null,
       full_name: String(formData.get("full_name") || "").slice(0, 120) || null,
     })

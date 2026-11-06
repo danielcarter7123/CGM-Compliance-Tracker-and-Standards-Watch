@@ -2,6 +2,20 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 5, 2026: Watch alert emails removed (Claude Code)
+
+**Decided by Dan:** no Watch alert emails. NERC offers its own alerts, and the point of Watch is one reviewed weekly digest instead of a stream of email (OPEN-QUESTIONS 14).
+
+**Removed:**
+- `lib/alerts.ts`, `/api/jobs/alerts` and `vercel.json`;
+- the alerts checkbox on the account page and the alerts panel on the digest page;
+- the alert half of `lib/changes.ts`;
+- `CRON_SECRET` from `.env.example`.
+
+**Migration `0009_no_watch_alerts.sql`:** drops `alert_log` and `profiles.alerts_opt_in`. `drafts.previous` stays, because the digest's corrections box uses it.
+
+**Unchanged:** the unsubscribe links cover the digest only, and the one-click header is still tested.
+
 ## Nov 5, 2026: W5 delivery: digest, alerts, calendar (Claude Code)
 
 **Migration `0008_delivery.sql`:**

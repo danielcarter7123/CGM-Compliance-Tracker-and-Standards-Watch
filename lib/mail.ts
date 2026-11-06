@@ -48,7 +48,7 @@ export async function sendMail(m: Mail): Promise<boolean> {
   return false;
 }
 
-/** Sends many emails (digest, alerts), 100 per Resend call. Throws with how many went out on failure. */
+/** Sends many emails (the digest), 100 per Resend call. Throws with how many went out on failure. */
 export async function sendBatch(list: Mail[]): Promise<number> {
   const t = mailTransport();
   if (!t) throw new Error("Email isn't configured: set RESEND_API_KEY and DIGEST_FROM.");

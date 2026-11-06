@@ -14,7 +14,7 @@ export default function Unsubscribe({ searchParams }: { searchParams: { u?: stri
       <h1>Email preferences</h1>
       {isListKind(done) ? (
         <>
-          <p className="notice ok">You&apos;re unsubscribed from {LIST_NAME[done]}. Other emails you get from us aren&apos;t affected.</p>
+          <p className="notice ok">You&apos;re unsubscribed from {LIST_NAME[done]}.</p>
           <p className="muted">Changed your mind? Turn it back on from your <a href="/account">account page</a>.</p>
         </>
       ) : ok ? (

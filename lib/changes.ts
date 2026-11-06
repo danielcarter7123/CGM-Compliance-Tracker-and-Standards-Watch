@@ -1,8 +1,7 @@
-import type { Deadline } from "./types";
-import { daysUntil, fmt, startOfToday } from "./watch";
+import { fmt } from "./watch";
 
 /* What changed in published Watch content, worked out from approved drafts and the values they
-   replaced (drafts.previous). Pure functions, so they're unit-tested without a database. */
+   replaced (drafts.previous). Used for the digest's corrections box. Pure functions, so they're unit-tested without a database. */
 
 export type DecidedDraft = {
   id: string;
@@ -47,42 +46,4 @@ export function correctionLines(drafts: DecidedDraft[]): string[] {
     }
   }
   return out;
-}
-
-export type Alert = { key: string; kind: "ferc" | "effective" | "deadline"; label: string; fn: string[] | null; href: string };
-
-export const ALERT_WINDOW_DAYS = 14;
-
-/** Alerts due now: new FERC approvals and new or changed effective dates from drafts approved in the last
- *  14 days, and comment periods or events within 14 days. `sent` holds keys already in alert_log. */
-export function dueAlerts(drafts: DecidedDraft[], deadlines: Deadline[], sent: Set<string>, today = startOfToday()): Alert[] {
-  const out: Alert[] = [];
-  const recent = drafts.filter((d) => d.decided_at && (today.getTime() - new Date(d.decided_at).getTime()) / 864e5 <= ALERT_WINDOW_DAYS);
-  for (const d of recent) {
-    if (d.section !== "items" || d.op !== "upsert" || !d.value) continue;
-    const v = d.value, prev = d.previous || {};
-    const std = str(v.std) || d.key;
-    const fn = Array.isArray(v.fn) ? (v.fn as string[]) : null;
-    const href = `/watch#${d.key}`;
-    const vf = str(v.ferc);
-    if (vf && v.status !== "dev" && str(prev.ferc) !== vf) {
-      out.push({ key: `ferc:${d.id}`, kind: "ferc", label: `${std} approved by FERC (${fmt(vf)}).${str(v.title) ? ` ${v.title}.` : ""}`, fn, href });
-    }
-    const ve = str(v.effective), pe = str(prev.effective);
-    if (ve && pe !== ve) {
-      out.push({
-        key: `effective:${d.id}`, kind: "effective", fn, href,
-        label: pe ? `${std}: U.S. effective date moved from ${fmt(pe)} to ${fmt(ve)}.` : `${std} takes effect in the U.S. on ${fmt(ve)}.`,
-      });
-    }
-  }
-  for (const dl of deadlines) {
-    const n = daysUntil(dl.d, today);
-    if (n < 0 || n > ALERT_WINDOW_DAYS) continue;
-    out.push({
-      key: `deadline:${dl.id}:${dl.d}`, kind: "deadline", fn: dl.fn ?? null, href: "/watch",
-      label: `${dl.t}: ${fmt(dl.d)} (${n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`}).${dl.who ? ` ${dl.who}.` : ""}`,
-    });
-  }
-  return out.filter((a) => !sent.has(a.key));
 }

@@ -350,15 +350,15 @@ test("onboarding: users set their own functions, Regional Entity and onboarded t
 });
 
 // ---------- Delivery (0008) ----------
-test("alert log: staff read it, nobody writes it through the API; alert and digest opt-outs are each user's own", async () => {
-  await db.exec(`insert into alert_log(key, kind, label) values ('deadline:x:2099-01-01','deadline','Fake deadline')`);
-  assert.equal(await count(STAFF, "select count(*) from alert_log"), 1);
-  for (const u of [W_USER, T_ADMIN, NOPLAN]) assert.equal(await count(u, "select count(*) from alert_log"), 0, u);
-  for (const u of [ADMIN, STAFF, T_ADMIN]) assert.ok(await fails(u, `insert into alert_log(key, kind, label) values ('k-${u}','ferc','x')`), u);
-  const [r] = await as(W_USER, `update profiles set alerts_opt_in = false, digest_opt_in = false where id = '${W_USER}' returning alerts_opt_in, digest_opt_in`);
-  assert.deepEqual([r.alerts_opt_in, r.digest_opt_in], [false, false]);
-  assert.equal((await as(W_USER, `update profiles set alerts_opt_in = false where id = '${T_USER}' returning id`)).length, 0, "not someone else's");
-  await db.exec(`update profiles set alerts_opt_in = true, digest_opt_in = true where id = '${W_USER}'`);
+test("digest opt-out is each user's own; there are no Watch alert tables (0009)", async () => {
+  const [r] = await as(W_USER, `update profiles set digest_opt_in = false where id = '${W_USER}' returning digest_opt_in`);
+  assert.equal(r.digest_opt_in, false);
+  assert.equal((await as(W_USER, `update profiles set digest_opt_in = false where id = '${T_USER}' returning id`)).length, 0, "not someone else's");
+  await db.exec(`update profiles set digest_opt_in = true where id = '${W_USER}'`);
+  const gone = (await db.query(`select to_regclass('public.alert_log') as t,
+    (select count(*) from information_schema.columns where table_name = 'profiles' and column_name = 'alerts_opt_in')::int as c`)).rows[0];
+  assert.equal(gone.t, null);
+  assert.equal(gone.c, 0);
 });
 
 test("drafts keep the value they replaced, visible to editors only", async () => {

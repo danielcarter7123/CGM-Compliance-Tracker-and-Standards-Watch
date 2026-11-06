@@ -63,6 +63,7 @@ Running `npm install`, `npm run typecheck`, `npm test` and `npm run build`, and 
 11. **Git.** Yes. Dan has an empty GitHub repository ready.
 12. **Sign-in method.** Keep the one-time email link for now: no passwords. "Sign in with Microsoft" (Azure via Supabase) can come later. It needs a CGM app registration in Microsoft Entra, which SharePoint evidence will need anyway.
 13. **Look.** Dan likes the sign-in page's white and blue. Decision: one CGM white-and-blue palette across every screen (Watch, Tracker, sign-in, editor console, digest email). The pilot's orange accent and the violet editor console are retired. Editor-only screens keep a red striped "Editor only" band so they stand out (Dan is the only one who sees them). Layouts and fonts stay as in the pilots.
+14. **No Watch alert emails.** NERC already offers its own email alerts. Standards Watch's value is having everything in one place, in one reviewed weekly digest, not more email. So Watch sends only the weekly digest. The alert emails built in W5 were removed (`0009_no_watch_alerts.sql`). Tracker reminders (T8) are a separate matter: they're about a client's own tasks.
 
 **Client data:** the live tracker's data is essential to how the internal tracker runs. It must be carried over completely and handled under CLAUDE.md rule 7.
 

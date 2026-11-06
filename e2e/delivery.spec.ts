@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 import { signIn } from "./helpers";
 
-// W5: digest with plain text, corrections and unsubscribe; alerts behind the email switch; calendar feed.
+// W5: digest with plain text, corrections and unsubscribe; calendar feed. (No Watch alert emails, by decision.)
 // All mail goes to the local Mailpit catcher. Fake accounts and fake TEST-000 entries only.
 const MAILPIT = "http://127.0.0.1:54324";
 const env = Object.fromEntries(
@@ -47,7 +47,7 @@ async function approveEverything(page: Page) {
   }
 }
 
-test("digest: corrections suggested, sent with plain text and unsubscribe; the link turns only the digest off", async ({ page, browser }) => {
+test("digest: corrections suggested, sent with plain text and unsubscribe (page and one-click)", async ({ page, browser }) => {
   const STD = `TEST-000-${run}`, key = `test-dg-${run}`;
   await queue([{ id: `dg-add-${run}`, section: "items", op: "upsert", key, label: `${STD} (fake)`,
     value: { std: STD, title: "Fake standard (digest test)", fn: ["GO"], topic: "ops", effective: "2099-01-01", what: "Test data.", src: [] } }]);
@@ -92,7 +92,17 @@ test("digest: corrections suggested, sent with plain text and unsubscribe; the l
   const watcher = await wa.newPage();
   await signIn(watcher, "admin@watch.example", "/account");
   await expect(watcher.getByLabel("Email me the weekly digest")).not.toBeChecked();
-  await expect(watcher.getByLabel(/Email me alerts between digests/)).toBeChecked();
+  await expect(watcher.getByLabel(/alerts/i)).toHaveCount(0); // Watch sends the digest only
+  await watcher.getByLabel("Email me the weekly digest").check();
+  await watcher.getByRole("button", { name: "Save preferences" }).click();
+  await expect(watcher.getByText("Preferences saved.")).toBeVisible();
+
+  // One-click unsubscribe from the email header (Gmail, Outlook) works too.
+  const oneClick = headers["List-Unsubscribe"][0].replace(/^<|>$/g, "").replace(/^https?:\/\/[^/]+/, "http://localhost:3000");
+  const r = await fetch(oneClick, { method: "POST", body: "List-Unsubscribe=One-Click", headers: { "content-type": "application/x-www-form-urlencoded" } });
+  expect(r.status).toBe(200);
+  await watcher.reload();
+  await expect(watcher.getByLabel("Email me the weekly digest")).not.toBeChecked();
   await watcher.getByLabel("Email me the weekly digest").check();
   await watcher.getByRole("button", { name: "Save preferences" }).click();
   await expect(watcher.getByText("Preferences saved.")).toBeVisible();
@@ -100,57 +110,6 @@ test("digest: corrections suggested, sent with plain text and unsubscribe; the l
 
   // Take the fake standard back off.
   await queue([{ id: `dg-rm-${run}`, section: "items", op: "remove", key, label: `Remove ${STD} (fake)` }]);
-  await approveEverything(page);
-});
-
-test("alerts: nothing while emails are off; once on, each alert is sent once; one-click unsubscribe works", async ({ page }) => {
-  const STD = `TEST-001-${run}`, key = `test-al-${run}`;
-  const job = () => fetch("http://localhost:3000/api/jobs/alerts", { headers: { authorization: `Bearer ${env.CRON_SECRET}` } }).then((r) => r.json());
-  expect((await fetch("http://localhost:3000/api/jobs/alerts")).status).toBe(401);
-
-  await queue([{ id: `al-add-${run}`, section: "items", op: "upsert", key, label: `${STD} (fake)`,
-    value: { std: STD, title: "Fake standard (alert test)", fn: ["GO", "GOP"], topic: "ops", ferc: "2099-01-15", effective: "2099-10-01", what: "Test data.", src: [] } }]);
-  await signIn(page, "admin@cgm.example", "/admin/review");
-  await approveEverything(page);
-  await page.goto("/admin/digest");
-  await expect(page.locator(".dlist li", { hasText: `${STD} approved by FERC` })).toBeVisible();
-  await expect(page.getByText("Automated emails are off, so nothing is sent.")).toBeVisible();
-
-  expect((await job()).skipped).toMatch(/emails are off/);
-
-  await clear("admin@watch.example");
-  await page.goto("/admin");
-  await page.getByRole("button", { name: "Turn emails on" }).click();
-  await expect(page.getByText("Automated emails are on.")).toBeVisible();
-  try {
-    const first = await job();
-    expect(first.alerts).toBeGreaterThan(0);
-    const m = await waitForMail("admin@watch.example", "Standards Watch");
-    const full = (await (await fetch(`${MAILPIT}/api/v1/message/${m.ID}`)).json()) as { Text: string };
-    expect(full.Text).toContain(`${STD} approved by FERC`);
-    expect(full.Text).toContain(`${STD} takes effect in the U.S. on Oct 1, 2099.`);
-    expect((await job()).alerts).toBe(0); // never twice
-
-    // One-click unsubscribe from the header turns alerts off.
-    const headers = (await (await fetch(`${MAILPIT}/api/v1/message/${m.ID}/headers`)).json()) as Record<string, string[]>;
-    const url = headers["List-Unsubscribe"][0].replace(/^<|>$/g, "").replace(/^https?:\/\/[^/]+/, "http://localhost:3000");
-    const r = await fetch(url, { method: "POST", body: "List-Unsubscribe=One-Click", headers: { "content-type": "application/x-www-form-urlencoded" } });
-    expect(r.status).toBe(200);
-  } finally {
-    await page.goto("/admin");
-    await page.getByRole("button", { name: "Turn emails off" }).click();
-    await expect(page.getByText("Automated emails are off.")).toBeVisible();
-  }
-  await page.context().clearCookies();
-  await signIn(page, "admin@watch.example", "/account");
-  await expect(page.getByLabel(/Email me alerts between digests/)).not.toBeChecked();
-  await page.getByLabel(/Email me alerts between digests/).check();
-  await page.getByRole("button", { name: "Save preferences" }).click();
-  await expect(page.getByText("Preferences saved.")).toBeVisible();
-
-  await page.context().clearCookies();
-  await signIn(page, "admin@cgm.example", "/admin/review");
-  await queue([{ id: `al-rm-${run}`, section: "items", op: "remove", key, label: `Remove ${STD} (fake)` }]);
   await approveEverything(page);
 });
 
