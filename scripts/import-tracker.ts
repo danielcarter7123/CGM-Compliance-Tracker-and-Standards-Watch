@@ -8,7 +8,6 @@
       psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f data/private/import-tracker.sql
    The SQL is one transaction: all of it lands, or none of it does. It refuses to run twice.
    See docs/IMPORT.md. */
-import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 
@@ -22,27 +21,10 @@ export type TrackerExport = {
 };
 type Row = Record<string, unknown>;
 
-const REGIONS = ["MRO", "NPCC", "RF", "SERC", "Texas RE", "WECC"];
-const TASK_STATUS = ["open", "inprogress", "review", "done"];
-const TEAM_STATUS = ["notstarted", "inprogress", "onhold", "review", "done"];
-const CTASK_STATUS = ["notstarted", "inprogress", "onhold", "done"];
-const REMIND = [90, 60, 30, 14, 7, 1];
-const CODE_RE = /^[A-Z]{2,4}-[A-Z0-9.\-]+$/;
-const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+import { CODE_RE, date, mapClient, mapClientTask, mapStandard, mapTask, mapTeamTask, standardOf, text, uuidFrom } from "../lib/legacy-map";
 
-/** Deterministic UUID (v5-style) so the same export always maps to the same ids. */
-export function uuidFrom(kind: string, id: string) {
-  const h = createHash("sha1").update(`cgm-tracker:${kind}:${id}`).digest("hex");
-  return `${h.slice(0, 8)}-${h.slice(8, 12)}-5${h.slice(13, 16)}-${((parseInt(h[16], 16) & 3) | 8).toString(16)}${h.slice(17, 20)}-${h.slice(20, 32)}`;
-}
-const date = (v: unknown) => (typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null);
-const text = (v: unknown) => (v === undefined || v === null || v === "" ? null : String(v));
-const https = (v: unknown) => (typeof v === "string" && /^https:\/\/\S+$/i.test(v.trim()) ? v.trim() : null);
-const email = (v: unknown) => (typeof v === "string" && EMAIL_RE.test(v.trim()) ? v.trim() : null);
-const unit = (u: unknown) => (u === "d" || u === "y" ? u : "m");
-const recurN = (r: any) => Math.max(0, Number.parseInt(r?.n, 10) || 0);
-const links = (v: unknown) =>
-  Array.isArray(v) ? v.filter((l: any) => https(l?.url)).map((l: any) => ({ label: String(l.label || ""), url: https(l.url) })) : [];
+// The per-record mapping lives in lib/legacy-map.ts, shared with Restore of records deleted before the move.
+export { uuidFrom };
 
 export function buildImportSql(exp: TrackerExport, today = new Date().toISOString().slice(0, 10)) {
   if (exp.format !== "cgm-tracker-export") throw new Error("Not a tracker export file (format should be cgm-tracker-export).");
@@ -56,21 +38,11 @@ export function buildImportSql(exp: TrackerExport, today = new Date().toISOStrin
   const templates: Row[] = [];
   const codes = new Set<string>();
   for (const d of C.standards || []) {
-    const s = d.data;
-    const code = String(s.code || d.id).trim().toUpperCase();
-    if (!CODE_RE.test(code)) { warnings.push(`Standard "${code}" skipped: not a valid standard number.`); continue; }
-    codes.add(code);
-    standards.push({
-      code, version: String(s.version || "?"), title: String(s.title || code), family: String(s.family || code.split("-")[0]),
-      applies: Array.isArray(s.applies) ? s.applies.map(String) : [], url: https(s.url), notes: text(s.notes), custom: !!s.custom,
-    });
-    (s.templates || []).forEach((t: any, i: number) =>
-      templates.push({
-        id: uuidFrom("template", `${code}|${i}`), standard_code: code, req: String(t.req || ""), title: String(t.title || "(untitled obligation)"),
-        recur_n: recurN(t.recur), recur_unit: unit(t.recur?.unit), recur_basis: t.recur?.basis === "done" ? "done" : "due",
-        basis_confirmed: t.recur?.basis === "done" || t.recur?.basis === "due", pos: i,
-      }),
-    );
+    const m = mapStandard(d.id, d.data);
+    if (!m) { warnings.push(`Standard "${String(d.data.code || d.id).trim().toUpperCase()}" skipped: not a valid standard number.`); continue; }
+    codes.add(m.standard.code as string);
+    standards.push(m.standard);
+    templates.push(...m.templates);
   }
   count("standards", (C.standards || []).length, standards.length);
 
@@ -80,28 +52,11 @@ export function buildImportSql(exp: TrackerExport, today = new Date().toISOStrin
   const entitlements: Row[] = [];
   const companyId = new Map<string, string>();
   for (const d of C.clients || []) {
-    const c = d.data;
-    const id = uuidFrom("client", d.id);
-    companyId.set(d.id, id);
-    if (c.region && !REGIONS.includes(c.region)) warnings.push(`Client ${d.id}: region "${c.region}" not recognised; left blank (kept in legacy).`);
-    companies.push({
-      id, name: String(c.name || "(unnamed client)"), legacy_id: d.id, ncr_id: text(c.ncr), region: REGIONS.includes(c.region) ? c.region : null,
-      reg_date: date(c.regDate), functions: Array.isArray(c.functions) ? c.functions.map(String) : [], entities: c.entities || {},
-      facilities: text(c.facilities), sharepoint_url: https(c.sharepoint), notes: text(c.notes), sample: !!c.sample, legacy: c,
-    });
-    const person = (kind: string, name: unknown, mail: unknown, digest: boolean) => {
-      if (!text(name) && !email(mail)) return;
-      if (mail && !email(mail)) // The address itself isn't printed: warnings go to the console and must never carry client contact details (CLAUDE.md rule 7).
-      warnings.push(`Client ${d.id}: ${kind} email is not valid; left blank (original kept in legacy).`);
-      contacts.push({ id: uuidFrom("contact", `${d.id}|${kind}`), company_id: id, kind, name: String(text(name) || text(mail)), email: email(mail), digest });
-    };
-    person("compliance", c.contact, c.contactEmail, c.digest !== false);
-    person("pm", c.pmName, c.pmEmail, c.pmDigest !== false);
-    person("plant_manager", c.plantMgrName, c.plantMgrEmail, c.plantMgrDigest === true);
-    if (!c.sample) entitlements.push({ company_id: id, product: "tracker", status: "active", source: "contract", notes: "Imported from the pilot tracker" });
-    // The pilot tracker opened with Standards Watch, so its clients keep Watch, now as its own app (decision 17).
-    if (!c.sample) entitlements.push({ company_id: id, product: "watch", status: "active", source: "contract", notes: "Imported from the pilot tracker (Standards Watch was part of it)" });
-    if (!c.sample && c.workspace === true) entitlements.push({ company_id: id, product: "client_tasks", status: "active", source: "contract", notes: "Imported from the pilot tracker" });
+    const m = mapClient(d.id, d.data, (w) => warnings.push(w));
+    companyId.set(d.id, m.company.id as string);
+    companies.push(m.company);
+    contacts.push(...m.contacts);
+    entitlements.push(...m.entitlements);
   }
   count("clients", (C.clients || []).length, companies.length);
 
@@ -125,7 +80,7 @@ export function buildImportSql(exp: TrackerExport, today = new Date().toISOStrin
   for (const d of C.tasks || []) taskId.set(d.id, uuidFrom("task", d.id));
   for (const d of C.tasks || []) {
     const t = d.data;
-    let std: string | null = t.standard ? String(t.standard).trim().toUpperCase() : null;
+    let std = standardOf(t);
     if (std && !codes.has(std)) {
       if (CODE_RE.test(std)) {
         codes.add(std);
@@ -136,21 +91,11 @@ export function buildImportSql(exp: TrackerExport, today = new Date().toISOStrin
         std = null;
       }
     }
-    const status = TASK_STATUS.includes(t.status) ? t.status : "open";
-    let completed = date(t.completedAt);
-    if (completed && completed > today) { warnings.push(`Task ${d.id}: completion date ${completed} is in the future; left blank (kept in legacy).`); completed = null; }
-    const id = taskId.get(d.id)!;
-    tasks.push({
-      id, company_id: clientFor(t.clientId, `Task ${d.id}`), title: String(t.title || "(untitled task)"), facility: text(t.facility),
-      standard_code: std, requirement: text(t.requirement), due_date: date(t.dueDate), assignee_text: text(t.assignee),
-      assignee_email: email(t.assigneeEmail), remind_days: Array.isArray(t.remindDays) ? t.remindDays.map(Number).filter((n: number) => REMIND.includes(n)) : [30, 7],
-      recur_n: recurN(t.recur), recur_unit: unit(t.recur?.unit), recur_basis: t.recur?.basis === "done" ? "done" : "due",
-      status, evidence: text(t.evidence), notes: text(t.notes), created_at: date(t.createdAt) ? `${t.createdAt}T12:00:00Z` : exp.exportedAt,
-      completed_at: completed, reviewed_at: date(t.reviewedAt), plan_id: text(t.planId), outlook: t.outlook || null, sample: !!t.sample,
-      legacy_id: d.id, legacy: t,
-    });
-    const link = (k: string, v: unknown) => (typeof v === "string" && taskId.has(v) ? taskId.get(v) : null);
-    const prev = link("prev", t.prevId), next = link("next", t.nextId), copied = link("copied", t.copiedFrom);
+    const row = mapTask(d.id, t, { companyId: clientFor(t.clientId, `Task ${d.id}`), standard: std, today, exportedAt: exp.exportedAt, warn: (w) => warnings.push(w) });
+    tasks.push(row);
+    const id = row.id as string;
+    const link = (v: unknown) => (typeof v === "string" && taskId.has(v) ? taskId.get(v) : null);
+    const prev = link(t.prevId), next = link(t.nextId), copied = link(t.copiedFrom);
     if (prev || next || copied) taskLinks.push({ id, prev_id: prev, next_id: next, copied_from: copied });
   }
   count("tasks", (C.tasks || []).length, tasks.length);
@@ -159,14 +104,7 @@ export function buildImportSql(exp: TrackerExport, today = new Date().toISOStrin
   const team: Row[] = [];
   for (const d of C.teamTasks || []) {
     const t = d.data;
-    const est = t.estHours === "" || t.estHours == null || isNaN(Number(t.estHours)) ? null : Number(t.estHours);
-    team.push({
-      id: uuidFrom("team", d.id), title: String(t.title || "(untitled)"), description: text(t.description),
-      company_id: t.clientId ? clientFor(t.clientId, `Team task ${d.id}`) : null, owner_legacy: text(t.owner), owner_email: email(t.ownerEmail),
-      collaborators_legacy: Array.isArray(t.collaborators) ? t.collaborators.map(String) : [], planned_date: date(t.plannedDate),
-      actual_date: date(t.actualDate), est_hours: est, status: TEAM_STATUS.includes(t.status) ? t.status : "notstarted", links: links(t.links),
-      created_at: date(t.createdAt) ? `${t.createdAt}T12:00:00Z` : exp.exportedAt, created_by_legacy: text(t.createdBy), legacy_id: d.id, legacy: t,
-    });
+    team.push(mapTeamTask(d.id, t, { companyId: t.clientId ? clientFor(t.clientId, `Team task ${d.id}`) : null, exportedAt: exp.exportedAt }));
   }
   count("teamTasks", (C.teamTasks || []).length, team.length);
 
@@ -174,14 +112,7 @@ export function buildImportSql(exp: TrackerExport, today = new Date().toISOStrin
   const ctasks: Row[] = [];
   for (const d of C.clientTasks || []) {
     const t = d.data;
-    ctasks.push({
-      id: uuidFrom("ctask", d.id), company_id: clientFor(t.clientId, `Client task ${d.id}`), title: String(t.title || "(untitled)"),
-      description: text(t.description), notes: text(t.notes), category: text(t.category), assigned_to: text(t.assignedTo),
-      party: ["client", "contractor", "cgm", "agency", "other"].includes(t.party) ? t.party : "client", due_date: date(t.dueDate),
-      completed_at: date(t.completedAt), priority: ["low", "normal", "high"].includes(t.priority) ? t.priority : "normal",
-      status: CTASK_STATUS.includes(t.status) ? t.status : "notstarted", recur_n: recurN(t.recur), recur_unit: unit(t.recur?.unit),
-      links: links(t.links), legacy_id: d.id, legacy: t,
-    });
+    ctasks.push(mapClientTask(d.id, t, { companyId: clientFor(t.clientId, `Client task ${d.id}`) }));
   }
   count("clientTasks", (C.clientTasks || []).length, ctasks.length);
 

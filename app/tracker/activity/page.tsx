@@ -147,7 +147,7 @@ export default async function Activity({ searchParams: sp }: { searchParams: Rec
       )}
       {staff && (
         <p className="muted small">
-          History carried over from the pilot is shown as recorded; restore and revert work on changes made in this app. Messages aren&apos;t logged here.
+          History carried over from the pilot is shown as recorded. Pilot deletions with a saved copy (tasks, clients with their tasks, standards) can be restored; revert works on changes made in this app. Messages aren&apos;t logged here.
         </p>
       )}
     </main>

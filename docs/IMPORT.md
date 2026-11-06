@@ -39,8 +39,8 @@ All of the live tracker's data moves into the app as it is, with no re-entry: ev
    - Take a Supabase backup first.
    - Then run the same file with `SUPABASE_DB_URL` (Project Settings → Database → connection string, session mode).
    - The SQL is one transaction: all of it lands, or none of it does. It refuses to run a second time into a database that already has imported clients.
-6. **Link people.** As each CGM colleague signs in to the app, a CGM admin runs `select link_legacy_person('<pilot id>', '<profile id>')`. Milestone T9 adds a screen for this. This fills team-task owners and collaborators; history entries resolve names through `legacy_people`.
-7. **Set the PM on each client.** Once PMs have logins, set `companies.pm_id`. Their name and email are already in `contacts` (`kind = 'pm'`).
+6. **Link people.** As each CGM colleague signs in to the app, a CGM admin links them on the Admin page ("People from the pilot tracker"; a matching name is suggested). This fills team-task owners and collaborators; history entries resolve names through `legacy_people`.
+7. **Set the PM on each client.** Once PMs have logins, pick each client's "CGM project manager (login)" on the Clients screen (`companies.pm_id`; must be CGM staff). Their name and email are already in `contacts` (`kind = 'pm'`).
 
 ## Timing
 

@@ -582,3 +582,28 @@ test("email opt-outs: each person manages only their own address; the send log i
   assert.equal(await count(T_USER, "select count(*) from tracker_email_log"), 0);
   assert.ok(await fails(ADMIN, "insert into tracker_email_log(key, kind, recipient) values ('k','reminders','a@b.com')"), "only the job writes it");
 });
+
+// ---------- T9 prep: restoring pilot deletions; a client's PM must be CGM staff ----------
+test("pilot deletions restore once, as staff, logged; the client PM must be CGM staff", async () => {
+  await db.exec("select set_config('request.jwt.claim.sub', '', false)");
+  const [{ id: entry }] = (await db.query(`insert into activity_log(action, kind, target_id, company_id, label, source, legacy)
+    values ('deleted','task','pilot-task-1','${A_CO}','Fake pilot task','legacy','{"hasSnap":true,"entryId":"e-1"}') returning id`)).rows;
+  const T = "70000000-0000-0000-0000-000000000001";
+  const rows = JSON.stringify([{ kind: "task", row: { id: T, company_id: A_CO, title: "Fake pilot task", due_date: "2026-12-01", status: "open", legacy_id: "pilot-task-1", next_id: "70000000-0000-0000-0000-0000000000ff" } }]);
+  assert.ok(await fails(T_USER, `select public.restore_legacy(${entry}, '${rows}'::jsonb)`), "clients can't");
+  assert.equal((await as(PM, `select public.restore_legacy(${entry}, '${rows}'::jsonb) as n`))[0].n, 1);
+  const [t] = (await db.query(`select title, next_id from tasks where id = '${T}'`)).rows;
+  assert.deepEqual([t.title, t.next_id], ["Fake pilot task", null], "a link to a task that isn't here is left empty");
+  const [l] = (await db.query(`select action, actor_id, ref_id from activity_log where target_id = '${T}'`)).rows;
+  assert.deepEqual([l.action, l.actor_id, Number(l.ref_id)], ["restored", PM, Number(entry)]);
+  assert.ok(await fails(PM, `select public.restore_legacy(${entry}, '${rows}'::jsonb)`), "only once");
+  const [{ id: plain }] = (await db.query(`insert into activity_log(action, kind, target_id, source, legacy) values ('updated','task','x','legacy','{"hasSnap":true}') returning id`)).rows;
+  assert.ok(await fails(PM, `select public.restore_legacy(${plain}, '[{"kind":"task","row":{}}]'::jsonb)`), "only deletions");
+  const [{ id: e2 }] = (await db.query(`insert into activity_log(action, kind, target_id, source, legacy) values ('deleted','task','y','legacy','{"hasSnap":true}') returning id`)).rows;
+  assert.ok(await fails(PM, `select public.restore_legacy(${e2}, '[{"kind":"team","row":{}}]'::jsonb)`), "only the kinds a saved copy holds");
+
+  // The PM must be CGM staff.
+  assert.ok(await fails(PM, `update companies set pm_id = '${T_USER}' where id = '${B_CO}'`), "not a client user");
+  assert.equal((await as(PM, `update companies set pm_id = '${PM}' where id = '${B_CO}' returning id`)).length, 1);
+  await db.exec(`update companies set pm_id = null where id = '${B_CO}'`);
+});

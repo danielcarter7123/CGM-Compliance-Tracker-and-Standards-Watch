@@ -13,7 +13,7 @@ export type LogEntry = {
   old_row: Record<string, unknown> | null;
   new_row: Record<string, unknown> | null;
   source: "app" | "legacy";
-  legacy: { by?: string; note?: string; changes?: { f: string; from: unknown; to: unknown }[]; clientName?: string; restoredAt?: string } | null;
+  legacy: { by?: string; note?: string; changes?: { f: string; from: unknown; to: unknown }[]; clientName?: string; restoredAt?: string; hasSnap?: boolean; entryId?: string } | null;
   ref_id: number | null;
 };
 export type Change = { field: string; from: string; to: string };
@@ -86,8 +86,13 @@ export function changes(e: LogEntry, ctx: Ctx): Change[] {
     .map((k) => ({ field: fieldLabel(k), from: clip(show(k, e.old_row![k], ctx)), to: clip(show(k, e.new_row![k], ctx)) }));
 }
 
-/** Restore and Revert are offered for this app's own entries (the database checks again). */
-export const canRestore = (e: LogEntry) => e.source === "app" && e.action === "deleted" && !!e.old_row && e.kind !== "export";
+/** Restore: this app's deletions, and pilot deletions that have a saved copy (tasks, clients with their tasks,
+ *  standards) and weren't already restored in the pilot. Revert: this app's changes. The database checks again. */
+export const canRestore = (e: LogEntry) =>
+  e.action === "deleted" &&
+  (e.source === "app"
+    ? !!e.old_row && e.kind !== "export"
+    : !!e.legacy?.hasSnap && !e.legacy?.restoredAt && ["task", "client", "standard"].includes(e.kind));
 export const canRevert = (e: LogEntry) => e.source === "app" && !!e.old_row && !!e.new_row && e.action !== "created" && e.action !== "deleted";
 
 /** CSV: one row per field change (an entry without changes still gets one row). */

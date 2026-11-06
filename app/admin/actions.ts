@@ -77,3 +77,13 @@ export async function setEmails(formData: FormData) {
   const { error } = await createClient().from("app_settings").update({ value: on }).eq("key", "emails_enabled");
   done(error, on ? "emails-on" : "emails-off");
 }
+
+/** Cutover: link someone from the pilot tracker to their login here. Their team tasks (as owner or collaborator) and
+ *  their pilot history then show under that login. The database function checks the caller is a CGM admin. */
+export async function linkPilotPerson(formData: FormData) {
+  await requireAdmin();
+  const legacy = String(formData.get("legacy_id") || ""), profile = String(formData.get("profile_id") || "");
+  if (!legacy || !profile) done({ message: "Choose a login to link." });
+  const { error } = await createClient().rpc("link_legacy_person", { p_legacy_id: legacy, p_profile: profile });
+  done(error, "linked");
+}

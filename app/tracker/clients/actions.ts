@@ -56,6 +56,7 @@ export async function saveClient(formData: FormData) {
     facilities: str(formData, "facilities") || null,
     sharepoint_url: sharepoint || null,
     notes: str(formData, "notes") || null,
+    pm_id: str(formData, "pm_id") || null,
   };
 
   let companyId = id;

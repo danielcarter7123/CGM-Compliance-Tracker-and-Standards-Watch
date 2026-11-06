@@ -4,7 +4,7 @@ import { emailsEnabled, emailsKilledByEnv } from "@/lib/settings";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { runTrackerEmails } from "@/lib/tracker-job";
-import { addCompany, setEmails, setPerson, setProducts } from "./actions";
+import { addCompany, linkPilotPerson, setEmails, setPerson, setProducts } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +15,7 @@ const OK: Record<string, string> = {
   person: "Person updated.",
   "emails-on": "Automated emails are on.",
   "emails-off": "Automated emails are off.",
+  linked: "Linked. Their team tasks and pilot history now show under that login.",
 };
 
 type Company = { id: string; name: string; sample: boolean; seats: number };
@@ -34,6 +35,9 @@ export default async function AdminPage({ searchParams }: { searchParams: { ok?:
     emailsEnabled(db),
   ]);
   const killed = emailsKilledByEnv();
+  const { data: pilotPeople } = await db.from("legacy_people").select("legacy_id, name, profile_id, linked_at").order("name");
+  const nameOf = (id: string | null) => ((people || []) as Person[]).find((p) => p.id === id);
+  const guess = (name: string) => ((people || []) as Person[]).find((p) => !!name && (p.full_name || "").trim().toLowerCase() === name.trim().toLowerCase())?.id || "";
   const entsFor = (id: string) => ((ents || []) as Ent[]).filter((e) => e.company_id === id);
 
   return (
@@ -129,6 +133,43 @@ export default async function AdminPage({ searchParams }: { searchParams: { ok?:
           </div>
           <button className="btn-line" type="submit" style={{ alignSelf: "end" }}>Add company</button>
         </form>
+      </section>
+
+      <section className="cardbox wide" id="pilot-people">
+        <h2>People from the pilot tracker</h2>
+        <p style={{ margin: 0 }} className="muted">
+          For the move from the live tracker: link each person the import brought over to their login here, once they have one.
+          Their team tasks (as owner or collaborator) move to that login. A name that matches a login is suggested.
+        </p>
+        {pilotPeople?.length ? (
+          <div className="tablewrap">
+            <table className="grid">
+              <thead><tr><th>Name in the pilot</th><th>Login</th><th></th></tr></thead>
+              <tbody>
+                {pilotPeople.map((lp) => (
+                  <tr key={lp.legacy_id as string}>
+                    <td>{(lp.name as string) || <span className="muted">(no name recorded)</span>}</td>
+                    <td colSpan={2}>
+                      {lp.profile_id ? (
+                        <span>Linked to <b>{nameOf(lp.profile_id as string)?.full_name || nameOf(lp.profile_id as string)?.email || "a login"}</b></span>
+                      ) : (
+                        <form action={linkPilotPerson} style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                          <input type="hidden" name="legacy_id" value={lp.legacy_id as string} />
+                          <label className="sr" htmlFor={`lp_${lp.legacy_id}`}>Login for {(lp.name as string) || "this person"}</label>
+                          <select id={`lp_${lp.legacy_id}`} name="profile_id" defaultValue={guess(lp.name as string)}>
+                            <option value="">Choose a login…</option>
+                            {((people || []) as Person[]).map((p) => <option key={p.id} value={p.id}>{p.full_name || p.email}{p.staff_role ? " (CGM)" : ""}</option>)}
+                          </select>
+                          <button className="btn-line" type="submit">Link</button>
+                        </form>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : <p style={{ margin: 0 }} className="muted">Nobody yet: this fills in when the live tracker&apos;s data is imported.</p>}
       </section>
 
       <section className="cardbox wide">

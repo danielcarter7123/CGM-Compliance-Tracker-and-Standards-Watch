@@ -176,8 +176,7 @@ Each milestone ends with `npm run typecheck && npm test && npm run build` green 
   - per-user iCal feed of task due dates, replacing the pilot's Outlook event creation.
   - **Ask Dan:** whether Outlook events through Microsoft Graph are still wanted.
 - **T9. Cutover from the live tracker** (`docs/IMPORT.md`; the importer is already built):
-  - a CGM admin screen to link pilot people (`legacy_people`) to logins and set each client's PM;
-  - restore support for `legacy_snapshots`.
+  - *Built Nov 6, 2026:* the Admin screen to link pilot people (`legacy_people`) to logins, the client PM picker, and Restore of pilot deletions from `legacy_snapshots` (see CHANGELOG).
   - On cutover day: pause edits, export, import to production, reconcile, then switch the team over.
   - Export the Sandbox Copy's task plans too (add the same button there).
   - Retire the Watch sync task and the tracker's email sender, then make both pilot trackers read-only.

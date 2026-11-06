@@ -2,6 +2,16 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 6, 2026: T9 cutover prep (Claude Code)
+
+The tools the move from the live tracker needs, built and tested. The cutover itself (export that day, import into a clean database, reconcile, switch over) is still to do.
+- **Link pilot people** (Admin page, "People from the pilot tracker"): each person the import brought over is linked to their login; a matching name is suggested. Their team tasks (owner and collaborator) move to that login, and their pilot history shows under their name. Uses `link_legacy_person` (CGM admins only).
+- **Client PM** (Clients screen): a "CGM project manager (login)" picker sets `companies.pm_id`, which decides who the client's users can message directly and who gets the client in their PM digest. The database now requires the PM to be CGM staff (migration `0016`).
+- **Restore pilot deletions** (Activity Log): deletions recorded in the pilot that have a saved copy (tasks, clients with their tasks, standards) now show Restore, unless the pilot already restored them. The server rebuilds the rows with the importer's own mapping and ids (now shared in `lib/legacy-map.ts`); `restore_legacy` checks the entry and writes them as the signed-in person, logged as "restored" and only once. Restoring a client brings back its contacts, products and tasks (chains re-linked); a task whose client isn't in the app asks for the client to be restored first. Checked offline against the real export: all 41 saved copies (34 tasks, 5 clients with 63 tasks, 2 standards) map cleanly.
+- **Importer refactor:** its per-record mapping moved to `lib/legacy-map.ts`. Run against the real export, the generated SQL and report are identical to before apart from the build timestamp.
+- **`restore_row`** now inserts only the fields a saved row has, so others take their column defaults.
+- **Tests:** RLS (pilot restore once, staff only, logged, only deletions and the kinds a copy holds; the PM must be staff); `e2e/cutover-prep.spec.ts` (restore a fake pilot client with a task chain and then its task, the "restore the client first" message, linking a pilot person with the suggested login, setting a PM).
+
 ## Nov 6, 2026: T8 Tracker emails and task calendar (Claude Code)
 
 All built and tested, and **off** until a CGM admin turns automated emails on (Admin page; `EMAILS_DISABLED` still overrides). Turn them on only after the live tracker's sender is off (OPEN-QUESTIONS 1), so nobody gets both.

@@ -14,11 +14,12 @@ export const metadata = { title: "Clients" };
 type Company = {
   id: string; name: string; ncr_id: string | null; region: string | null; reg_date: string | null; functions: string[];
   entities: Record<string, string>; facilities: string | null; sharepoint_url: string | null; notes: string | null; sample: boolean;
+  pm_id: string | null;
 };
 type Contact = { id: string; company_id: string; kind: string; name: string; email: string | null; digest: boolean };
 type Ent = { company_id: string; product: string; status: string };
 
-const EMPTY: Company = { id: "", name: "", ncr_id: null, region: null, reg_date: null, functions: ["GO", "GOP"], entities: {}, facilities: null, sharepoint_url: null, notes: null, sample: false };
+const EMPTY: Company = { id: "", name: "", ncr_id: null, region: null, reg_date: null, functions: ["GO", "GOP"], entities: {}, facilities: null, sharepoint_url: null, notes: null, sample: false, pm_id: null };
 
 /** CGM staff only: the Tracker's client directory and the client drawer. Watch-only subscribers aren't listed. */
 export default async function Clients({ searchParams }: { searchParams: { c?: string; ok?: string; error?: string } }) {
@@ -26,11 +27,12 @@ export default async function Clients({ searchParams }: { searchParams: { c?: st
   const canEdit = v.canApprove;
   const isAdmin = v.staffRole === "admin";
   const db = createClient();
-  const [{ data: cos, error }, { data: contacts }, { data: ents }, { data: openTasks }] = await Promise.all([
-    db.from("companies").select("id, name, ncr_id, region, reg_date, functions, entities, facilities, sharepoint_url, notes, sample").order("name"),
+  const [{ data: cos, error }, { data: contacts }, { data: ents }, { data: openTasks }, { data: staffPeople }] = await Promise.all([
+    db.from("companies").select("id, name, ncr_id, region, reg_date, functions, entities, facilities, sharepoint_url, notes, sample, pm_id").order("name"),
     db.from("contacts").select("id, company_id, kind, name, email, digest"),
     db.from("entitlements").select("company_id, product, status"),
     db.from("tasks").select("company_id, title, standard_code, requirement, sample").neq("status", "done"),
+    db.from("profiles").select("id, full_name, email, staff_role").not("staff_role", "is", null).order("full_name"),
   ]);
   const entsOf = (id: string) => ((ents || []) as Ent[]).filter((e) => e.company_id === id);
   const has = (id: string, p: string) => entsOf(id).some((e) => e.product === p && isLive(e.status));
@@ -134,6 +136,14 @@ export default async function Clients({ searchParams }: { searchParams: { c?: st
               {person("compliance", "Primary compliance contact", "Email this contact a weekday digest of their overdue and coming-due tasks", true)}
               {person("pm", "Project Manager", "Email the Project Manager a weekday digest (one email covering every client they manage)", true)}
               {person("plant_manager", "Plant Manager", "Email the Plant Manager the weekday client digest of this client's overdue and coming-due tasks", false)}
+              <div className="field">
+                <label htmlFor="c_pm">CGM project manager (login)</label>
+                <select id="c_pm" name="pm_id" defaultValue={sel.pm_id || ""} aria-describedby="c_pm_h">
+                  <option value="">Not assigned</option>
+                  {(staffPeople || []).map((p) => <option key={p.id} value={p.id}>{p.full_name || p.email}{p.staff_role === "pm" ? "" : ` (${p.staff_role})`}</option>)}
+                </select>
+                <span id="c_pm_h" className="muted small">The client&apos;s users can message this person directly, and they get this client in their weekday PM digest.</span>
+              </div>
               <div className="field">
                 <label htmlFor="c_sp">SharePoint folder</label>
                 <input id="c_sp" name="sharepoint_url" type="url" defaultValue={sel.sharepoint_url || ""} placeholder="https://yourtenant.sharepoint.com/sites/…" autoComplete="off" />
