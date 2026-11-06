@@ -1,12 +1,15 @@
 import { expect, test } from "@playwright/test";
-import { navLinks, signIn } from "./helpers";
+import { navLinks, sectionLinks, signIn } from "./helpers";
 
 // F1 acceptance: each role sees exactly the sections docs/ACCESS.md allows, and typing any other URL redirects.
 // Fake users come from scripts/seed-dev.ts.
 
 type Case = {
   email: string;
+  /** Top-right links (account and editor tools). */
   nav: string[];
+  /** The section menu under the CGM Compliance Tracker header. */
+  sections: string[];
   allowed: string[];
   denied: [path: string, landsOn: string][];
   trackerLocked?: boolean;
@@ -15,50 +18,58 @@ type Case = {
 const CASES: Record<string, Case> = {
   "CGM admin": {
     email: "admin@cgm.example",
-    nav: ["Watch", "Tracker", "Review queue", "Digest", "Admin", "Account"],
-    allowed: ["/watch", "/tracker", "/admin", "/admin/review", "/admin/digest", "/account"],
+    nav: ["Review queue", "Digest", "Admin", "Account"],
+    sections: ["Standards Watch", "Dashboard", "Tasks", "Team Tasks", "Standards Library", "Clients", "Messages", "Activity Log"],
+    allowed: ["/watch", "/tracker", "/tracker/standards", "/tracker/clients", "/admin", "/admin/review", "/admin/digest", "/account"],
     denied: [],
   },
   "CGM project manager": {
     email: "pm@cgm.example",
-    nav: ["Watch", "Tracker", "Account"],
-    allowed: ["/watch", "/tracker", "/account"],
-    denied: [["/admin", "/watch"], ["/admin/review", "/watch"], ["/admin/digest", "/watch"]],
+    nav: ["Account"],
+    sections: ["Standards Watch", "Dashboard", "Tasks", "Team Tasks", "Standards Library", "Clients", "Messages", "Activity Log"],
+    allowed: ["/watch", "/tracker", "/tracker/clients", "/account"],
+    denied: [["/admin", "/tracker"], ["/admin/review", "/tracker"], ["/admin/digest", "/tracker"]],
   },
   "CGM staff": {
     email: "staff@cgm.example",
-    nav: ["Watch", "Tracker", "Account"],
-    allowed: ["/watch", "/tracker", "/account"],
-    denied: [["/admin", "/watch"], ["/admin/review", "/watch"]],
+    nav: ["Account"],
+    sections: ["Standards Watch", "Dashboard", "Tasks", "Team Tasks", "Standards Library", "Clients", "Messages", "Activity Log"],
+    allowed: ["/watch", "/tracker", "/tracker/clients", "/account"],
+    denied: [["/admin", "/tracker"], ["/admin/review", "/tracker"]],
   },
   "Watch-only client admin": {
     email: "admin@watch.example",
-    nav: ["Watch", "Tracker", "Account"],
+    nav: ["Account"],
+    sections: ["Standards Watch", "Compliance Tracker"],
     trackerLocked: true,
     allowed: ["/watch", "/account"],
-    denied: [["/tracker", "/account"], ["/admin", "/watch"], ["/admin/review", "/watch"]],
+    denied: [["/tracker", "/account"], ["/tracker/standards", "/account"], ["/admin", "/watch"], ["/admin/review", "/watch"]],
   },
   "Tracker + Client Tasks client admin": {
     email: "admin@peaker.example",
-    nav: ["Watch", "Tracker", "Account"],
-    allowed: ["/watch", "/tracker", "/account"],
-    denied: [["/admin", "/watch"], ["/admin/digest", "/watch"]],
+    nav: ["Account"],
+    sections: ["Standards Watch", "Dashboard", "Tasks", "Client Tasks", "Standards Library", "Messages", "Activity Log"],
+    allowed: ["/watch", "/tracker", "/tracker/standards", "/account"],
+    denied: [["/admin", "/tracker"], ["/admin/digest", "/tracker"], ["/tracker/clients", "/tracker"]],
   },
   "Tracker + Client Tasks member": {
     email: "member@peaker.example",
-    nav: ["Watch", "Tracker", "Account"],
+    nav: ["Account"],
+    sections: ["Standards Watch", "Dashboard", "Tasks", "Client Tasks", "Standards Library", "Messages", "Activity Log"],
     allowed: ["/watch", "/tracker", "/account"],
-    denied: [["/admin", "/watch"]],
+    denied: [["/admin", "/tracker"]],
   },
   "Tracker-only member": {
     email: "member@wind.example",
-    nav: ["Watch", "Tracker", "Account"],
+    nav: ["Account"],
+    sections: ["Standards Watch", "Dashboard", "Tasks", "Standards Library", "Messages", "Activity Log"],
     allowed: ["/watch", "/tracker", "/account"],
-    denied: [["/admin", "/watch"]],
+    denied: [["/admin", "/tracker"]],
   },
   "Signed in, no plan": {
     email: "noplan@nowhere.example",
-    nav: ["Tracker", "Account", "Subscribe"],
+    nav: ["Account", "Standards Watch plans"],
+    sections: ["Compliance Tracker"],
     trackerLocked: true,
     allowed: ["/account"],
     denied: [["/watch", "/account"], ["/tracker", "/account"], ["/admin", "/account"], ["/admin/review", "/account"]],
@@ -67,7 +78,10 @@ const CASES: Record<string, Case> = {
 
 test("signed out: only public pages; protected URLs go to sign-in", async ({ page }) => {
   await page.goto("/");
-  expect(await navLinks(page)).toEqual(["Sign in", "Subscribe"]);
+  await expect(page.locator(".mast .bname")).toContainText("CGM Compliance Tracker");
+  await expect(page.getByRole("heading", { name: "CGM Compliance Tracker", level: 1 })).toBeVisible();
+  expect(await navLinks(page)).toEqual(["Sign in", "Standards Watch plans"]);
+  expect(await sectionLinks(page)).toEqual([]);
   for (const path of ["/watch", "/tracker", "/admin", "/account"]) {
     await page.goto(path);
     await expect(page).toHaveURL(/\/login\?next=/);
@@ -77,10 +91,12 @@ test("signed out: only public pages; protected URLs go to sign-in", async ({ pag
 for (const [role, c] of Object.entries(CASES)) {
   test(`${role}: sees exactly the allowed sections`, async ({ page }) => {
     await signIn(page, c.email);
+    await expect(page.locator(".mast .bname")).toContainText("CGM Compliance Tracker");
     expect(await navLinks(page)).toEqual(c.nav);
-    const tracker = page.locator("nav.sitenav a", { hasText: "Tracker" });
+    expect(await sectionLinks(page)).toEqual(c.sections);
+    const tracker = page.locator("nav.appnav > a", { hasText: "Compliance Tracker" });
     if (c.trackerLocked) await expect(tracker).toHaveClass(/locked/);
-    else await expect(tracker).not.toHaveClass(/locked/);
+    else await expect(tracker).toHaveCount(0);
 
     for (const path of c.allowed) {
       await page.goto(path);
@@ -93,19 +109,30 @@ for (const [role, c] of Object.entries(CASES)) {
   });
 }
 
+test("the name NERC Standards Watch is the Watch page's own; everything else is CGM Compliance Tracker", async ({ page }) => {
+  await signIn(page, "member@wind.example", "/watch");
+  await expect(page).toHaveTitle("NERC Standards Watch | CGM Compliance Tracker");
+  await expect(page.locator(".watchname")).toHaveText("NERC Standards Watch");
+  await page.goto("/tracker/standards");
+  await expect(page).toHaveTitle("Standards library | CGM Compliance Tracker");
+  await expect(page.locator(".watchname")).toHaveCount(0);
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/tracker$/); // signed-in Tracker users open the app on the Dashboard
+});
+
 test("Tracker clients see only their own company on the dashboard; staff see every client", async ({ page }) => {
   await signIn(page, "member@wind.example", "/tracker");
   await expect(page.locator("main h1")).toHaveText("Demo Wind Farm LLC (fake)");
   await expect(page.locator("table.grid tbody tr")).toHaveCount(1);
   await expect(page.getByText("Sample Peaker LLC (fake)")).toHaveCount(0);
-  await expect(page.locator(".trk-tabs")).not.toContainText("Clients");
-  await expect(page.locator(".trk-tabs")).not.toContainText("Team Tasks");
+  await expect(page.locator("nav.appnav")).not.toContainText("Clients");
+  await expect(page.locator("nav.appnav")).not.toContainText("Team Tasks");
 
   await page.context().clearCookies();
   await signIn(page, "staff@cgm.example", "/tracker");
   await expect(page.locator("main h1")).toHaveText("All clients");
   await expect(page.locator("table.grid tbody tr")).toHaveCount(2);
-  await expect(page.locator(".trk-tabs")).toContainText("Team Tasks");
+  await expect(page.locator("nav.appnav")).toContainText("Team Tasks");
 });
 
 test("CGM admin turns automated emails on and off, and switches a company's products", async ({ page }) => {

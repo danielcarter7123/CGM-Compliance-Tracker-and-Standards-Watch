@@ -26,5 +26,5 @@ test("drafting job: editors see the panel and its run log; without an API key a 
 test("drafting job: PMs and clients don't see it", async ({ page }) => {
   await signIn(page, "pm@cgm.example", "/watch");
   await page.goto("/admin/review");
-  await expect(page).toHaveURL(/\/watch$/);
+  await expect(page).toHaveURL(/\/tracker$/); // their home: the Dashboard
 });

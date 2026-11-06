@@ -64,6 +64,11 @@ Running `npm install`, `npm run typecheck`, `npm test` and `npm run build`, and 
 12. **Sign-in method.** Keep the one-time email link for now: no passwords. "Sign in with Microsoft" (Azure via Supabase) can come later. It needs a CGM app registration in Microsoft Entra, which SharePoint evidence will need anyway.
 13. **Look.** Dan likes the sign-in page's white and blue. Decision: one CGM white-and-blue palette across every screen (Watch, Tracker, sign-in, editor console, digest email). The pilot's orange accent and the violet editor console are retired. Editor-only screens keep a red striped "Editor only" band so they stand out (Dan is the only one who sees them). Layouts and fonts stay as in the pilots.
 14. **Watch email: digest by default, alerts opt-in.** NERC already offers its own email alerts. Standards Watch's value is having everything in one place, in one reviewed weekly digest, not more email. So everyone gets the weekly digest by default. Alerts (new FERC approvals, effective dates set or moved, deadlines within 14 days) are an optional setting on the account page for anyone who really wants a note for each change. They're **off by default** (`0010_watch_alerts_opt_in.sql`; the brief removal in `0009` was superseded). Tracker reminders (T8) are a separate matter: they're about a client's own tasks.
+15. **Name and structure.** The app is **CGM Compliance Tracker**, and that name goes at the top of every screen. **NERC Standards Watch is one scrollable page** in it, and the only page titled with that name. The Tracker is everything else. Dan said this during the handoff, but it was lost: "build the Watch page first" meant launch order, not that Watch was the face of the app.
+   - One header and one section menu for the whole app: Standards Watch · Dashboard · Tasks · … · Activity Log.
+   - Watch-only subscribers see Standards Watch and a locked Compliance Tracker.
+   - The public home page is the Tracker's, with Standards Watch offered on it (option A).
+   - Signed-in Tracker users open on the Dashboard. After signing in they see Watch first, with "Continue to the Dashboard", as in the pilot.
 
 **Client data:** the live tracker's data is essential to how the internal tracker runs. It must be carried over completely and handled under CLAUDE.md rule 7.
 

@@ -62,3 +62,4 @@
   .signin-panel{padding:32px 16px 48px;align-items:flex-start}
   .signin-sub{margin-bottom:24px}
 }
+.signin-product{font:700 15px var(--body);letter-spacing:.14em;text-transform:uppercase;color:#9DBBFF;margin-bottom:14px}

@@ -2,6 +2,29 @@
 
 What changed in the handoff, newest first. Claude Code: read this after `CLAUDE.md` so you know what is new and what was decided. Add an entry here whenever you finish a milestone.
 
+## Nov 5, 2026: one app, CGM Compliance Tracker (Claude Code)
+
+**Decided by Dan** (OPEN-QUESTIONS 15): the app is CGM Compliance Tracker, and NERC Standards Watch is one page in it. Before this, the app had been branded as Standards Watch, with the Tracker as a section.
+
+**Header and menu:**
+- one header on every screen: the CGM logo, "CGM Compliance Tracker", and the person's company or CGM role;
+- top right: editor tools and Account;
+- one section menu from `lib/nav.ts` (`components/AppNav.tsx`) replaces the separate site and Tracker menus.
+
+**Who lands where** (`homeFor()`):
+- Tracker users → Dashboard; Watch subscribers → Watch; others → Account;
+- a blocked page sends people to their own home;
+- signed-in visitors to `/` go to their home.
+
+**Pages and titles:**
+- **Watch page:** has its own "NERC Standards Watch" title, the awareness-only disclaimer and "Continue to the Dashboard →".
+- **Page titles:** "<page> | CGM Compliance Tracker".
+- **Public home page:** CGM Compliance Tracker first, then a NERC Standards Watch section with the teaser and plans.
+- **Sign-in, welcome page and invite emails:** use the new name.
+- **Footer:** "CGM Compliance Tracker · © CGM Consulting Group"; the Watch disclaimer moved onto the Watch page and the teaser.
+
+**Tests:** the access tests now check every role's header links and section menu, and that only the Watch page uses the Watch name.
+
 ## Nov 5, 2026: T1 standards library and clients (Claude Code)
 
 **Function list** (Dan's decision 5): `lib/functions.ts` holds the one registered-function list: GO, GOP, GO-2, GOP-2, TO, TOP, TP, PC.

@@ -6,7 +6,7 @@ import { ALL_FUNCTIONS, REGIONS } from "@/lib/types";
 import { finishWelcome } from "./actions";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Welcome | CGM Compliance Platform" };
+export const metadata = { title: "Welcome" };
 
 /** First sign-in for a client user: name, registered functions and Regional Entity, so Watch and the digest
  *  are filtered from day one. Everything here can be changed later on the account page. */
@@ -27,7 +27,7 @@ export default async function WelcomePage({ searchParams }: { searchParams: { ne
   return (
     <main className="wrap page" style={{ display: "grid", gap: 18 }}>
       <div>
-        <h1>{companyName ? `Welcome to ${companyName}'s workspace` : "Welcome"}</h1>
+        <h1>{companyName ? `Welcome to CGM Compliance Tracker, ${companyName}` : "Welcome to CGM Compliance Tracker"}</h1>
         <p className="lede">Two quick choices so Standards Watch and your weekly email show what applies to you. You can change them any time on your account page.</p>
       </div>
       {searchParams.error && <p className="notice">Couldn&apos;t save: {searchParams.error}</p>}

@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import "./watch.css";
 import "./app.css";
+import AppNav from "@/components/AppNav";
 import SiteChrome from "@/components/SiteChrome";
+import { appSections, whoLine } from "@/lib/nav";
 import { getViewer } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "NERC Standards Watch | CGM Consulting Group",
-  description: "Reviewed, function-filtered updates on new and changing NERC Reliability Standards for generation and transmission entities.",
+  title: { default: "CGM Compliance Tracker", template: "%s | CGM Compliance Tracker" },
+  description: "NERC compliance programs for generation and transmission entities, run with CGM Consulting Group, with NERC Standards Watch.",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -24,7 +26,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         <SiteChrome>
-        <header className="mast">
+        <header className="mast app">
           <div className="wrap">
             <a className="brand" href="/" style={{ textDecoration: "none", color: "inherit" }}>
               <span className="logo">
@@ -32,36 +34,29 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <img src="/cgm-logo.webp" alt="CGM Consulting Group" width={130} height={52} />
               </span>
               <div className="bname">
-                NERC Standards Watch<small>Standards changes for generation &amp; transmission</small>
+                CGM Compliance Tracker<small>{viewer ? whoLine(viewer) : "CGM Consulting Group"}</small>
               </div>
             </a>
-            <nav className="sitenav" aria-label="Site">
-              {viewer?.hasAccess && <a href="/watch">Watch</a>}
-              {viewer && (viewer.products.tracker ? (
-                <a href="/tracker">Tracker</a>
-              ) : (
-                <a className="locked" href="/tracker" title="The Compliance Tracker is available by agreement with CGM">
-                  Tracker <span aria-hidden="true">🔒</span>
-                </a>
-              ))}
+            <nav className="sitenav" aria-label="Account and tools">
               {viewer?.isEditor && <a className="admin" href="/admin/review">Review queue</a>}
               {viewer?.isEditor && <a className="admin" href="/admin/digest">Digest</a>}
               {viewer?.staffRole === "admin" && <a className="admin" href="/admin">Admin</a>}
               {viewer ? <a href="/account">Account</a> : <a href="/login">Sign in</a>}
-              {!viewer?.hasAccess && <a className="cta" href="/#plans">Subscribe</a>}
+              {!viewer?.hasAccess && <a className="cta" href="/#plans">Standards Watch plans</a>}
             </nav>
           </div>
+          {viewer && (
+            <div className="wrap navrow">
+              <AppNav sections={appSections(viewer)} />
+            </div>
+          )}
         </header>
         </SiteChrome>
         {children}
         <SiteChrome>
         <footer className="foot">
           <div className="wrap">
-            <p>
-              Standards Watch summarizes publicly available NERC and FERC information for awareness only and is not a compliance determination.
-              Confirm applicability and dates against the approved standard, its implementation plan, and your Regional Entity. U.S. effective dates shown.
-            </p>
-            <p>© CGM Consulting Group</p>
+            <p>CGM Compliance Tracker · © CGM Consulting Group</p>
           </div>
         </footer>
         </SiteChrome>

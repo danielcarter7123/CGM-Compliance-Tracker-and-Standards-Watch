@@ -25,7 +25,7 @@ test("a company admin invites a colleague, who joins on sign-in, sets up, and ca
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
   await signIn(page, newbie, "/welcome");
-  await expect(page.getByRole("heading", { name: "Welcome to Sample Peaker LLC (fake)'s workspace" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Welcome to CGM Compliance Tracker, Sample Peaker LLC (fake)" })).toBeVisible();
   await expect(page.getByLabel("GO", { exact: true })).toBeChecked(); // started from the company's functions
   await page.getByLabel("Your name").fill("Nina Newbie (fake)");
   await page.getByLabel("Regional Entity").selectOption("SERC");

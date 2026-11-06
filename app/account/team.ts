@@ -41,13 +41,13 @@ export async function inviteColleague(formData: FormData) {
   try {
     sent = await sendMail({
       to: email,
-      subject: `${who} invited you to ${company} on the CGM Compliance Platform`,
+      subject: `${who} invited you to ${company} on CGM Compliance Tracker`,
       text:
-        `${who} invited you to join ${company} on the CGM Compliance Platform from CGM Consulting Group.\n\n` +
+        `${who} invited you to join ${company} on CGM Compliance Tracker from CGM Consulting Group.\n\n` +
         `Sign in with this email address (${email}) at:\n${link}\n\n` +
         `There's no password: we email you a one-time sign-in link. The invite expires in 14 days.`,
       html: `<div style="font:15px/1.5 Arial,sans-serif;color:#0D1B2E;max-width:520px">
-  <p><b>${esc(who)}</b> invited you to join <b>${esc(company)}</b> on the CGM Compliance Platform from CGM Consulting Group.</p>
+  <p><b>${esc(who)}</b> invited you to join <b>${esc(company)}</b> on CGM Compliance Tracker from CGM Consulting Group.</p>
   <p>Sign in with this email address (${esc(email)}). There's no password: we email you a one-time sign-in link.</p>
   <p><a href="${esc(link)}" style="display:inline-block;background:#1747D1;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;font-weight:600">Sign in to accept</a></p>
   <p style="color:#55657A;font-size:13px">The invite expires in 14 days.</p></div>`,

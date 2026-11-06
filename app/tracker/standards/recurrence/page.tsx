@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { applyRecurrence } from "../actions";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Recurrence settings | Compliance Tracker" };
+export const metadata = { title: "Recurrence settings" };
 
 type Tpl = { id: string; standard_code: string; req: string; title: string; recur_n: number; recur_unit: string; recur_basis: "due" | "done"; basis_confirmed: boolean };
 type Task = { title: string; standard_code: string | null; requirement: string | null; recur_basis: string };

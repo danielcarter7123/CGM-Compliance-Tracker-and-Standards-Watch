@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getViewer, type Viewer } from "./auth";
+import { homeFor } from "./nav";
 
 /** Route guards for server components and layouts. They decide what to show and where to send people;
     row level security in the database is what actually protects the data. */
@@ -30,12 +31,12 @@ export async function requireStaff(next = "/tracker"): Promise<Viewer> {
 
 export async function requireAdmin(next = "/admin"): Promise<Viewer> {
   const v = await requireViewer(next);
-  if (v.staffRole !== "admin") redirect(v.hasAccess ? "/watch" : "/account");
+  if (v.staffRole !== "admin") redirect(homeFor(v));
   return v;
 }
 
 export async function requireEditor(next = "/admin/review"): Promise<Viewer> {
   const v = await requireViewer(next);
-  if (!v.isEditor) redirect(v.hasAccess ? "/watch" : "/account");
+  if (!v.isEditor) redirect(homeFor(v));
   return v;
 }

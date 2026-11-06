@@ -48,8 +48,8 @@ test("page furniture: hero jump flashes the card; calendar, CTA, sources and dis
   await expect(page.locator(".nextbar .nbtn.locked")).toBeVisible();
 });
 
-test("Tracker clients get the Next: Compliance Tracker bar", async ({ page }) => {
+test("Tracker clients get the Continue to the Dashboard bar", async ({ page }) => {
   await signIn(page, "member@wind.example", "/watch");
-  await page.locator(".nextbar a", { hasText: "Next: Compliance Tracker" }).click();
+  await page.locator(".nextbar a", { hasText: "Continue to the Dashboard" }).click();
   await expect(page).toHaveURL(/\/tracker$/);
 });

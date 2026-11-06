@@ -9,6 +9,9 @@ type Props = { content: Content; defaultFunctions: string[]; teaser?: boolean };
 
 /** Filter choices are remembered per browser, like the pilot. First visit starts from the company's registered functions. */
 const SAVED = "cgm-watch-filters";
+const WATCH_DISCLAIMER =
+  "NERC Standards Watch summarizes publicly available NERC and FERC information for awareness only and is not a compliance determination. " +
+  "Confirm applicability and dates against the approved standard, its implementation plan, and your Regional Entity. U.S. effective dates shown.";
 const ALL_FN: string[] = [...FUNCTIONS.gen, ...FUNCTIONS.tx];
 
 export default function WatchView({ content, defaultFunctions, teaser = false }: Props) {
@@ -118,7 +121,12 @@ export default function WatchView({ content, defaultFunctions, teaser = false }:
 
   if (teaser) {
     const sample = vis.filter((i) => i.phase === "upcoming" || i.freshNews.length).slice(0, 3);
-    return <div className="teaser fade">{sample.map((i) => card(i, SECTIONS.find((s) => s.k === i.phase)?.pill || ""))}</div>;
+    return (
+      <>
+        <div className="teaser fade">{sample.map((i) => card(i, SECTIONS.find((s) => s.k === i.phase)?.pill || ""))}</div>
+        <p className="muted small-note">{WATCH_DISCLAIMER}</p>
+      </>
+    );
   }
 
   const firstShown = new Date(today); firstShown.setFullYear(today.getFullYear() - 1);
@@ -149,6 +157,7 @@ export default function WatchView({ content, defaultFunctions, teaser = false }:
       <section className="hero">
         <div className="wrap">
           <div>
+            <div className="watchname">NERC Standards Watch</div>
             <div className="eyebrow">Generation &amp; transmission · GO · GOP · TO · TOP · TP · PC</div>
             <h1>New and changing NERC standards that apply to your facilities</h1>
             <p className="lede">Reviewed by CGM Consulting Group{content.reviewed ? ` · ${fmt(content.reviewed)}` : ""}. Pick your registered functions to see what applies, what changes, and what to do before the compliance date.</p>
@@ -247,6 +256,12 @@ export default function WatchView({ content, defaultFunctions, teaser = false }:
             <li>Procedure, evidence and training updates</li>
             <li>Category 2 IBR registration and onboarding support</li>
           </ul>
+        </div>
+      </section>
+
+      <section className="foot watchnote" aria-label="About this page">
+        <div className="wrap">
+          <p>{WATCH_DISCLAIMER}</p>
         </div>
       </section>
 

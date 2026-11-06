@@ -2,7 +2,7 @@ import { LIST_NAME, isListKind, verifyUnsubscribe } from "@/lib/email-links";
 import { confirmUnsubscribe } from "./actions";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Unsubscribe | CGM Standards Watch" };
+export const metadata = { title: "Email preferences" };
 
 /** Opened from the link at the bottom of a Standards Watch email. Asks first, so email security
  *  scanners that open links can't unsubscribe anyone. No sign-in needed. */

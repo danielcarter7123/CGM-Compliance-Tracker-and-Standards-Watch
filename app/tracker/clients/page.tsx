@@ -7,7 +7,7 @@ import { fmt } from "@/lib/watch";
 import { deleteClient, removeSamples, saveClient, setClientProducts } from "./actions";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Clients | Compliance Tracker" };
+export const metadata = { title: "Clients" };
 
 type Company = {
   id: string; name: string; ncr_id: string | null; region: string | null; reg_date: string | null; functions: string[];

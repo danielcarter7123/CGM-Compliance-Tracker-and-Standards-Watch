@@ -3,7 +3,7 @@ import { fieldLabel } from "@/lib/draft-fields";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Decision log | CGM Standards Watch" };
+export const metadata = { title: "Watch decision log" };
 
 const SECTION_NAME: Record<string, string> = {
   items: "Standard", deadlines: "Comment period / event", activity: "FERC / NERC action", sources: "Source", week: "This-week box",

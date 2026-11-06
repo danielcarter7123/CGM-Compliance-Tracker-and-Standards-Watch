@@ -6,6 +6,8 @@ import { loadContent } from "@/lib/content";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
+// The one page in CGM Compliance Tracker that carries the NERC Standards Watch name.
+export const metadata = { title: "NERC Standards Watch" };
 
 export default async function WatchPage() {
   const viewer = await getViewer();
@@ -21,8 +23,8 @@ export default async function WatchPage() {
         <div className="wrap">
           {viewer.products.tracker ? (
             <>
-              <span>Done reviewing this week&apos;s changes? Your tasks are in the Compliance Tracker.</span>
-              <a className="nbtn" href="/tracker">Next: Compliance Tracker →</a>
+              <span>Done reviewing this week&apos;s changes? Your tasks are on the Dashboard.</span>
+              <a className="nbtn" href="/tracker">Continue to the Dashboard →</a>
             </>
           ) : (
             <>

@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { deleteStandard, saveLink, saveStandard, saveVersion } from "./actions";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Standards library | Compliance Tracker" };
+export const metadata = { title: "Standards library" };
 
 type Std = { code: string; version: string; title: string; family: string; applies: string[]; url: string | null; notes: string | null; custom: boolean };
 type Tpl = { id: string; standard_code: string; req: string; title: string; recur_n: number; recur_unit: "d" | "m" | "y"; recur_basis: "due" | "done"; basis_confirmed: boolean; pos: number | null };

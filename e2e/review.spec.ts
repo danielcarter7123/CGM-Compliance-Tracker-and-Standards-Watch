@@ -88,6 +88,6 @@ test("only CGM admins reach the review queue and the decision log", async ({ pag
   await signIn(page, "pm@cgm.example", "/watch");
   for (const path of ["/admin/review", "/admin/review/log"]) {
     await page.goto(path);
-    await expect(page).toHaveURL(/\/watch$/);
+    await expect(page).toHaveURL(/\/tracker$/); // their home: the Dashboard
   }
 });

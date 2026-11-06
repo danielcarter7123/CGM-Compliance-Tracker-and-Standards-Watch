@@ -24,7 +24,12 @@ export async function signIn(page: Page, email: string, next = "/account") {
   await page.waitForURL((u) => u.pathname === next || u.pathname.startsWith(next));
 }
 
-/** The links shown in the masthead navigation. */
+/** The top-right links in the header (account and editor tools). */
 export async function navLinks(page: Page): Promise<string[]> {
   return (await page.locator("nav.sitenav a").allInnerTexts()).map((t) => t.replace("🔒", "").trim());
+}
+
+/** The section menu under the CGM Compliance Tracker header, including greyed-out sections. */
+export async function sectionLinks(page: Page): Promise<string[]> {
+  return (await page.locator("nav.appnav > a, nav.appnav > span").allInnerTexts()).map((t) => t.replace("🔒", "").trim());
 }

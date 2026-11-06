@@ -63,3 +63,25 @@ table.grid select,.cardbox select{font:14px var(--body);padding:6px 8px;border:1
 table.grid input.seats{width:72px;font:14px var(--body);padding:6px 8px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--ink)}
 .plaintext{white-space:pre-wrap;font:12.5px/1.5 var(--adm-mono);background:var(--adm-bg);color:var(--adm-ink);border:1px solid var(--adm-line);border-radius:4px;padding:12px;max-height:480px;overflow:auto}
 .console .field label{font:600 11.5px var(--adm-mono);letter-spacing:.06em;text-transform:uppercase}
+
+/* App header: CGM Compliance Tracker everywhere, with one section menu (lib/nav.ts) */
+.mast.app .wrap{padding-block:10px}
+.mast.app .brand .logo img{height:44px}
+.mast.app .bname{font-size:21px}
+.mast.app .bname small{text-transform:none;letter-spacing:0;font-size:12.5px}
+.mast.app .navrow{padding-block:0;border-top:1px solid var(--line)}
+.appnav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+.appnav a,.appnav span{font:500 13.5px var(--body);padding:10px 11px;text-decoration:none;color:var(--ink);white-space:nowrap}
+.appnav a:hover{background:var(--sunk)}
+.appnav a[aria-current="page"]{box-shadow:inset 0 -3px 0 var(--accent);font-weight:600}
+.appnav .soon{color:var(--muted);opacity:.6;cursor:default}
+.appnav a.locked{color:var(--muted)}
+.appnav a.locked span{padding:0;font-size:11px}
+@media (max-width:520px){.mast.app .brand .logo img{height:34px}.mast.app .bname{font-size:18px}}
+
+/* The Watch page's own name: the only place "NERC Standards Watch" is a title */
+.watchname{font-family:var(--display);font-size:22px;font-weight:700;color:var(--accent);letter-spacing:.01em;margin-bottom:6px}
+.foot.watchnote .wrap{padding-bottom:0}
+.small-note{font-size:12.5px;margin:-16px 0 28px}
+.watchintro{padding-top:8px;margin-bottom:8px}
+.subhead{font-family:var(--display);font-size:24px;font-weight:600;margin:0}

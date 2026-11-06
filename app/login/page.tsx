@@ -1,11 +1,11 @@
 import "../login.css";
 import LoginForm from "@/components/LoginForm";
 
-export const metadata = { title: "Sign in | CGM Consulting Group" };
+export const metadata = { title: "Sign in" };
 
 const FEATURES = [
   {
-    label: "Standards Watch: reviewed NERC changes for your functions",
+    label: "NERC Standards Watch: reviewed changes for your functions",
     icon: <path d="M3 6h14M3 12h9M3 18h7m4-1.5 2.5 2.5 5-5" />,
   },
   {
@@ -27,12 +27,13 @@ export default function LoginPage({ searchParams }: { searchParams: { next?: str
   const next = searchParams.next && searchParams.next.startsWith("/") ? searchParams.next : "/watch";
   return (
     <main className="signin">
-      <section className="signin-art" aria-label="CGM Compliance Platform">
+      <section className="signin-art" aria-label="CGM Compliance Tracker">
         <a className="signin-logo" href="/">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/cgm-logo.webp" alt="CGM Consulting Group: NERC Compliance, Grid Reliability" width={200} height={72} />
         </a>
         <div className="signin-pitch">
+          <div className="signin-product">CGM Compliance Tracker</div>
           <h1>Confidence in every requirement.</h1>
           <p>NERC compliance for Generator Owners and Operators, run with CGM Consulting Group.</p>
           <ul>
@@ -49,7 +50,7 @@ export default function LoginPage({ searchParams }: { searchParams: { next?: str
       <section className="signin-panel">
         <div className="signin-box">
           <h2>Welcome back</h2>
-          <p className="signin-sub">Sign in to your compliance workspace.</p>
+          <p className="signin-sub">Sign in to CGM Compliance Tracker.</p>
           {searchParams.error && <p className="signin-alert">That sign-in link didn&apos;t work or has expired. Request a new one below.</p>}
           <LoginForm next={next} />
           <p className="signin-how">

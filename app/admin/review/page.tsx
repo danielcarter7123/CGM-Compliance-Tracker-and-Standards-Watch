@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import DraftingJobPanel, { type JobRun } from "@/components/DraftingJobPanel";
 import ReviewQueue, { type ReviewDraft } from "@/components/ReviewQueue";
 import { getViewer } from "@/lib/auth";
+import { homeFor } from "@/lib/nav";
 import { publishedValue } from "@/lib/published";
 import { createClient } from "@/lib/supabase/server";
 import type { Draft } from "@/lib/types";
@@ -14,7 +15,7 @@ export const maxDuration = 800;
 export default async function ReviewPage() {
   const v = await getViewer();
   if (!v) redirect("/login?next=/admin/review");
-  if (!v.isEditor) redirect("/watch");
+  if (!v.isEditor) redirect(homeFor(v));
 
   const db = createClient();
   const { data: drafts } = await db.from("drafts").select("*").eq("status", "pending").order("created_at");

@@ -1,14 +1,18 @@
+import { redirect } from "next/navigation";
 import WatchView from "@/components/WatchView";
 import { getViewer } from "@/lib/auth";
 import { loadContent } from "@/lib/content";
+import { homeFor } from "@/lib/nav";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Content } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-/** Public landing page: what the service is, a three-card teaser from live content, and the plans. */
+/** Public home page of CGM Compliance Tracker: what the service is, then NERC Standards Watch (sold on its own)
+ *  with a three-card teaser from live content and the plans. Signed-in users with a product go to their home. */
 export default async function Home({ searchParams }: { searchParams: { checkout?: string } }) {
   const viewer = await getViewer().catch(() => null);
+  if (viewer?.hasAccess && !searchParams.checkout) redirect(homeFor(viewer));
   let content: Content | null = null;
   try {
     // Server-side read with the service key, so signed-out visitors see the teaser cards only.
@@ -22,41 +26,51 @@ export default async function Home({ searchParams }: { searchParams: { checkout?
       <section className="hero">
         <div className="wrap">
           <div>
-            <div className="eyebrow">For generation &amp; transmission compliance teams</div>
-            <h1>Know which NERC standards are changing, before they reach you</h1>
+            <div className="eyebrow">CGM Consulting Group</div>
+            <h1>CGM Compliance Tracker</h1>
             <p className="lede">
-              Every week CGM Consulting Group reviews NERC and FERC activity and tells you, for your registered functions, what was approved,
-              what takes effect next, what is still phasing in, and what to do about each one.
+              The NERC compliance program CGM Consulting Group runs with each client: recurring tasks from the standards library,
+              reminders, review and approval, evidence, messages and a full audit trail, with your company&apos;s own view of its tasks.
             </p>
             <p style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 20 }}>
-              <a className="btn-main" href="#plans">See plans</a>
-              {viewer?.hasAccess ? <a className="btn-line" href="/watch">Open Standards Watch</a> : <a className="btn-line" href="/login">Sign in</a>}
+              <a className="btn-main" href="/login">Sign in</a>
+              <a className="btn-line" href="mailto:dan@cgmconsultinggroup.com?subject=CGM%20Compliance%20Tracker">Ask CGM about the Tracker</a>
             </p>
           </div>
           <div className="next">
-            <span className="lbl">What subscribers get</span>
-            <span className="what">Weekly reviewed digest</span>
-            <span className="sub">Filtered to GO, GOP, TO, TOP, TP or PC</span>
-            <span className="what">Live Standards Watch page</span>
-            <span className="sub">Effective dates, phase-ins, comment deadlines</span>
-            <span className="what">Calendar feed</span>
-            <span className="sub">Dates land in Outlook or Google Calendar</span>
+            <span className="lbl">Inside the Tracker</span>
+            <span className="what">Compliance tasks and reminders</span>
+            <span className="sub">Every recurring NERC obligation, due dates and approvals</span>
+            <span className="what">Evidence and audit trail</span>
+            <span className="sub">SharePoint folders, uploads and a record of every change</span>
+            <span className="what">NERC Standards Watch</span>
+            <span className="sub">Reviewed weekly changes for your registered functions</span>
           </div>
         </div>
+      </section>
+
+      <section className="section wrap watchintro" id="standards-watch">
+        <div className="watchname">NERC Standards Watch</div>
+        <div className="sechead"><h2>Know which NERC standards are changing, before they reach you</h2></div>
+        <p className="secnote">
+          Included with the Tracker, and available on its own. Every week CGM Consulting Group reviews NERC and FERC activity and tells you,
+          for your registered functions, what was approved, what takes effect next, what is still phasing in, and what to do about each one.
+          Subscribers get the full page, a weekly digest and a calendar feed for Outlook or Google Calendar.
+        </p>
       </section>
 
       <div className="wrap">
         {searchParams.checkout === "cancelled" && <p className="notice">Checkout was cancelled. Nothing was charged.</p>}
         {content && content.items.length > 0 && (
           <>
-            <div className="sechead"><h2>A look at this week</h2></div>
-            <p className="secnote">A few entries from the current Standards Watch. Subscribers see every standard, filtered to their functions.</p>
+            <div className="sechead"><h3 className="subhead">A look at this week</h3></div>
+            <p className="secnote">A few entries from the current NERC Standards Watch. Subscribers see every standard, filtered to their functions.</p>
             <WatchView content={content} defaultFunctions={[]} teaser />
           </>
         )}
 
         <section id="plans" className="section">
-          <div className="sechead"><h2>Plans</h2></div>
+          <div className="sechead"><h2>Standards Watch plans</h2></div>
           <p className="secnote">Priced per company with several seats. Cancel any time from your account page.</p>
           <div className="plans">
             <div className="plan featured">

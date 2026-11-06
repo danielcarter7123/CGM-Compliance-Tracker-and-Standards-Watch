@@ -7,7 +7,9 @@ Guidance for Claude Code working in this repository. Before starting any milesto
 
 ## What this is
 
-The CGM Compliance Platform: one web app with two products from CGM Consulting Group, for NERC-registered utilities.
+**CGM Compliance Tracker** is the app. Its name is at the top of every screen and in every page title. **NERC Standards Watch is one scrollable page inside it** (`/watch`, the first section in the menu, as in the pilot), and that page is the only place the "NERC Standards Watch" name is used as a title. The Watch digest email and calendar feed keep the Watch name because they are that page's output. Dan's decision (OPEN-QUESTIONS 15); "build the Watch page first" was about launch order, never about branding.
+
+Both are from CGM Consulting Group, for NERC-registered utilities:
 
 - **Standards Watch**: a reviewed, function-filtered view of NERC standards that FERC has approved, versions taking effect, and requirements phasing in. It comes with a weekly digest and a calendar feed. Sold self-serve through Stripe.
 - **Compliance Tracker**: CGM's operator console for running each client's NERC compliance program. It covers recurring tasks from a standards library, review and approval, internal team work, messages and an audit log. Clients on a Tracker agreement see and act on their own company's tasks. It includes Standards Watch. An optional **Client Tasks** add-on gives a client a non-NERC task list.
